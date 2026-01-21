@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵境智能助手 - 会员中心</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../member-common.css">
+    <style>
+        /* 会员卡片 */
+        .member-card {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 24px;
+            color: #fff;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .member-card::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -50%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        
+        .member-card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .member-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .status-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .member-level {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .member-benefits {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }
+        
+        .member-progress {
+            width: 100%;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #fff;
+            border-radius: 4px;
+            width: 65%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-size: 12px;
+            opacity: 0.8;
+            text-align: right;
+        }
+        
+        /* 会员功能菜单 */
+        .member-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover {
+            background-color: #e9ecef;
+            transform: translateX(4px);
+        }
+        
+        .menu-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .menu-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .menu-action {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        /* 订单记录 */
+        .order-records {
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 16px;
+        }
+        
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .order-item {
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .order-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .order-id {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .order-status {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        .order-status.active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .order-status.expired {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .order-details {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .order-package {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .order-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e74c3c;
+        }
+        
+        .order-date {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+        
+        /* 查看全部订单按钮 */
+        .view-all-orders {
+            width: 100%;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            color: #3498db;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        
+        .view-all-orders:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 页面内容 -->
+        <div class="page" id="page-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <button class="back-btn" onclick="window.location.href='member.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="page-title" style="font-size: 16px; text-align: center; width: 100%;">会员中心</div>
+              
+            </div>
+            
+            <!-- 会员卡片 -->
+            <div class="member-card">
+                <div class="member-card-content">
+                    <div class="member-status">
+                        <div class="status-label">当前会员</div>
+                        <div class="status-badge">青铜会员</div>
+                    </div>
+                    <div class="member-level">LV.5</div>
+                    <div class="member-benefits">享受AI对话、健康分析等多项特权</div>
+                    <div class="member-progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <div class="progress-text">升级白银会员还需 350 积分</div>
+                </div>
+            </div>
+            
+            <!-- 会员功能菜单 -->
+            <div class="member-menu">
+                <div class="menu-item" onclick="window.location.href='member_privileges.html'">
+                    <div class="menu-info">
+                        <div class="menu-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="menu-title">会员权益</div>
+                    </div>
+                    <div class="menu-action">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="window.location.href='member_purchase.html'">
+                    <div class="menu-info">
+                        <div class="menu-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="menu-title">续费/升级</div>
+                    </div>
+                    <div class="menu-action">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                <div class="menu-item" onclick="window.location.href='member_center_points.html'">
+                    <div class="menu-info">
+                        <div class="menu-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="menu-title">积分中心</div>
+                    </div>
+                    <div class="menu-action">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                <!-- <div class="menu-item">
+                    <div class="menu-info">
+                        <div class="menu-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="menu-title">会员设置</div>
+                    </div>
+                    <div class="menu-action">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div> -->
+            
+            <!-- 订单记录 -->
+            <div class="order-records">
+                <div class="section-title" style="margin-bottom: 16px;">最近订单</div>
+                <div class="order-list">
+                    <div class="order-item">
+                        <div class="order-header">
+                            <div class="order-id">订单号: 20251227001</div>
+                            <div class="order-status active">已完成</div>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-package">季度会员</div>
+                            <div class="order-price">¥79</div>
+                        </div>
+                        <div class="order-date">2025-12-27 14:30:00</div>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-header">
+                            <div class="order-id">订单号: 20251127001</div>
+                            <div class="order-status active">已完成</div>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-package">季度会员</div>
+                            <div class="order-price">¥79</div>
+                        </div>
+                        <div class="order-date">2025-11-27 10:15:00</div>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-header">
+                            <div class="order-id">订单号: 20251027001</div>
+                            <div class="order-status expired">已过期</div>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-package">月度会员</div>
+                            <div class="order-price">¥29</div>
+                        </div>
+                        <div class="order-date">2025-10-27 16:45:00</div>
+                    </div>
+                </div>
+                <button class="view-all-orders">查看全部订单</button>
+            </div>
+        </div>
+        
+       
+        <script src="../member-common.js"></script>
+        <script>
+            // 页面初始化
+            document.addEventListener('DOMContentLoaded', function() {
+                // 会员卡片进度条动画
+                const progressBar = document.querySelector('.progress-bar');
+                if (progressBar) {
+                    progressBar.style.width = '0%';
+                    setTimeout(() => {
+                        progressBar.style.width = '65%';
+                    }, 500);
+                }
+                
+                // 订单记录点击事件
+                const orderItems = document.querySelectorAll('.order-item');
+                orderItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        const orderId = item.querySelector('.order-id').textContent;
+                        alert(`查看订单详情：${orderId}`);
+                    });
+                });
+                
+                // 查看全部订单按钮事件
+                const viewAllOrdersBtn = document.querySelector('.view-all-orders');
+                viewAllOrdersBtn.addEventListener('click', () => {
+                    alert('查看全部订单功能开发中...');
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

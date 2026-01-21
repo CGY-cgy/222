@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵境智能助手 - 发布帖子</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 页面通用样式 */
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* 发布页面头部 */
+        .publish-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .header-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .header-btn.cancel {
+            color: #7f8c8d;
+        }
+        
+        .header-btn.cancel:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .header-btn.publish {
+            color: #3498db;
+            font-weight: 500;
+        }
+        
+        .header-btn.publish:hover {
+            background-color: #e3f2fd;
+        }
+        
+        /* 用户信息区域 */
+        .user-info-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .user-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        /* 帖子输入区域 */
+        .post-input-section {
+            margin-bottom: 24px;
+        }
+        
+        .post-title-input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 16px;
+            margin-bottom: 16px;
+            resize: none;
+        }
+        
+        .post-title-input:focus {
+            outline: none;
+            border-bottom-color: #3498db;
+        }
+        
+        .post-content-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 150px;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+        
+        .post-content-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        /* 功能按钮区域 */
+        .function-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .function-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: #7f8c8d;
+        }
+        
+        .function-btn:hover {
+            background-color: #e9ecef;
+            color: #3498db;
+        }
+        
+        .function-btn i {
+            font-size: 20px;
+        }
+        
+        .function-btn span {
+            font-size: 12px;
+        }
+        
+        /* 图片预览区域 */
+        .image-preview-section {
+            margin-bottom: 24px;
+        }
+        
+        .image-preview-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #7f8c8d;
+            margin-bottom: 12px;
+        }
+        
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .image-preview-item {
+            position: relative;
+            width: 100%;
+            padding-top: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .image-preview-item::after {
+            content: '🖼️';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+        }
+        
+        .remove-image-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-image-btn:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        /* 标签选择区域 */
+        .tags-section {
+            margin-bottom: 24px;
+        }
+        
+        .tags-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #7f8c8d;
+            margin-bottom: 12px;
+        }
+        
+        .tags-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .tag-item {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            background-color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+        }
+        
+        .tag-item:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+        
+        .tag-item.active {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: #fff;
+        }
+        
+        /* 隐私设置区域 */
+        .privacy-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .privacy-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        
+        .privacy-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .privacy-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .privacy-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .privacy-option-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .privacy-option-label i {
+            font-size: 16px;
+            color: #3498db;
+        }
+        
+        .privacy-option-label span {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .privacy-option-radio {
+            width: 18px;
+            height: 18px;
+            accent-color: #3498db;
+        }
+        
+        /* 发布按钮 */
+        .publish-action-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+        
+        .publish-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .publish-action-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 8px 0;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item.active i, .nav-item.active span {
+            color: #3498db;
+        }
+        
+        .publish-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .publish-icon {
+            position: absolute;
+            bottom: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .publish-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        .publish-icon i {
+            font-size: 24px;
+            color: #fff;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 414px) {
+            .app-container {
+                max-width: 100%;
+            }
+            
+            .bottom-nav {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 发布帖子页面内容 -->
+        <div class="page active" id="publish-post">
+            <!-- 发布页面头部 -->
+            <div class="publish-header">
+                <button class="header-btn cancel">取消</button>
+                <h1 style="font-size: 18px; font-weight: 500; color: #2c3e50;">发布动态</h1>
+                <button class="header-btn publish">发布</button>
+            </div>
+            
+            <!-- 用户信息区域 -->
+            <div class="user-info-section">
+                <div class="user-avatar"></div>
+                <div class="user-name">健康达人</div>
+            </div>
+            
+            <!-- 帖子输入区域 -->
+            <div class="post-input-section">
+                <input type="text" class="post-title-input" placeholder="请输入标题...">
+                <textarea class="post-content-input" placeholder="分享你的生活感悟、健康经验或疑问..."></textarea>
+            </div>
+            
+            <!-- 功能按钮区域 -->
+            <div class="function-buttons">
+                <button class="function-btn">
+                    <i class="fas fa-image"></i>
+                    <span>图片</span>
+                </button>
+                <button class="function-btn">
+                    <i class="fas fa-video"></i>
+                    <span>视频</span>
+                </button>
+                <button class="function-btn">
+                    <i class="fas fa-microphone"></i>
+                    <span>语音</span>
+                </button>
+                <button class="function-btn">
+                    <i class="fas fa-smile"></i>
+                    <span>表情</span>
+                </button>
+                <button class="function-btn">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>位置</span>
+                </button>
+            </div>
+            
+            <!-- 图片预览区域 -->
+            <div class="image-preview-section">
+                <div class="image-preview-title">图片预览</div>
+                <div class="image-preview-grid">
+                    <div class="image-preview-item">
+                        <button class="remove-image-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="image-preview-item">
+                        <button class="remove-image-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 标签选择区域 -->
+            <div class="tags-section">
+                <div class="tags-title">选择标签</div>
+                <div class="tags-grid">
+                    <div class="tag-item active">健康养生</div>
+                    <div class="tag-item">心理测试</div>
+                    <div class="tag-item">星座运势</div>
+                    <div class="tag-item">饮食推荐</div>
+                    <div class="tag-item">运动健身</div>
+                    <div class="tag-item">情感分析</div>
+                    <div class="tag-item">生活感悟</div>
+                    <div class="tag-item">其他</div>
+                </div>
+            </div>
+            
+            <!-- 隐私设置区域 -->
+            <div class="privacy-section">
+                <div class="privacy-title">隐私设置</div>
+                <div class="privacy-options">
+                    <div class="privacy-option">
+                        <div class="privacy-option-label">
+                            <i class="fas fa-globe"></i>
+                            <span>公开</span>
+                        </div>
+                        <input type="radio" name="privacy" class="privacy-option-radio" checked>
+                    </div>
+                    <div class="privacy-option">
+                        <div class="privacy-option-label">
+                            <i class="fas fa-users"></i>
+                            <span>仅关注者可见</span>
+                        </div>
+                        <input type="radio" name="privacy" class="privacy-option-radio">
+                    </div>
+                    <div class="privacy-option">
+                        <div class="privacy-option-label">
+                            <i class="fas fa-user-secret"></i>
+                            <span>仅自己可见</span>
+                        </div>
+                        <input type="radio" name="privacy" class="privacy-option-radio">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 发布按钮 -->
+            <button class="publish-action-btn">发布动态</button>
+        </div>
+        
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <div class="nav-item" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" data-page="ai-chat">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper active" data-page="publish-post">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" data-page="member">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+        <script>
+            // 确保当前页面的导航项处于活动状态
+            document.addEventListener('DOMContentLoaded', function() {
+                const currentPage = 'publish-post';
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    if (item.getAttribute('data-page') === currentPage) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+                // 为发布按钮添加活动状态
+                const publishIcon = document.querySelector('.publish-icon');
+                publishIcon.classList.add('active');
+            });
+        </script>
+    </div>
+    
+    <script>
+        // 取消发布功能
+        const cancelBtn = document.querySelector('.header-btn.cancel');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                if (confirm('确定要取消发布吗？未保存的内容将会丢失。')) {
+                    alert('已取消发布');
+                }
+            });
+        }
+        
+        // 发布功能
+        const publishBtns = document.querySelectorAll('.header-btn.publish, .publish-action-btn');
+        publishBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const titleInput = document.querySelector('.post-title-input');
+                const contentInput = document.querySelector('.post-content-input');
+                
+                if (!titleInput.value.trim() || !contentInput.value.trim()) {
+                    alert('请填写标题和内容');
+                    return;
+                }
+                
+                // 模拟发布过程
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 发布中...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    btn.innerHTML = '发布';
+                    btn.disabled = false;
+                    alert('发布成功！');
+                    
+                    // 清空表单
+                    titleInput.value = '';
+                    contentInput.value = '';
+                }, 1500);
+            });
+        });
+        
+        // 标签选择功能
+        const tagItems = document.querySelectorAll('.tag-item');
+        tagItems.forEach(tag => {
+            tag.addEventListener('click', () => {
+                tag.classList.toggle('active');
+            });
+        });
+        
+        // 图片删除功能
+        const removeImageBtns = document.querySelectorAll('.remove-image-btn');
+        removeImageBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const imageItem = btn.closest('.image-preview-item');
+                imageItem.remove();
+            });
+        });
+        
+        // 功能按钮点击效果
+        const functionBtns = document.querySelectorAll('.function-btn');
+        functionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 100);
+                
+                // 模拟不同功能的提示
+                const functionName = btn.querySelector('span').textContent;
+                alert(`正在打开${functionName}功能...`);
+            });
+        });
+        
+        // 页面跳转功能
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.getAttribute('data-page');
+                if (page) {
+                    // 实现平滑过渡效果
+                    document.body.style.opacity = '0';
+                    document.body.style.transition = 'opacity 0.3s ease';
+                    
+                    setTimeout(() => {
+                        window.location.href = `${page}.html`;
+                    }, 300);
+                }
+            });
+        });
+        
+        // 微交互效果
+        const buttons = document.querySelectorAll('button, .nav-item, .tag-item, .image-item');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                button.style.transform = 'translateY(-2px)';
+                button.style.transition = 'transform 0.2s ease';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'translateY(0)';
+            });
+            
+            if (!button.classList.contains('nav-item')) {
+                button.addEventListener('click', () => {
+                    button.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        button.style.transform = 'scale(1)';
+                    }, 100);
+                });
+            }
+        });
+        
+        // 输入框焦点效果
+        const inputs = document.querySelectorAll('.post-title-input, .post-content-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                if (input === document.querySelector('.post-title-input')) {
+                    input.style.borderBottomColor = '#3498db';
+                } else {
+                    input.style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }
+            });
+            
+            input.addEventListener('blur', () => {
+                if (input === document.querySelector('.post-title-input')) {
+                    input.style.borderBottomColor = '#e0e0e0';
+                } else {
+                    input.style.boxShadow = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出生信息命理分析 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .back-btn:hover {
+            background-color: #e9ecef;
+        }
+        
+        .header-title {
+            flex: 1;
+            font-size: 20px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .module-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .module-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .module-nav::-webkit-scrollbar-thumb {
+            background: rgba(52, 152, 219, 0.3);
+            border-radius: 2px;
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 2px solid transparent;
+        }
+        
+        .nav-tab:hover {
+            background-color: #e9ecef;
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            border-color: #3498db;
+        }
+        
+        .form-section {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .form-label .required {
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 6px;
+        }
+        
+        .info-card {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-title i {
+            color: #3498db;
+        }
+        
+        .info-text {
+            font-size: 14px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 8px 0;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item.active i, .nav-item.active span {
+            color: #3498db;
+        }
+        
+        .publish-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .publish-icon {
+            position: absolute;
+            bottom: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .publish-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        .publish-icon i {
+            font-size: 24px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="page">
+            <div class="header">
+                <button class="back-btn" onclick="window.location.href='../home.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="header-title">命理分析与心理抚慰</div>
+            </div>
+            
+           <!-- 功能导航 -->
+           <div class="module-nav">
+            <div class="nav-tab" onclick="window.location.href='home_face_analysis.html'">面部/手相</div>
+            <div class="nav-tab active" onclick="window.location.href='home_birth_analysis.html'">出生信息</div>
+            <div class="nav-tab" onclick="window.location.href='home_mental_assessment.html'">心理自评</div>
+            <div class="nav-tab" onclick="window.location.href='home_history_reports.html'">历史报告</div>
+        </div>
+        
+            <div class="form-section">
+                <div class="form-group">
+                    <label class="form-label">
+                        出生日期
+                        <span class="required">*</span>
+                    </label>
+                    <input type="date" class="form-input" id="birthDate" required>
+                    <div class="form-hint">请选择您的公历出生日期</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        出生时间
+                        <span class="required">*</span>
+                    </label>
+                    <input type="time" class="form-input" id="birthTime" required>
+                    <div class="form-hint">请选择您的出生时间（精确到小时）</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        出生地点
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" class="form-input" id="birthPlace" placeholder="请输入出生城市" required>
+                    <div class="form-hint">例如：北京市、上海市</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        性别
+                        <span class="required">*</span>
+                    </label>
+                    <select class="form-select" id="gender" required>
+                        <option value="">请选择</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-info-circle"></i>
+                    <span>分析说明</span>
+                </div>
+                <div class="info-text">
+                    根据您提供的出生信息，我们将为您生成详细的命理分析报告，包括八字、五行、性格特点、运势走向等内容。所有信息仅用于分析，我们承诺保护您的隐私安全。
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>隐私保护</span>
+                </div>
+                <div class="info-text">
+                    您的出生信息将被严格保密，仅用于生成命理分析报告。我们不会将您的信息用于其他用途或分享给第三方。
+                </div>
+            </div>
+            
+            <button class="submit-btn" onclick="submitAnalysis()">
+                生成分析报告
+            </button>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='../home.html'">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../ai-chat.html'">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" onclick="window.location.href='../publish-post.html'">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../member.html'">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../profile.html'">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function submitAnalysis() {
+            const birthDate = document.getElementById('birthDate').value;
+            const birthTime = document.getElementById('birthTime').value;
+            const birthPlace = document.getElementById('birthPlace').value;
+            const gender = document.getElementById('gender').value;
+            
+            if (!birthDate || !birthTime || !birthPlace || !gender) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            alert('正在生成分析报告，请稍候...');
+            // 这里可以跳转到报告页面
+            // window.location.href = 'home_history_reports.html';
+        }
+    </script>
+</body>
+</html>
+

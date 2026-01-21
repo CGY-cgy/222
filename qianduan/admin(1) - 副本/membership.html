@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会员分析 - 灵境管理后台</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon"></div>
+                    <div>
+                        <div class="sidebar-logo-text">灵境管理</div>
+                        <div class="sidebar-logo-sub">Admin Console</div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">主要功能</div>
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="nav-item-icon">📊</span>
+                        <span class="nav-item-text">数据看板</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <span class="nav-item-icon">👥</span>
+                        <span class="nav-item-text">用户管理</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                        <span class="nav-item-icon">📈</span>
+                        <span class="nav-item-text">数据分析</span>
+                    </a>
+                    <a href="membership.html" class="nav-item active">
+                        <span class="nav-item-icon">💎</span>
+                        <span class="nav-item-text">会员分析</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统管理</div>
+                    <a href="security.html" class="nav-item">
+                        <span class="nav-item-icon">🔒</span>
+                        <span class="nav-item-text">安全管理</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="nav-item-icon">⚙️</span>
+                        <span class="nav-item-text">系统设置</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <span class="nav-item-icon">🚪</span>
+                        <span class="nav-item-text">退出登录</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 class="header-title">会员分析</h1>
+                    <p class="header-subtitle">会员转化、收入与留存数据监控</p>
+                </div>
+                <div class="header-actions">
+                    <div class="date-range">
+                        <select class="form-select">
+                            <option value="30" selected>最近30天</option>
+                            <option value="90">最近90天</option>
+                            <option value="180">最近半年</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary">
+                        <span>📊</span>
+                        <span>导出报表</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="stats-grid" style="margin-bottom: var(--spacing-lg);">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon revenue">💰</div>
+                        <span class="stat-trend up">↑ 18.6%</span>
+                    </div>
+                    <div class="stat-value">¥1,286,450</div>
+                    <div class="stat-label">总收入</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon users">👑</div>
+                        <span class="stat-trend up">↑ 12.3%</span>
+                    </div>
+                    <div class="stat-value">45,892</div>
+                    <div class="stat-label">付费会员数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon conversion">📈</div>
+                        <span class="stat-trend up">↑ 1.2%</span>
+                    </div>
+                    <div class="stat-value">8.5%</div>
+                    <div class="stat-label">付费转化率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon active">💎</div>
+                        <span class="stat-trend up">↑ 5.6%</span>
+                    </div>
+                    <div class="stat-value">¥28.0</div>
+                    <div class="stat-label">ARPU</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: var(--spacing-lg);">
+                <div class="card-header">
+                    <h3 class="card-title">会员转化漏斗</h3>
+                    <div class="card-subtitle">从注册到付费全链路转化分析</div>
+                </div>
+                <div class="card-body">
+                    <div class="funnel-container">
+                        <div class="funnel-step step-1">
+                            <span>注册用户: 1,234,567</span>
+                        </div>
+                        <div class="funnel-arrow">↓ 68.5%</div>
+                        <div class="funnel-step step-2">
+                            <span>活跃用户: 845,678</span>
+                        </div>
+                        <div class="funnel-arrow">↓ 42.3%</div>
+                        <div class="funnel-step step-3">
+                            <span>试用用户: 357,890</span>
+                        </div>
+                        <div class="funnel-arrow">↓ 23.8%</div>
+                        <div class="funnel-step step-4">
+                            <span>付费会员: 85,234</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">会员套餐销售分布</h3>
+                        <div class="card-subtitle">各套餐销量与收入占比</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="packageDistChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">收入趋势</h3>
+                        <div class="card-subtitle">月度会员收入变化</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="revenueTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: var(--spacing-lg);">
+                <div class="card-header">
+                    <h3 class="card-title">会员套餐对比</h3>
+                    <div class="card-subtitle">三种套餐的详细数据对比</div>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg);">
+                        <div style="padding: var(--spacing-lg); background: var(--bg-tertiary); border-radius: var(--border-radius-lg); text-align: center;">
+                            <div style="display: inline-block; padding: 6px 16px; background: rgba(102, 126, 234, 0.1); color: var(--primary-color); border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: var(--spacing-md);">基础版</div>
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary);">¥29</div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: var(--spacing-lg);">/月</div>
+                            <div style="text-align: left; margin-bottom: var(--spacing-lg);">
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>基础健康评估</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>每日饮食推荐</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary);">
+                                    <span style="color: var(--text-light);">✗</span>
+                                    <span>AI健康规划</span>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">28,456</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">订阅人数</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">¥825,234</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">月收入</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: var(--spacing-lg); background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.02)); border: 2px solid rgba(255, 215, 0, 0.3); border-radius: var(--border-radius-lg); text-align: center; position: relative;">
+                            <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); display: inline-block; padding: 6px 16px; background: linear-gradient(135deg, #FFD700, #FFA500); color: white; border-radius: 20px; font-size: 12px; font-weight: 600;">热门推荐</div>
+                            <div style="display: inline-block; padding: 6px 16px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1)); color: #B8860B; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: var(--spacing-md);">专业版</div>
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary);">¥99</div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: var(--spacing-lg);">/月</div>
+                            <div style="text-align: left; margin-bottom: var(--spacing-lg);">
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>全部基础功能</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>AI健康规划</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary);">
+                                    <span style="color: var(--text-light);">✗</span>
+                                    <span>专属顾问服务</span>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">12,876</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">订阅人数</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">¥1,274,724</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">月收入</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: var(--spacing-lg); background: var(--bg-tertiary); border-radius: var(--border-radius-lg); text-align: center;">
+                            <div style="display: inline-block; padding: 6px 16px; background: rgba(118, 75, 162, 0.1); color: var(--secondary-color); border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: var(--spacing-md);">企业版</div>
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary);">¥299</div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: var(--spacing-lg);">/月</div>
+                            <div style="text-align: left; margin-bottom: var(--spacing-lg);">
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>全部专业功能</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>专属顾问服务</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>API接口调用</span>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">4,560</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">订阅人数</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">¥1,363,440</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">月收入</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-lg);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">会员留存率</h3>
+                        <div class="card-subtitle">各周期留存数据分析</div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 80px; font-size: 14px; color: var(--text-secondary);">次日留存</div>
+                                <div style="flex: 1; height: 24px; background: var(--bg-tertiary); border-radius: 12px; overflow: hidden;">
+                                    <div style="width: 68.5%; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--primary-light)); border-radius: 12px;"></div>
+                                </div>
+                                <div style="width: 50px; text-align: right; font-size: 14px; font-weight: 600; color: var(--text-primary);">68.5%</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 80px; font-size: 14px; color: var(--text-secondary);">7日留存</div>
+                                <div style="flex: 1; height: 24px; background: var(--bg-tertiary); border-radius: 12px; overflow: hidden;">
+                                    <div style="width: 45.2%; height: 100%; background: linear-gradient(90deg, var(--success-color), #68d391); border-radius: 12px;"></div>
+                                </div>
+                                <div style="width: 50px; text-align: right; font-size: 14px; font-weight: 600; color: var(--text-primary);">45.2%</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 80px; font-size: 14px; color: var(--text-secondary);">30日留存</div>
+                                <div style="flex: 1; height: 24px; background: var(--bg-tertiary); border-radius: 12px; overflow: hidden;">
+                                    <div style="width: 32.8%; height: 100%; background: linear-gradient(90deg, var(--warning-color), #f6ad55); border-radius: 12px;"></div>
+                                </div>
+                                <div style="width: 50px; text-align: right; font-size: 14px; font-weight: 600; color: var(--text-primary);">32.8%</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 80px; font-size: 14px; color: var(--text-secondary);">90日留存</div>
+                                <div style="flex: 1; height: 24px; background: var(--bg-tertiary); border-radius: 12px; overflow: hidden;">
+                                    <div style="width: 25.4%; height: 100%; background: linear-gradient(90deg, var(--danger-color), #fc8181); border-radius: 12px;"></div>
+                                </div>
+                                <div style="width: 50px; text-align: right; font-size: 14px; font-weight: 600; color: var(--text-primary);">25.4%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">续费行为分析</h3>
+                        <div class="card-subtitle">会员续费与流失情况</div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                            <div style="padding: var(--spacing-md); background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(72, 187, 120, 0.05)); border-radius: var(--border-radius-md); text-align: center;">
+                                <div style="font-size: 28px; font-weight: 600; color: var(--success-color);">78.5%</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">续费率</div>
+                            </div>
+                            <div style="padding: var(--spacing-md); background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(245, 101, 101, 0.05)); border-radius: var(--border-radius-md); text-align: center;">
+                                <div style="font-size: 28px; font-weight: 600; color: var(--danger-color);">21.5%</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">流失率</div>
+                            </div>
+                        </div>
+                        <div class="chart-container" style="height: 180px;">
+                            <canvas id="renewalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .funnel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: var(--spacing-lg);
+        }
+        
+        .funnel-step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 56px;
+            border-radius: var(--border-radius-md);
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            width: 100%;
+            max-width: 600px;
+            transition: all var(--transition-normal);
+        }
+        
+        .funnel-step:hover {
+            transform: scale(1.02);
+        }
+        
+        .funnel-step.step-1 {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+        
+        .funnel-step.step-2 {
+            background: linear-gradient(135deg, var(--success-color), #38a169);
+        }
+        
+        .funnel-step.step-3 {
+            background: linear-gradient(135deg, var(--warning-color), #dd6b20);
+        }
+        
+        .funnel-step.step-4 {
+            background: linear-gradient(135deg, var(--secondary-color), #6b46c1);
+        }
+        
+        .funnel-arrow {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+    </style>
+
+    <script>
+        // 用于存储图表实例，以便后续销毁
+        let charts = {};
+
+        // 根据日期范围生成不同的数据
+        function generateDataByDateRange(range) {
+            // 基础数据结构
+            let data = {
+                stats: {
+                    revenue: 1286450,
+                    members: 45892,
+                    conversion: 8.5,
+                    arpu: 28.0
+                },
+                funnel: [
+                    { name: '注册用户', value: 1234567, conversion: 100 },
+                    { name: '活跃用户', value: 845678, conversion: 68.5 },
+                    { name: '试用用户', value: 357890, conversion: 42.3 },
+                    { name: '付费会员', value: 85234, conversion: 23.8 }
+                ],
+                packageDist: [28456, 12876, 4560],
+                revenueTrend: { labels: ['1月', '2月', '3月', '4月', '5月', '6月'], data: [986000, 1056000, 1123000, 1189000, 1234000, 1286450] },
+                renewalData: [23456, 18234, 12456, 7865]
+            };
+
+            // 根据不同的日期范围调整数据
+            switch(range) {
+                case 90:
+                    // 最近90天数据
+                    data.stats = {
+                        revenue: 3567890,
+                        members: 128456,
+                        conversion: 8.2,
+                        arpu: 27.8
+                    };
+                    data.funnel = [
+                        { name: '注册用户', value: 3567890, conversion: 100 },
+                        { name: '活跃用户', value: 2423456, conversion: 67.9 },
+                        { name: '试用用户', value: 1023456, conversion: 42.2 },
+                        { name: '付费会员', value: 240567, conversion: 23.5 }
+                    ];
+                    data.packageDist = [78456, 36876, 13560];
+                    data.revenueTrend = {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        data: [2856000, 3056000, 3256000, 3423000, 3523000, 3567890]
+                    };
+                    data.renewalData = [65456, 52345, 36876, 22456];
+                    break;
+                case 180:
+                    // 最近180天数据
+                    data.stats = {
+                        revenue: 6876540,
+                        members: 245678,
+                        conversion: 8.1,
+                        arpu: 27.9
+                    };
+                    data.funnel = [
+                        { name: '注册用户', value: 6987654, conversion: 100 },
+                        { name: '活跃用户', value: 4756321, conversion: 68.1 },
+                        { name: '试用用户', value: 1956789, conversion: 41.1 },
+                        { name: '付费会员', value: 465890, conversion: 23.8 }
+                    ];
+                    data.packageDist = [145678, 70890, 25678];
+                    data.revenueTrend = {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        data: [5234000, 5890000, 6234000, 6543000, 6765000, 6876540]
+                    };
+                    data.renewalData = [123456, 98765, 72345, 41234];
+                    break;
+                default: // 30天数据，使用默认值
+                    break;
+            }
+
+            return data;
+        }
+
+        function updateStatsCards(data) {
+            // 更新统计卡片
+            const stats = data.stats;
+            document.querySelectorAll('.stat-card .stat-value')[0].textContent = `¥${stats.revenue.toLocaleString()}`;
+            document.querySelectorAll('.stat-card .stat-value')[1].textContent = stats.members.toLocaleString();
+            document.querySelectorAll('.stat-card .stat-value')[2].textContent = `${stats.conversion}%`;
+            document.querySelectorAll('.stat-card .stat-value')[3].textContent = `¥${stats.arpu.toFixed(1)}`;
+        }
+
+        function updateFunnel(data) {
+            // 更新漏斗图
+            const funnelSteps = document.querySelectorAll('.funnel-step');
+            const funnelArrows = document.querySelectorAll('.funnel-arrow');
+            
+            data.funnel.forEach((step, index) => {
+                if (funnelSteps[index]) {
+                    funnelSteps[index].innerHTML = `<span>${step.name}: ${step.value.toLocaleString()}</span>`;
+                }
+                if (index < data.funnel.length - 1 && funnelArrows[index]) {
+                    funnelArrows[index].textContent = `↓ ${data.funnel[index + 1].conversion}%`;
+                }
+            });
+        }
+
+        function initCharts(data) {
+            // 销毁现有图表实例
+            if (charts.packageDist) {
+                charts.packageDist.destroy();
+            }
+            if (charts.revenueTrend) {
+                charts.revenueTrend.destroy();
+            }
+            if (charts.renewal) {
+                charts.renewal.destroy();
+            }
+
+            const packageDistCtx = document.getElementById('packageDistChart');
+            if (packageDistCtx) {
+                charts.packageDist = new Chart(packageDistCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['基础版', '专业版', '企业版'],
+                        datasets: [{
+                                data: data.packageDist,
+                                backgroundColor: [
+                                    '#667eea',
+                                    '#FFD700',
+                                    '#764ba2'
+                                ],
+                                borderWidth: 0
+                            }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const revenueTrendCtx = document.getElementById('revenueTrendChart');
+            if (revenueTrendCtx) {
+                charts.revenueTrend = new Chart(revenueTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.revenueTrend.labels,
+                        datasets: [{
+                            label: '收入',
+                            data: data.revenueTrend.data,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '¥' + (value / 10000) + '万';
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const renewalCtx = document.getElementById('renewalChart');
+            if (renewalCtx) {
+                charts.renewal = new Chart(renewalCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1次续费', '2次续费', '3次续费', '4次+续费'],
+                        datasets: [{
+                            label: '用户数',
+                            data: data.renewalData,
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(72, 187, 120, 0.8)',
+                                'rgba(237, 137, 54, 0.8)',
+                                'rgba(118, 75, 162, 0.8)'
+                            ],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 根据日期范围更新所有数据
+        function updateDataByDateRange(range) {
+            // 显示加载状态
+            document.body.style.cursor = 'wait';
+            
+            // 生成新数据
+            const data = generateDataByDateRange(range);
+            
+            // 更新统计卡片
+            updateStatsCards(data);
+            
+            // 更新漏斗图
+            updateFunnel(data);
+            
+            // 更新图表
+            initCharts(data);
+            
+            // 恢复正常状态
+            document.body.style.cursor = 'default';
+        }
+
+        // 导出报表功能
+        function exportReport() {
+            // 获取当前日期范围
+            const range = parseInt(document.querySelector('.date-range select').value);
+            const data = generateDataByDateRange(range);
+            
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            
+            // 创建统计数据工作表
+            const statsData = [
+                ['指标', '值'],
+                ['总收入', data.stats.revenue],
+                ['付费会员数', data.stats.members],
+                ['付费转化率', `${data.stats.conversion}%`],
+                ['ARPU', `¥${data.stats.arpu}`]
+            ];
+            const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
+            XLSX.utils.book_append_sheet(wb, statsSheet, '统计数据');
+            
+            // 创建漏斗数据工作表
+            const funnelData = [
+                ['阶段', '人数', '转化率']
+            ];
+            data.funnel.forEach((step, index) => {
+                funnelData.push([step.name, step.value, `${step.conversion}%`]);
+            });
+            const funnelSheet = XLSX.utils.aoa_to_sheet(funnelData);
+            XLSX.utils.book_append_sheet(wb, funnelSheet, '转化漏斗');
+            
+            // 创建套餐分布数据工作表
+            const packageData = [
+                ['套餐类型', '用户数'],
+                ['基础版', data.packageDist[0]],
+                ['专业版', data.packageDist[1]],
+                ['企业版', data.packageDist[2]]
+            ];
+            const packageSheet = XLSX.utils.aoa_to_sheet(packageData);
+            XLSX.utils.book_append_sheet(wb, packageSheet, '套餐分布');
+            
+            // 创建收入趋势数据工作表
+            const revenueData = [
+                ['月份', '收入']
+            ];
+            for (let i = 0; i < data.revenueTrend.labels.length; i++) {
+                revenueData.push([data.revenueTrend.labels[i], data.revenueTrend.data[i]]);
+            }
+            const revenueSheet = XLSX.utils.aoa_to_sheet(revenueData);
+            XLSX.utils.book_append_sheet(wb, revenueSheet, '收入趋势');
+            
+            // 创建续费数据工作表
+            const renewalData = [
+                ['续费次数', '用户数']
+            ];
+            const renewalLabels = ['1次续费', '2次续费', '3次续费', '4次+续费'];
+            for (let i = 0; i < data.renewalData.length; i++) {
+                renewalData.push([renewalLabels[i], data.renewalData[i]]);
+            }
+            const renewalSheet = XLSX.utils.aoa_to_sheet(renewalData);
+            XLSX.utils.book_append_sheet(wb, renewalSheet, '续费分析');
+            
+            // 导出为Excel文件
+            const fileName = `会员分析报表_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化数据
+            const initialRange = parseInt(document.querySelector('.date-range select').value);
+            const initialData = generateDataByDateRange(initialRange);
+            
+            // 初始化统计卡片
+            updateStatsCards(initialData);
+            
+            // 初始化漏斗图
+            updateFunnel(initialData);
+            
+            // 初始化图表
+            initCharts(initialData);
+            
+            // 添加日期范围选择事件监听器
+            const dateRangeSelect = document.querySelector('.date-range select');
+            dateRangeSelect.addEventListener('change', function() {
+                const range = parseInt(this.value);
+                updateDataByDateRange(range);
+            });
+            
+            // 添加导出报表事件监听器
+            const exportBtn = document.querySelector('.btn-secondary');
+            exportBtn.addEventListener('click', exportReport);
+            
+            // 添加悬停效果
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                    this.style.boxShadow = 'var(--shadow-lg)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'var(--shadow)';
+                });
+            });
+            
+            // 添加漏斗步骤点击事件
+            const funnelSteps = document.querySelectorAll('.funnel-step');
+            funnelSteps.forEach((step, index) => {
+                step.addEventListener('click', function() {
+                    console.log(`点击了漏斗步骤 ${index + 1}: ${this.textContent}`);
+                    // 这里可以添加更多交互逻辑，比如显示详细数据
+                });
+            });
+        });
+    </script>
+</body>
+</html>

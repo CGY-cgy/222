@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心理状态自评 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="traditional_style.css">
+    <style>
+        /* 进度条样式 */
+        .progress-text {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 12px;
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            height: 12px;
+            margin-bottom: 28px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        /* 问题卡片样式 */
+        .question-card {
+            position: relative;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 3px solid #8b4513;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        /* 云纹装饰 */
+        .question-card::before,
+        .question-card::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40"%3E%3Cpath d="M10 20 Q 20 10 30 20 Q 40 30 50 20 Q 40 10 30 20 Q 20 30 10 20 Z" fill="rgba(245,222,179,0.6)"/%3E%3C/svg%3E');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .question-card::before {
+            top: -15px;
+            left: -15px;
+            transform: rotate(-30deg);
+        }
+        
+        .question-card::after {
+            bottom: -15px;
+            right: -15px;
+            transform: rotate(30deg);
+        }
+        
+        .question-number {
+            font-size: 14px;
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 16px;
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 24px;
+            line-height: 1.6;
+            font-family: 'Microsoft YaHei', serif;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 选项列表样式 */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .option-item {
+            position: relative;
+            padding: 16px 20px;
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .option-item:hover {
+            background: linear-gradient(135deg, #deb887 0%, #f5deb3 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .option-item.selected {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        
+        /* 选项单选框样式 */
+        .option-radio {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .option-item.selected .option-radio {
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            border-color: #fff;
+        }
+        
+        .option-item.selected .option-radio::after {
+            content: '✓';
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .option-text {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 500;
+            color: #8b4513;
+            transition: color 0.3s ease;
+        }
+        
+        .option-item.selected .option-text {
+            color: #fff;
+        }
+        
+        /* 提交按钮样式 */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 8px;
+            border: 3px solid #8b4513;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 28px;
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(231, 76, 60, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+            border-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="page">
+            <div class="scroll-header">
+                <div class="scroll-title">命理分析与心理抚慰</div>
+            </div>
+            
+            <!-- 功能导航 -->
+            <div class="module-nav">
+                <div class="nav-tab" onclick="window.location.href='home_fortune.html'">面部/手相</div>
+                <div class="nav-tab" onclick="window.location.href='home_birth_analysis.html'">出生信息</div>
+                <div class="nav-tab active" onclick="window.location.href='home_mental_assessment.html'">心理自评</div>
+                <div class="nav-tab" onclick="window.location.href='home_history_reports.html'">历史报告</div>
+            </div>
+            
+            <div class="progress-text">第 <span id="currentQuestion">1</span> / <span id="totalQuestions">10</span> 题</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+            </div>
+            
+            <div class="question-card" id="questionCard">
+                <div class="question-number">问题 1</div>
+                <div class="question-text" id="questionText">在过去的一周里，您感到心情愉快的时间有多少？</div>
+                <div class="options-list" id="optionsList">
+                    <div class="option-item" onclick="selectOption(0)">
+                        <div class="option-radio"></div>
+                        <div class="option-text">几乎没有</div>
+                    </div>
+                    <div class="option-item" onclick="selectOption(1)">
+                        <div class="option-radio"></div>
+                        <div class="option-text">偶尔</div>
+                    </div>
+                    <div class="option-item" onclick="selectOption(2)">
+                        <div class="option-radio"></div>
+                        <div class="option-text">经常</div>
+                    </div>
+                    <div class="option-item" onclick="selectOption(3)">
+                        <div class="option-radio"></div>
+                        <div class="option-text">几乎总是</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="submit-btn" id="nextBtn" onclick="nextQuestion()" disabled>
+                下一题
+            </button>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='../home.html'">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../ai-chat.html'">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" onclick="window.location.href='../publish-post.html'">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../member.html'">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../profile.html'">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const questions = [
+            { text: '在过去的一周里，您感到心情愉快的时间有多少？', options: ['几乎没有', '偶尔', '经常', '几乎总是'] },
+            { text: '您是否经常感到焦虑或紧张？', options: ['几乎总是', '经常', '偶尔', '几乎没有'] },
+            { text: '您的睡眠质量如何？', options: ['很差', '较差', '一般', '很好'] },
+            { text: '您对未来的态度如何？', options: ['非常悲观', '比较悲观', '比较乐观', '非常乐观'] },
+            { text: '您是否容易感到疲劳？', options: ['几乎总是', '经常', '偶尔', '几乎没有'] },
+            { text: '您对日常活动的兴趣如何？', options: ['几乎没有兴趣', '兴趣较少', '有一定兴趣', '兴趣浓厚'] },
+            { text: '您是否经常感到孤独？', options: ['几乎总是', '经常', '偶尔', '几乎没有'] },
+            { text: '您处理压力的能力如何？', options: ['很差', '较差', '一般', '很好'] },
+            { text: '您是否经常感到情绪低落？', options: ['几乎总是', '经常', '偶尔', '几乎没有'] },
+            { text: '您对自己的整体心理健康状况评价如何？', options: ['很差', '较差', '一般', '很好'] }
+        ];
+        
+        let currentQuestionIndex = 0;
+        let answers = [];
+        
+        function selectOption(index) {
+            const options = document.querySelectorAll('.option-item');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            document.getElementById('nextBtn').disabled = false;
+        }
+        
+        function nextQuestion() {
+            const selectedOption = document.querySelector('.option-item.selected');
+            if (!selectedOption) return;
+            
+            const optionIndex = Array.from(document.querySelectorAll('.option-item')).indexOf(selectedOption);
+            answers.push(optionIndex);
+            
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                updateQuestion();
+            } else {
+                submitAssessment();
+            }
+        }
+        
+        function updateQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('questionText').textContent = question.text;
+            document.querySelector('.question-number').textContent = `问题 ${currentQuestionIndex + 1}`;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            
+            const optionsList = document.getElementById('optionsList');
+            optionsList.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const optionItem = document.createElement('div');
+                optionItem.className = 'option-item';
+                optionItem.onclick = () => selectOption(index);
+                optionItem.innerHTML = `
+                    <div class="option-radio"></div>
+                    <div class="option-text">${option}</div>
+                `;
+                optionsList.appendChild(optionItem);
+            });
+            
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('progressFill').style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                document.getElementById('nextBtn').textContent = '提交评估';
+            }
+        }
+        
+        function submitAssessment() {
+            alert('评估完成！正在生成报告...');
+            // 这里可以跳转到报告页面
+            // window.location.href = 'home_history_reports.html';
+        }
+    </script>
+</body>
+</html>
+

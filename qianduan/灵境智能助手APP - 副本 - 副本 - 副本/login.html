@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵境智能助手 - 登录</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 50%, #90caf9 100%);
+            color: #2c3e50;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* 登录页面样式 */
+        .login-page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 24px;
+            background: linear-gradient(180deg, #e3f2fd 0%, #ffffff 30%);
+        }
+        
+        /* Logo区域 */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        .logo-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 20px rgba(66, 165, 245, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .logo-icon i {
+            font-size: 48px;
+            color: #fff;
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+        
+        .logo-subtitle {
+            font-size: 14px;
+            color: #64b5f6;
+        }
+        
+        /* 登录按钮区域 */
+        .login-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .login-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .login-btn-primary {
+            background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+            color: #fff;
+        }
+        
+        .login-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(66, 165, 245, 0.4);
+        }
+        
+        .login-btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .login-btn-wechat {
+            background: #fff;
+            color: #07c160;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .login-btn-wechat:hover {
+            border-color: #07c160;
+            background: #f0fdf4;
+        }
+        
+        .login-btn-alipay {
+            background: #fff;
+            color: #1677ff;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .login-btn-alipay:hover {
+            border-color: #1677ff;
+            background: #f0f7ff;
+        }
+        
+        .login-btn i {
+            font-size: 20px;
+        }
+        
+        /* 引导步骤容器 */
+        .guide-container {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            padding: 24px;
+            background: #fff;
+        }
+        
+        .guide-container.active {
+            display: flex;
+        }
+        
+        /* 步骤指示器 */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+        
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .step-dot.active {
+            width: 24px;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #42a5f5 0%, #1e88e5 100%);
+        }
+        
+        /* 步骤标题 */
+        .step-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1976d2;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .step-subtitle {
+            font-size: 14px;
+            color: #90a4ae;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        /* 习惯设置 */
+        .habit-setting {
+            background: #f5f9ff;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 2px solid #e3f2fd;
+        }
+        
+        .habit-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+        }
+        
+        .habit-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .habit-label i {
+            font-size: 20px;
+            color: #42a5f5;
+        }
+        
+        /* 开关样式 */
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background-color: #e0e0e0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            left: 27px;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #546e7a;
+            margin-bottom: 12px;
+        }
+        
+        .form-label i {
+            color: #42a5f5;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #42a5f5;
+            box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #42a5f5;
+            box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.1);
+        }
+        
+        /* 欢迎页样式 */
+        .welcome-features {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f5f9ff 100%);
+            border-radius: 16px;
+            padding: 20px;
+            border-left: 4px solid #42a5f5;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(66, 165, 245, 0.2);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            color: #fff;
+            font-size: 24px;
+        }
+        
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+        
+        .feature-desc {
+            font-size: 14px;
+            color: #546e7a;
+            line-height: 1.6;
+        }
+        
+        /* 权限引导 */
+        .permission-card {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 2px solid #ffebee;
+            transition: all 0.3s ease;
+        }
+        
+        .permission-card:hover {
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.1);
+        }
+        
+        .permission-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .permission-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+        }
+        
+        .permission-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .permission-desc {
+            font-size: 14px;
+            color: #546e7a;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .permission-benefits {
+            background: #f5f9ff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .permission-benefits-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+        
+        .permission-benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .permission-benefits-list li {
+            font-size: 13px;
+            color: #546e7a;
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .permission-benefits-list li::before {
+            content: '✓';
+            color: #42a5f5;
+            font-weight: bold;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(66, 165, 245, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: #fff;
+            color: #42a5f5;
+            border: 2px solid #42a5f5;
+        }
+        
+        .btn-secondary:hover {
+            background: #f5f9ff;
+        }
+        
+        .btn-permission {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: #fff;
+        }
+        
+        .btn-permission:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* 动画 */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .guide-container.active {
+            animation: slideInRight 0.5s ease;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 414px) {
+            .app-container {
+                max-width: 100%;
+            }
+        }
+        
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 登录页面 -->
+        <div class="login-page" id="loginPage">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <div class="logo-text">灵境智能助手</div>
+                <div class="logo-subtitle">您的专属智能生活伙伴</div>
+            </div>
+            
+            <div class="login-buttons">
+                <button class="login-btn login-btn-primary" id="phoneLoginBtn">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>手机号一键登录</span>
+                </button>
+                
+                <button class="login-btn login-btn-wechat" id="wechatLoginBtn">
+                    <i class="fab fa-weixin"></i>
+                    <span>微信登录</span>
+                </button>
+                
+                <button class="login-btn login-btn-alipay" id="alipayLoginBtn">
+                    <i class="fab fa-alipay"></i>
+                    <span>支付宝登录</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 个性化引导 - 习惯设置 -->
+        <div class="guide-container" id="habitGuide">
+            <div class="step-indicator">
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+            
+            <h2 class="step-title">核心习惯设置</h2>
+            <p class="step-subtitle">让我们了解您的习惯，为您提供更贴心的服务</p>
+            
+            <div class="habit-setting">
+                <div class="habit-item">
+                    <div class="habit-label">
+                        <i class="fas fa-bell"></i>
+                        <span>每日提醒</span>
+                    </div>
+                    <div class="toggle-switch active" id="dailyReminderToggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="nextToBasicInfo">
+                下一步
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        <!-- 个性化引导 - 基本信息 -->
+        <div class="guide-container" id="basicInfoGuide">
+            <div class="step-indicator">
+                <div class="step-dot active"></div>
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+            
+            <h2 class="step-title">基本信息录入</h2>
+            <p class="step-subtitle">完善您的个人信息，获得更精准的服务</p>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>出生日期</span>
+                </label>
+                <input type="date" class="form-input" id="birthDate" max="">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-venus-mars"></i>
+                    <span>性别</span>
+                </label>
+                <select class="form-select" id="gender">
+                    <option value="">请选择</option>
+                    <option value="male">男</option>
+                    <option value="female">女</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" id="nextToWelcome">
+                下一步
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        <!-- 个性化引导 - 欢迎页 -->
+        <div class="guide-container" id="welcomeGuide">
+            <div class="step-indicator">
+                <div class="step-dot active"></div>
+                <div class="step-dot active"></div>
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+            </div>
+            
+            <h2 class="step-title">欢迎使用灵境智能助手</h2>
+            <p class="step-subtitle">探索我们的核心功能亮点</p>
+            
+            <div class="welcome-features">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="feature-title">AI智能对话</div>
+                    <div class="feature-desc">24小时在线AI助手，随时为您解答疑问，提供专业建议</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="feature-title">健康管理</div>
+                    <div class="feature-desc">个性化健康档案，智能分析您的身体状况，提供专业建议</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="feature-title">命理分析</div>
+                    <div class="feature-desc">结合传统命理学，为您提供个性化的运势分析和生活指导</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="feature-title">社区互动</div>
+                    <div class="feature-desc">与志同道合的朋友分享经验，共同成长</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="nextToPermission">
+                下一步
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        
+        <!-- 权限引导 -->
+        <div class="guide-container" id="permissionGuide">
+            <div class="step-indicator">
+                <div class="step-dot active"></div>
+                <div class="step-dot active"></div>
+                <div class="step-dot active"></div>
+                <div class="step-dot active"></div>
+            </div>
+            
+            <h2 class="step-title">权限引导与价值说明</h2>
+            <p class="step-subtitle">授权这些权限，让应用更好地为您服务</p>
+            
+            <!-- 位置权限 -->
+            <div class="permission-card">
+                <div class="permission-header">
+                    <div class="permission-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="permission-title">位置权限</div>
+                </div>
+                <div class="permission-desc">
+                    我们需要获取您的位置信息，以便为您提供基于地理位置的服务
+                </div>
+                <div class="permission-benefits">
+                    <div class="permission-benefits-title">开启后您可以：</div>
+                    <ul class="permission-benefits-list">
+                        <li>获取本地天气信息</li>
+                        <li>接收附近活动推荐</li>
+                        <li>享受位置相关的个性化服务</li>
+                    </ul>
+                </div>
+                <button class="btn btn-permission" id="locationPermissionBtn">
+                    <i class="fas fa-check"></i>
+                    授权位置权限
+                </button>
+            </div>
+            
+            <!-- 通知权限 -->
+            <div class="permission-card">
+                <div class="permission-header">
+                    <div class="permission-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="permission-title">通知权限</div>
+                </div>
+                <div class="permission-desc">
+                    我们需要获取通知权限，以便及时向您推送重要信息和提醒
+                </div>
+                <div class="permission-benefits">
+                    <div class="permission-benefits-title">开启后您可以：</div>
+                    <ul class="permission-benefits-list">
+                        <li>接收每日健康提醒</li>
+                        <li>获取重要消息通知</li>
+                        <li>及时了解活动信息</li>
+                    </ul>
+                </div>
+                <button class="btn btn-permission" id="notificationPermissionBtn">
+                    <i class="fas fa-check"></i>
+                    授权通知权限
+                </button>
+            </div>
+            
+            <button class="btn btn-primary" id="completeGuide">
+                完成设置，开始使用
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // 设置日期选择器的最大值为今天
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('birthDate').setAttribute('max', today);
+        });
+        
+        // 登录按钮点击事件
+        document.getElementById('phoneLoginBtn').addEventListener('click', function() {
+            handleLogin('phone');
+        });
+        
+        document.getElementById('wechatLoginBtn').addEventListener('click', function() {
+            handleLogin('wechat');
+        });
+        
+        document.getElementById('alipayLoginBtn').addEventListener('click', function() {
+            handleLogin('alipay');
+        });
+        
+        // 登录处理函数
+        function handleLogin(type) {
+            const btn = event.target.closest('.login-btn');
+            const originalContent = btn.innerHTML;
+            
+            // 显示加载状态
+            btn.innerHTML = '<span class="loading"></span> 登录中...';
+            btn.disabled = true;
+            
+            // 模拟登录过程
+            setTimeout(() => {
+                // 检查是否是新用户（这里可以根据实际情况判断）
+                const isNewUser = !localStorage.getItem('hasCompletedGuide');
+                
+                if (isNewUser) {
+                    // 新用户，显示引导流程
+                    showGuide();
+                } else {
+                    // 老用户，直接跳转首页
+                    window.location.href = 'home.html';
+                }
+            }, 1500);
+        }
+        
+        // 显示引导流程
+        function showGuide() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('habitGuide').classList.add('active');
+        }
+        
+        // 习惯设置切换
+        document.getElementById('dailyReminderToggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
+        
+        // 下一步按钮事件
+        document.getElementById('nextToBasicInfo').addEventListener('click', function() {
+            document.getElementById('habitGuide').classList.remove('active');
+            document.getElementById('basicInfoGuide').classList.add('active');
+        });
+        
+        document.getElementById('nextToWelcome').addEventListener('click', function() {
+            const birthDate = document.getElementById('birthDate').value;
+            const gender = document.getElementById('gender').value;
+            
+            if (!birthDate || !gender) {
+                alert('请完善您的个人信息');
+                return;
+            }
+            
+            document.getElementById('basicInfoGuide').classList.remove('active');
+            document.getElementById('welcomeGuide').classList.add('active');
+        });
+        
+        document.getElementById('nextToPermission').addEventListener('click', function() {
+            document.getElementById('welcomeGuide').classList.remove('active');
+            document.getElementById('permissionGuide').classList.add('active');
+        });
+        
+        // 权限申请按钮
+        document.getElementById('locationPermissionBtn').addEventListener('click', function() {
+            requestLocationPermission();
+        });
+        
+        document.getElementById('notificationPermissionBtn').addEventListener('click', function() {
+            requestNotificationPermission();
+        });
+        
+        // 位置权限申请
+        function requestLocationPermission() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        alert('位置权限已授权！\n纬度: ' + position.coords.latitude + '\n经度: ' + position.coords.longitude);
+                        document.getElementById('locationPermissionBtn').innerHTML = '<i class="fas fa-check-circle"></i> 已授权';
+                        document.getElementById('locationPermissionBtn').disabled = true;
+                        document.getElementById('locationPermissionBtn').style.background = '#4caf50';
+                    },
+                    function(error) {
+                        alert('位置权限被拒绝，您可以在设置中手动开启');
+                    }
+                );
+            } else {
+                alert('您的浏览器不支持地理位置服务');
+            }
+        }
+        
+        // 通知权限申请
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === 'granted') {
+                        alert('通知权限已授权！');
+                        document.getElementById('notificationPermissionBtn').innerHTML = '<i class="fas fa-check-circle"></i> 已授权';
+                        document.getElementById('notificationPermissionBtn').disabled = true;
+                        document.getElementById('notificationPermissionBtn').style.background = '#4caf50';
+                    } else {
+                        alert('通知权限被拒绝，您可以在设置中手动开启');
+                    }
+                });
+            } else {
+                alert('您的浏览器不支持通知功能');
+            }
+        }
+        
+        // 完成引导
+        document.getElementById('completeGuide').addEventListener('click', function() {
+            // 保存引导完成状态
+            localStorage.setItem('hasCompletedGuide', 'true');
+            
+            // 显示完成提示
+            const btn = this;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="loading"></span> 正在跳转...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                window.location.href = 'home.html';
+            }, 1000);
+        });
+        
+        // 按钮点击波纹效果
+        document.querySelectorAll('.btn, .login-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    </script>
+    
+    <style>
+        /* 波纹效果 */
+        .btn, .login-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+</html>
+

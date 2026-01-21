@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐私设置 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 复用profile.html中的样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* 头部导航 */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #f5f7fa;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        /* 功能菜单区域 */
+        .menu-section {
+            margin-bottom: 24px;
+        }
+        
+        .menu-group {
+            background-color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+        }
+        
+        .menu-text {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .menu-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .menu-arrow {
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+        
+        /* 隐私设置开关样式 */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background-color: #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background-color: #3498db;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            left: 26px;
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 8px 0;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item.active i, .nav-item.active span {
+            color: #3498db;
+        }
+        
+        .publish-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .publish-icon {
+            position: absolute;
+            bottom: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .publish-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        .publish-icon i {
+            font-size: 24px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.location.href='../profile.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="page-title">隐私设置</div>
+            </div>
+        </div>
+        
+        <!-- 功能菜单区域 -->
+        <div class="page">
+            <!-- 数据权限管理 -->
+            <div class="menu-section">
+                <div class="menu-group">
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #3498db;">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="menu-text">公开个人资料</div>
+                        </div>
+                        <div class="menu-right">
+                            <div class="toggle-switch active" onclick="toggleSwitch(this, 'publicProfile')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #27ae60;">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="menu-text">公开健康数据</div>
+                        </div>
+                        <div class="menu-right">
+                            <div class="toggle-switch" onclick="toggleSwitch(this, 'publicHealth')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #f39c12;">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="menu-text">公开日程信息</div>
+                        </div>
+                        <div class="menu-right">
+                            <div class="toggle-switch" onclick="toggleSwitch(this, 'publicSchedule')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #e74c3c;">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="menu-text">允许陌生人私信</div>
+                        </div>
+                        <div class="menu-right">
+                            <div class="toggle-switch active" onclick="toggleSwitch(this, 'allowStrangerMessage')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #9b59b6;">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="menu-text">接收推送通知</div>
+                        </div>
+                        <div class="menu-right">
+                            <div class="toggle-switch active" onclick="toggleSwitch(this, 'receiveNotifications')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 隐私协议 -->
+                <div class="menu-group">
+                    <div class="menu-item" onclick="viewPrivacyPolicy()">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #1abc9c;">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="menu-text">隐私政策</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item" onclick="viewTermsOfService()">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #34495e;">
+                                <i class="fas fa-gavel"></i>
+                            </div>
+                            <div class="menu-text">服务条款</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <div class="nav-item" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" data-page="ai-chat">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" data-page="publish-post">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" data-page="member">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item active" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+        
+        <script>
+            // 初始化隐私设置
+            function initPrivacySettings() {
+                // 从本地存储获取设置
+                const settings = JSON.parse(localStorage.getItem('privacySettings')) || {
+                    publicProfile: true,
+                    publicHealth: false,
+                    publicSchedule: false,
+                    allowStrangerMessage: true,
+                    receiveNotifications: true
+                };
+                
+                // 更新开关状态
+                updateSwitch('publicProfile', settings.publicProfile);
+                updateSwitch('publicHealth', settings.publicHealth);
+                updateSwitch('publicSchedule', settings.publicSchedule);
+                updateSwitch('allowStrangerMessage', settings.allowStrangerMessage);
+                updateSwitch('receiveNotifications', settings.receiveNotifications);
+            }
+            
+            // 更新开关状态
+            function updateSwitch(settingName, isActive) {
+                const switches = document.querySelectorAll('.toggle-switch');
+                switches.forEach(switchEl => {
+                    const onclickAttr = switchEl.getAttribute('onclick');
+                    if (onclickAttr.includes(settingName)) {
+                        if (isActive) {
+                            switchEl.classList.add('active');
+                        } else {
+                            switchEl.classList.remove('active');
+                        }
+                    }
+                });
+            }
+            
+            // 切换开关功能
+            function toggleSwitch(element, settingName) {
+                element.classList.toggle('active');
+                const isActive = element.classList.contains('active');
+                
+                // 保存到本地存储
+                const settings = JSON.parse(localStorage.getItem('privacySettings')) || {};
+                settings[settingName] = isActive;
+                localStorage.setItem('privacySettings', JSON.stringify(settings));
+                
+                console.log(settingName + ' 设置为: ' + isActive);
+            }
+            
+            // 查看隐私政策
+            function viewPrivacyPolicy() {
+                console.log('查看隐私政策');
+                alert('正在打开隐私政策页面...');
+            }
+            
+            // 查看服务条款
+            function viewTermsOfService() {
+                console.log('查看服务条款');
+                alert('正在打开服务条款页面...');
+            }
+            
+            // 底部导航
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    let url = '';
+                    
+                    switch(page) {
+                        case 'home':
+                            url = '../home.html';
+                            break;
+                        case 'ai-chat':
+                            url = '../ai-chat.html';
+                            break;
+                        case 'publish-post':
+                            url = '../publish-post.html';
+                            break;
+                        case 'member':
+                            url = '../member.html';
+                            break;
+                        case 'profile':
+                            url = '../profile.html';
+                            break;
+                    }
+                    
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
+            });
+            
+            // 页面加载时初始化
+            document.addEventListener('DOMContentLoaded', initPrivacySettings);
+        </script>
+        
+        <!-- 引入外部JavaScript文件 -->
+        <script src="../script.js"></script>
+        <script src="../member-common.js"></script>
+    </div>
+</body>
+</html>

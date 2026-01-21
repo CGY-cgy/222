@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵境智能助手 - 首页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fefefef8;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 页面通用样式 */
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* 搜索栏样式 */
+        .search-bar {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 12px 16px 12px 48px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar input:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        /* 节气Banner样式 */
+        .festival-banner {
+            width: 100%;
+            min-height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            margin-bottom: 24px;
+            padding: 20px;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.35);
+        }
+        
+        .festival-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .festival-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: -40px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(30%, -30%) translateY(0px); }
+            50% { transform: translate(30%, -30%) translateY(-15px); }
+        }
+        
+        .festival-content {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .festival-text {
+            flex: 1;
+        }
+        
+        .festival-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .festival-date {
+            font-size: 15px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+        
+        .festival-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .festival-desc {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        
+        /* 模块标题样式 */
+        .section-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .section-title .title-with-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title .title-icon {
+            font-size: 20px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            padding: 4px;
+        }
+        
+        .section-title span:last-child {
+            font-size: 14px;
+            color: #7f8c8d;
+            cursor: pointer;
+        }
+        
+        /* 快速导航图标 */
+        .quick-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-radius: 16px;
+            padding: 16px 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .quick-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 12px;
+            flex: 1;
+        }
+        
+        .quick-nav-item:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .quick-nav-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .quick-nav-item:nth-child(1) .quick-nav-icon {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .quick-nav-item:nth-child(2) .quick-nav-icon {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+        
+        .quick-nav-item:nth-child(3) .quick-nav-icon {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+        
+        .quick-nav-item:nth-child(4) .quick-nav-icon {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        
+        .quick-nav-item:nth-child(5) .quick-nav-icon {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .quick-nav-label {
+            font-size: 12px;
+            color: #2c3e50;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .section-anchor {
+            scroll-margin-top: 20px;
+        }
+        
+        /* 2×2网格布局 */
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .function-item {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+        
+        .function-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: rgba(52, 152, 219, 0.3);
+        }
+        
+        .function-item i {
+            font-size: 32px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .function-item:nth-child(1) i {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .function-item:nth-child(2) i {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .function-item:nth-child(3) i {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .function-item:nth-child(4) i {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .function-item span {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        /* 饮食推荐样式 */
+        .recipe-recommendations {
+            margin-bottom: 24px;
+        }
+        
+        .recipe-cards {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scrollbar-width: thin;
+        }
+        
+        .recipe-card {
+            min-width: 180px;
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .recipe-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: rgba(243, 156, 18, 0.3);
+        }
+        
+      
+        
+        @keyframes bounce {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        .recipe-info {
+            padding: 12px;
+        }
+        
+        .recipe-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .recipe-desc {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        
+        .recipe-calories {
+            font-size: 12px;
+            color: #e74c3c;
+        }
+        
+        /* 智能规划看板样式 */
+        .kanban-board {
+            margin-bottom: 24px;
+        }
+        
+        .kanban-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .kanban-card {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .kanban-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: rgba(155, 89, 182, 0.3);
+        }
+        
+        .kanban-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+        }
+        
+        .kanban-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .kanban-subtitle {
+            font-size: 13px;
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+        
+        /* 社区帖子流样式 */
+        .community-posts {
+            margin-bottom: 24px;
+        }
+        
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .post-card {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .post-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: rgba(52, 152, 219, 0.2);
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .post-time {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .post-content {
+            margin-bottom: 12px;
+        }
+        
+        .post-content p {
+            font-size: 14px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .post-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #addfff 0%, #57d8f5 100%);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .post-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .post-stats {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .like-count, .comment-count {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .like-count i, .comment-count i {
+            font-size: 14px;
+        }
+        
+        .view-full-btn {
+            font-size: 14px;
+            color: #3498db;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 8px 0;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item.active i, .nav-item.active span {
+            color: #3498db;
+        }
+        
+        .publish-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .publish-icon {
+            position: absolute;
+            bottom: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .publish-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        .publish-icon i {
+            font-size: 24px;
+            color: #fff;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 414px) {
+            .app-container {
+                max-width: 100%;
+            }
+            
+            .bottom-nav {
+                max-width: 100%;
+            }
+            
+            .kanban-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 首页内容 -->
+        <div class="page active" id="home">
+            <!-- 搜索栏 -->
+            <div class="search-bar" onclick="window.location.href='home_modules/home_search.html'">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜索帖子、食谱、健康知识..." readonly>
+            </div>
+            
+            <!-- 节气Banner -->
+            <div class="festival-banner" onclick="window.location.href='home_modules/home_festival.html'" style="cursor: pointer;">
+                <div class="festival-content">
+                    <div class="festival-text">
+                        <div class="festival-title" id="festivalTitle">春分</div>
+                        <div class="festival-date" id="currentDate">加载中...</div>
+                        <div class="festival-desc">昼夜平分，万物复苏，春意盎然</div>
+                    </div>
+                    <div class="festival-image">🌸</div>
+                </div>
+            </div>
+            
+            <!-- 快速导航 -->
+            <div class="quick-nav">
+                <div class="quick-nav-item" onclick="window.location.href='home_modules/home_fortune.html'">
+                    <div class="quick-nav-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="quick-nav-label">命理分析</div>
+                </div>
+                <div class="quick-nav-item" onclick="window.location.href='home_modules/home_health.html'">
+                    <div class="quick-nav-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="quick-nav-label">健康画像</div>
+                </div>
+                <div class="quick-nav-item" onclick="window.location.href='home_modules/home_recipe.html'">
+                    <div class="quick-nav-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="quick-nav-label">饮食推荐</div>
+                </div>
+                <div class="quick-nav-item" onclick="window.location.href='home_modules/home_kanban.html'">
+                    <div class="quick-nav-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="quick-nav-label">智能看板</div>
+                </div>
+                <div class="quick-nav-item" onclick="scrollToSection('community-section')">
+                    <div class="quick-nav-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="quick-nav-label">社区动态</div>
+                </div>
+            </div>
+            
+            <!-- 社区帖子流 -->
+            <div id="community-section" class="section-anchor community-posts">
+                <div class="section-title">
+                    <span class="title-with-icon">
+                        <span class="title-icon" style="background: linear-gradient(135deg, #8feeff, #8ad9df);">
+                            <i class="fas fa-comments"></i>
+                        </span>
+                        <span>社区动态</span>
+                    </span>
+                    <span onclick="window.location.href='home_modules/home_search.html'" style="cursor: pointer;">全部<i class="fas fa-chevron-right"></i></span>
+                </div>
+                <div class="post-list">
+                    <!-- 帖子1 -->
+                    <div class="post-card" onclick="window.location.href='home_modules/home_post_detail.html'">
+                        <div class="post-header">
+                            <div class="user-info">
+                                <div class="user-avatar"></div>
+                                <div class="user-details">
+                                    <div class="user-name">健康达人</div>
+                                    <div class="post-time">2小时前</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            <p>今天分享一个春季养生小技巧：多食用当季新鲜蔬菜，如菠菜、荠菜等，有助于补充维生素和矿物质，增强免疫力。</p>
+                            <div class="post-image"></div>
+                        </div>
+                        <div class="post-footer">
+                            <div class="post-stats">
+                                <span class="like-count"><i class="fas fa-heart"></i> 128</span>
+                                <span class="comment-count"><i class="fas fa-comment"></i> 36</span>
+                            </div>
+                            <button class="view-full-btn">查看全文</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 帖子2 -->
+                    <div class="post-card" onclick="window.location.href='home_modules/home_post_detail.html'">
+                        <div class="post-header">
+                            <div class="user-info">
+                                <div class="user-avatar"></div>
+                                <div class="user-details">
+                                    <div class="user-name">养生专家</div>
+                                    <div class="post-time">5小时前</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            <p>春分时节，昼夜平分，养生要注意阴阳平衡。推荐大家每天进行15分钟的冥想，有助于调节身心，提高睡眠质量。</p>
+                            <div class="post-image"></div>
+                        </div>
+                        <div class="post-footer">
+                            <div class="post-stats">
+                                <span class="like-count"><i class="fas fa-heart"></i> 89</span>
+                                <span class="comment-count"><i class="fas fa-comment"></i> 23</span>
+                            </div>
+                            <button class="view-full-btn">查看全文</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" data-page="ai-chat">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" data-page="publish-post">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" data-page="member">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    <script>
+        // 滚动到指定区域
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }
+        
+        // 快速导航点击事件（社区动态使用滚动，其他使用跳转）
+        
+        // 更新当前日期和时间
+        function updateDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekday = weekdays[now.getDay()];
+            
+            const dateStr = `${year}年${month}月${day}日 ${weekday}`;
+            document.getElementById('currentDate').textContent = dateStr;
+            
+            // 根据当前日期更新节气（简化版，实际应该根据具体节气日期）
+            const solarTerms = [
+                { name: '立春', emoji: '🌱', desc: '万物复苏，春意盎然', start: 2, end: 2 },
+                { name: '雨水', emoji: '💧', desc: '春雨绵绵，润物无声', start: 2, end: 2 },
+                { name: '惊蛰', emoji: '⚡', desc: '春雷乍响，万物复苏', start: 3, end: 3 },
+                { name: '春分', emoji: '🌸', desc: '昼夜平分，万物复苏', start: 3, end: 3 },
+                { name: '清明', emoji: '🌿', desc: '清明时节，踏青赏春', start: 4, end: 4 },
+                { name: '谷雨', emoji: '🌧️', desc: '雨生百谷，春意正浓', start: 4, end: 4 },
+                { name: '立夏', emoji: '🌻', desc: '夏日初至，万物繁茂', start: 5, end: 5 },
+                { name: '小满', emoji: '🌾', desc: '小满未满，生机勃勃', start: 5, end: 5 },
+                { name: '芒种', emoji: '🌾', desc: '芒种时节，农忙正当时', start: 6, end: 6 },
+                { name: '夏至', emoji: '☀️', desc: '夏至已至，昼长夜短', start: 6, end: 6 },
+                { name: '小暑', emoji: '🔥', desc: '小暑初至，炎夏开始', start: 7, end: 7 },
+                { name: '大暑', emoji: '🌡️', desc: '大暑时节，酷热难当', start: 7, end: 7 },
+                { name: '立秋', emoji: '🍂', desc: '立秋已至，秋意渐浓', start: 8, end: 8 },
+                { name: '处暑', emoji: '🍁', desc: '处暑时节，暑气渐消', start: 8, end: 8 },
+                { name: '白露', emoji: '💎', desc: '白露为霜，秋意渐浓', start: 9, end: 9 },
+                { name: '秋分', emoji: '🍂', desc: '秋分时节，昼夜平分', start: 9, end: 9 },
+                { name: '寒露', emoji: '❄️', desc: '寒露已至，秋意更深', start: 10, end: 10 },
+                { name: '霜降', emoji: '🧊', desc: '霜降时节，秋意正浓', start: 10, end: 10 },
+                { name: '立冬', emoji: '❄️', desc: '立冬已至，冬意渐浓', start: 11, end: 11 },
+                { name: '小雪', emoji: '❄️', desc: '小雪初至，冬意渐浓', start: 11, end: 11 },
+                { name: '大雪', emoji: '🌨️', desc: '大雪纷飞，冬意正浓', start: 12, end: 12 },
+                { name: '冬至', emoji: '❄️', desc: '冬至已至，昼短夜长', start: 12, end: 12 },
+                { name: '小寒', emoji: '🧊', desc: '小寒初至，寒意渐浓', start: 1, end: 1 },
+                { name: '大寒', emoji: '❄️', desc: '大寒时节，寒意正浓', start: 1, end: 1 }
+            ];
+            
+            let currentTerm = solarTerms.find(term => term.start === month) || solarTerms[3]; // 默认春分
+            document.getElementById('festivalTitle').textContent = currentTerm.name;
+            document.querySelector('.festival-image').textContent = currentTerm.emoji;
+            document.querySelector('.festival-desc').textContent = currentTerm.desc;
+        }
+        
+        // 确保当前页面的导航项处于活动状态
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            const currentPage = 'home';
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                if (item.getAttribute('data-page') === currentPage) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        });
+    </script>
+    </div>
+    
+    <script>
+        // 搜索功能
+        const searchInput = document.querySelector('.search-bar input');
+        if (searchInput) {
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+            });
+            
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.style.boxShadow = 'none';
+            });
+        }
+        
+        // 页面跳转功能
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.getAttribute('data-page');
+                if (page) {
+                    // 实现平滑过渡效果
+                    document.body.style.opacity = '0';
+                    document.body.style.transition = 'opacity 0.3s ease';
+                    
+                    setTimeout(() => {
+                        window.location.href = `${page}.html`;
+                    }, 300);
+                }
+            });
+        });
+        
+        // 微交互效果
+        const buttons = document.querySelectorAll('.nav-item, .function-item, .recipe-card, .kanban-card, .post-card');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                button.style.transform = 'translateY(-2px)';
+                button.style.transition = 'transform 0.2s ease';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'translateY(0)';
+            });
+            
+            if (!button.classList.contains('nav-item')) {
+                button.addEventListener('click', () => {
+                    button.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        button.style.transform = 'scale(1)';
+                    }, 100);
+                });
+            }
+        });
+        
+        // 无限滚动功能（简化版）
+        const postList = document.querySelector('.post-list');
+        if (postList) {
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollHeight = document.documentElement.scrollHeight;
+                const clientHeight = document.documentElement.clientHeight;
+                
+                if (scrollHeight - scrollTop - clientHeight < 200) {
+                    // 模拟加载更多帖子
+                    loadMorePosts();
+                }
+            });
+        }
+        
+        function loadMorePosts() {
+            const postList = document.querySelector('.post-list');
+            if (!postList) return;
+            
+            // 创建新帖子
+            const newPost = document.createElement('div');
+            newPost.className = 'post-card';
+            newPost.innerHTML = `
+                <div class="post-header">
+                    <div class="user-info">
+                        <div class="user-avatar"></div>
+                        <div class="user-details">
+                            <div class="user-name">用户${Math.floor(Math.random() * 1000)}</div>
+                            <div class="post-time">${Math.floor(Math.random() * 24)}小时前</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <p>这是一条新的社区动态，分享我的生活感悟和健康经验...</p>
+                    <div class="post-image"></div>
+                </div>
+                <div class="post-footer">
+                    <div class="post-stats">
+                        <span class="like-count"><i class="fas fa-heart"></i> ${Math.floor(Math.random() * 300)}</span>
+                        <span class="comment-count"><i class="fas fa-comment"></i> ${Math.floor(Math.random() * 100)}</span>
+                    </div>
+                    <button class="view-full-btn">查看全文</button>
+                </div>
+            `;
+            
+            postList.appendChild(newPost);
+        }
+    </script>
+</body>
+</html>

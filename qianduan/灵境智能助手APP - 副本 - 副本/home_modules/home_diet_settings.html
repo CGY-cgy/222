@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>饮食设置 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="traditional_style.css">
+    <style>
+        /* 设置区域样式 */
+        .settings-section {
+            position: relative;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 3px solid #8b4513;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        /* 云纹装饰 */
+        .settings-section::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 60px;
+            height: 40px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40"%3E%3Cpath d="M10 20 Q 20 10 30 20 Q 40 30 50 20 Q 40 10 30 20 Q 20 30 10 20 Z" fill="rgba(245,222,179,0.6)"/%3E%3C/svg%3E');
+            background-size: contain;
+            background-repeat: no-repeat;
+            transform: rotate(15deg);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .section-title i {
+            color: #e74c3c;
+            font-size: 20px;
+        }
+        
+        /* 设置项样式 */
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 2px solid #f5deb3;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-label {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 500;
+            color: #8b4513;
+        }
+        
+        .setting-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #a0522d;
+            margin-right: 12px;
+        }
+        
+        /* 开关样式 */
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-switch label {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            border: 2px solid #8b4513;
+            transition: .4s;
+            border-radius: 8px;
+        }
+        
+        .toggle-switch label:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 3px;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 1px solid #8b4513;
+            transition: .4s;
+            border-radius: 4px;
+        }
+        
+        .toggle-switch input:checked + label {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+        
+        .toggle-switch input:checked + label:before {
+            transform: translateX(26px);
+        }
+        
+        /* 标签样式 */
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .tag-item {
+            padding: 8px 14px;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #8b4513;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tag-item.selected {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        
+        .tag-item .remove-tag {
+            color: #8b4513;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .tag-item.selected .remove-tag {
+            color: #fff;
+        }
+        
+        /* 添加标签按钮 */
+        .add-tag-btn {
+            padding: 8px 14px;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            border: 2px dashed #8b4513;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #8b4513;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .add-tag-btn:hover {
+            background: linear-gradient(135deg, #deb887 0%, #f5deb3 100%);
+            border-style: solid;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 保存按钮样式 */
+        .save-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 8px;
+            border: 3px solid #8b4513;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 28px;
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .save-btn:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(231, 76, 60, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="page">
+            <div class="scroll-header">
+                <div class="scroll-title">智能饮食推荐</div>
+            </div>
+            
+            <!-- 功能导航 -->
+            <div class="module-nav">
+                <div class="nav-tab" onclick="window.location.href='home_recipe.html'">推荐食谱</div>
+                <div class="nav-tab active" onclick="window.location.href='home_diet_settings.html'">设置饮食禁忌</div>
+                <div class="nav-tab" onclick="window.location.href='home_dos_donts.html'">今日宜忌</div>
+                <div class="nav-tab" onclick="window.location.href='home_recipe_history.html'">历史推荐</div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="section-title">
+                    <i class="fas fa-ban"></i>
+                    <span>过敏源</span>
+                </div>
+                <div class="tag-list">
+                    <div class="tag-item selected">
+                        <span>花生</span>
+                        <i class="fas fa-times remove-tag"></i>
+                    </div>
+                    <div class="tag-item selected">
+                        <span>海鲜</span>
+                        <i class="fas fa-times remove-tag"></i>
+                    </div>
+                    <div class="add-tag-btn" onclick="addAllergen()">
+                        <i class="fas fa-plus"></i> 添加
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="section-title">
+                    <i class="fas fa-utensils"></i>
+                    <span>忌口食物</span>
+                </div>
+                <div class="tag-list">
+                    <div class="tag-item selected">
+                        <span>辛辣</span>
+                        <i class="fas fa-times remove-tag"></i>
+                    </div>
+                    <div class="tag-item selected">
+                        <span>油腻</span>
+                        <i class="fas fa-times remove-tag"></i>
+                    </div>
+                    <div class="add-tag-btn" onclick="addTaboo()">
+                        <i class="fas fa-plus"></i> 添加
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="section-title">
+                    <i class="fas fa-heart"></i>
+                    <span>饮食偏好</span>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">素食</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="vegetarian">
+                        <label for="vegetarian"></label>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">低盐</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="lowSalt" checked>
+                        <label for="lowSalt"></label>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">低糖</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="lowSugar">
+                        <label for="lowSugar"></label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="section-title">
+                    <i class="fas fa-fire"></i>
+                    <span>每日热量目标</span>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">目标热量</span>
+                    <span class="setting-value">1800 卡路里</span>
+                    <i class="fas fa-chevron-right" style="color: #bdc3c7;"></i>
+                </div>
+            </div>
+            
+            <button class="save-btn" onclick="saveSettings()">
+                保存设置
+            </button>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='../home.html'">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../ai-chat.html'">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" onclick="window.location.href='../publish-post.html'">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../member.html'">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../profile.html'">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function addAllergen() {
+            const allergen = prompt('请输入过敏源名称：');
+            if (allergen) {
+                alert('添加成功：' + allergen);
+            }
+        }
+        
+        function addTaboo() {
+            const taboo = prompt('请输入忌口食物：');
+            if (taboo) {
+                alert('添加成功：' + taboo);
+            }
+        }
+        
+        function saveSettings() {
+            alert('设置已保存');
+        }
+        
+        // 移除标签
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-tag')) {
+                e.target.closest('.tag-item').remove();
+            }
+        });
+    </script>
+</body>
+</html>
+

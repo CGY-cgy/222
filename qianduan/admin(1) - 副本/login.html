@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 灵境管理后台</title>
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body {
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+            margin: 0;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-xl);
+            padding: var(--spacing-xl) var(--spacing-lg);
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: url('lingjing.png') center center no-repeat;
+            background-size: contain;
+            border-radius: var(--border-radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-lg);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .login-subtitle {
+            font-size: 15px;
+            color: var(--text-tertiary);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            font-size: 16px;
+            color: var(--text-primary);
+            transition: all var(--transition-fast);
+            background: var(--bg-tertiary);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-light);
+        }
+        
+        .password-toggle {
+            position: relative;
+        }
+        
+        .password-toggle .form-input {
+            padding-right: 50px;
+        }
+        
+        .toggle-btn {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-tertiary);
+            transition: color var(--transition-fast);
+        }
+        
+        .toggle-btn:hover {
+            color: var(--text-primary);
+        }
+        
+        .form-options {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .remember-me input {
+            display: none;
+        }
+        
+        .remember-me .checkmark {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+        
+        .remember-me input:checked + .checkmark {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-color: transparent;
+        }
+        
+        .remember-me .checkmark::after {
+            content: '✓';
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+        
+        .remember-me input:checked + .checkmark::after {
+            opacity: 1;
+        }
+        
+        .remember-me span {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .forgot-password {
+            font-size: 14px;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition-fast);
+        }
+        
+        .forgot-password:hover {
+            color: var(--primary-dark);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: 17px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: var(--spacing-lg) 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+        
+        .divider span {
+            padding: 0 var(--spacing-md);
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+        
+        .security-tips {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .security-tips h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .security-tips ul {
+            list-style: none;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .error-message {
+            background: rgba(245, 101, 101, 0.1);
+            border: 1px solid rgba(245, 101, 101, 0.3);
+            border-radius: var(--border-radius-md);
+            padding: 12px 16px;
+            margin-bottom: var(--spacing-md);
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .error-message.show {
+            display: flex;
+        }
+        
+        .error-message span:first-child {
+            font-size: 18px;
+        }
+        
+        .error-message span:last-child {
+            font-size: 14px;
+            color: var(--danger-color);
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo"></div>
+            <h1 class="login-title">灵境管理后台</h1>
+            <p class="login-subtitle">请登录您的管理员账户</p>
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            <span>⚠️</span>
+            <span id="errorText">用户名或密码错误</span>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">用户名</label>
+                <input type="text" class="form-input" id="username" placeholder="请输入管理员用户名" autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">密码</label>
+                <div class="password-toggle">
+                    <input type="password" class="form-input" id="password" placeholder="请输入密码" autocomplete="current-password">
+                    <button type="button" class="toggle-btn" onclick="togglePassword()">👁️</button>
+                </div>
+            </div>
+            
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <span class="checkmark"></span>
+                    <span>记住我</span>
+                </label>
+                <a href="#" class="forgot-password">忘记密码？</a>
+            </div>
+            
+            <button type="submit" class="login-btn">登录</button>
+        </form>
+        
+        <div class="divider"><span>安全提示</span></div>
+        
+        <div class="security-tips">
+            <h4>🔒 安全提示</h4>
+            <ul>
+                <li>• 请妥善保管您的登录凭证</li>
+                <li>• 建议定期更换密码（至少90天）</li>
+                <li>• 离开时请记得退出登录</li>
+                <li>• 如发现异常请立即联系管理员</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const toggleBtn = document.querySelector('.toggle-btn');
+        
+        const validUsers = {
+            'admin': 'admin123',
+            'manager': 'manager123',
+            'superadmin': 'super2024'
+        };
+        
+        function togglePassword() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            toggleBtn.textContent = type === 'password' ? '👁️' : '🙈';
+        }
+        
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.add('show', 'shake');
+            setTimeout(() => {
+                errorMessage.classList.remove('shake');
+            }, 300);
+        }
+        
+        function hideError() {
+            errorMessage.classList.remove('show');
+        }
+        
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            hideError();
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!username || !password) {
+                showError('请输入用户名和密码');
+                return;
+            }
+            
+            if (validUsers[username] === password) {
+                const loginBtn = document.querySelector('.login-btn');
+                loginBtn.textContent = '登录中...';
+                loginBtn.disabled = true;
+                
+                setTimeout(() => {
+                    sessionStorage.setItem('adminUser', username);
+                    sessionStorage.setItem('loginTime', new Date().toISOString());
+                    
+                    if (document.getElementById('remember').checked) {
+                        localStorage.setItem('rememberUser', username);
+                    } else {
+                        localStorage.removeItem('rememberUser');
+                    }
+                    
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            } else {
+                showError('用户名或密码错误');
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        });
+        
+        usernameInput.addEventListener('input', hideError);
+        passwordInput.addEventListener('input', hideError);
+        
+        const savedUser = localStorage.getItem('rememberUser');
+        if (savedUser) {
+            usernameInput.value = savedUser;
+            document.getElementById('remember').checked = true;
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

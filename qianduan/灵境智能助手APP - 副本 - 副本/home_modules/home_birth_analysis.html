@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出生信息命理分析 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="traditional_style.css">
+    <style>
+        /* 表单样式 */
+        .form-section {
+            position: relative;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 3px solid #8b4513;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 8px;
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .form-label .required {
+            color: #e74c3c;
+            margin-left: 4px;
+        }
+        
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            font-size: 14px;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            color: #8b4513;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, #f5f5dc 0%, #fffaf0 100%);
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+        
+        .form-hint {
+            font-size: 13px;
+            color: #8b4513;
+            opacity: 0.8;
+            margin-top: 6px;
+        }
+        
+        /* 提交按钮 */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 8px;
+            border: 3px solid #8b4513;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(231, 76, 60, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+            border-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="page">
+            <!-- 卷轴标题 -->
+            <div class="scroll-header">
+                <div class="scroll-title">命理分析与心理抚慰</div>
+            </div>
+            
+            <!-- 功能导航 -->
+            <div class="module-nav">
+                <div class="nav-tab" onclick="window.location.href='home_fortune.html'">面部/手相</div>
+                <div class="nav-tab active" onclick="window.location.href='home_birth_analysis.html'">出生信息</div>
+                <div class="nav-tab" onclick="window.location.href='home_mental_assessment.html'">心理自评</div>
+                <div class="nav-tab" onclick="window.location.href='home_history_reports.html'">历史</div>
+            </div>
+        
+            <div class="form-section">
+                <div class="form-group">
+                    <label class="form-label">
+                        出生日期
+                        <span class="required">*</span>
+                    </label>
+                    <input type="date" class="form-input" id="birthDate" required>
+                    <div class="form-hint">请选择您的公历出生日期</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        出生时间
+                        <span class="required">*</span>
+                    </label>
+                    <input type="time" class="form-input" id="birthTime" required>
+                    <div class="form-hint">请选择您的出生时间（精确到小时）</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        出生地点
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" class="form-input" id="birthPlace" placeholder="请输入出生城市" required>
+                    <div class="form-hint">例如：北京市、上海市</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        性别
+                        <span class="required">*</span>
+                    </label>
+                    <select class="form-select" id="gender" required>
+                        <option value="">请选择</option>
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-info-circle"></i>
+                    <span>分析说明</span>
+                </div>
+                <div class="info-text">
+                    根据您提供的出生信息，我们将为您生成详细的命理分析报告，包括八字、五行、性格特点、运势走向等内容。所有信息仅用于分析，我们承诺保护您的隐私安全。
+                </div>
+            </div>
+            
+            <button class="submit-btn" onclick="submitAnalysis()">
+                生成分析报告
+            </button>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='../home.html'">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../ai-chat.html'">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" onclick="window.location.href='../publish-post.html'">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../member.html'">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../profile.html'">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function submitAnalysis() {
+            const birthDate = document.getElementById('birthDate').value;
+            const birthTime = document.getElementById('birthTime').value;
+            const birthPlace = document.getElementById('birthPlace').value;
+            const gender = document.getElementById('gender').value;
+            
+            if (!birthDate || !birthTime || !birthPlace || !gender) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            alert('正在生成分析报告，请稍候...');
+            // 这里可以跳转到报告页面
+            // window.location.href = 'home_history_reports.html';
+        }
+    </script>
+</body>
+</html>
+

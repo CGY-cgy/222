@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵境智能助手 - 会员购买</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../member-common.css">
+    <style>
+        /* 会员购买页面样式 */
+        
+        /* 套餐选择区域 */
+        .package-section {
+            margin-bottom: 24px;
+        }
+        
+        .package-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .package-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .package-option:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
+        }
+        
+        .package-option.selected {
+            border-color: #e74c3c;
+            background-color: #fff5f5;
+        }
+        
+        .package-option.recommended::before {
+            content: '推荐';
+            position: absolute;
+            top: -10px;
+            right: 16px;
+            background-color: #e74c3c;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .package-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .package-period {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .package-description {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .package-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e74c3c;
+        }
+        
+        .package-price span {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-left: 4px;
+        }
+        
+        /* 支付方式选择 */
+        .payment-section {
+            margin-bottom: 24px;
+        }
+        
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .payment-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-option:hover {
+            border-color: #3498db;
+        }
+        
+        .payment-option.selected {
+            border-color: #3498db;
+            background-color: #f8f9fa;
+        }
+        
+        .payment-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .payment-icon {
+            font-size: 24px;
+        }
+        
+        .payment-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .payment-option.selected::after {
+            content: '✓';
+            font-size: 18px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        /* 自动续费设置 */
+        .renewal-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .renewal-setting {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .renewal-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .renewal-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .renewal-description {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        /* 订单确认区域 */
+        .order-confirmation {
+            margin-bottom: 24px;
+            padding: 16px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .order-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .order-item-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .order-item-value {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .total-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e74c3c;
+        }
+        
+        /* 购买按钮 */
+        .purchase-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+        }
+        
+        .purchase-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .purchase-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* 自动续费开关样式 */
+        .auto-renewal-toggle {
+            width: 50px;
+            height: 24px;
+            background-color: #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .auto-renewal-toggle.active {
+            background-color: #27ae60;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .auto-renewal-toggle.active .toggle-slider {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 会员购买页面内容 -->
+        <div class="page active" id="page-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <button class="back-btn" title="返回" onclick="window.location.href='member.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="page-title" style="font-size: 16px; text-align: center; width: 100%;">开通会员</div>
+             
+            </div>
+            
+            <!-- 套餐选择 -->
+            <div class="package-section">
+                <div class="section-title">选择套餐</div>
+                <div class="package-options">
+                    <div class="package-option" data-package="monthly" data-price="29">
+                        <div class="package-info">
+                            <div class="package-period">月付套餐</div>
+                            <div class="package-description">每月自动续费</div>
+                        </div>
+                        <div class="package-price">¥29<span>/月</span></div>
+                    </div>
+                    <div class="package-option selected recommended" data-package="quarterly" data-price="79">
+                        <div class="package-info">
+                            <div class="package-period">季付套餐</div>
+                            <div class="package-description">每3个月自动续费</div>
+                        </div>
+                        <div class="package-price">¥79<span>/3月</span></div>
+                    </div>
+                    <div class="package-option" data-package="yearly" data-price="299">
+                        <div class="package-info">
+                            <div class="package-period">年付套餐</div>
+                            <div class="package-description">每年自动续费</div>
+                        </div>
+                        <div class="package-price">¥299<span>/年</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 支付方式选择 -->
+            <div class="payment-section">
+                <div class="section-title">支付方式</div>
+                <div class="payment-options">
+                    <div class="payment-option selected" data-payment="wechat">
+                        <div class="payment-info">
+                            <i class="fab fa-weixin payment-icon" style="color: #07C160;"></i>
+                            <div class="payment-name">微信支付</div>
+                        </div>
+                    </div>
+                    <div class="payment-option" data-payment="alipay">
+                        <div class="payment-info">
+                            <i class="fab fa-alipay payment-icon" style="color: #1677FF;"></i>
+                            <div class="payment-name">支付宝</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 自动续费设置 -->
+            <div class="renewal-section">
+                <div class="renewal-setting">
+                    <div class="renewal-info">
+                        <div class="renewal-title">自动续费</div>
+                        <div class="renewal-description">开通后每月自动续费，可随时关闭</div>
+                    </div>
+                    <div class="auto-renewal-toggle active">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 订单确认 -->
+            <div class="order-confirmation">
+                <div class="order-item">
+                    <div class="order-item-label">套餐金额</div>
+                    <div class="order-item-value">¥<span id="totalAmount">79</span></div>
+                </div>
+                <div class="order-item">
+                    <div class="order-item-label">优惠</div>
+                    <div class="order-item-value">-¥0</div>
+                </div>
+                <div class="order-item">
+                    <div class="order-item-label">实付金额</div>
+                    <div class="order-item-value total-price">¥<span id="finalAmount">79</span></div>
+                </div>
+            </div>
+            
+            <!-- 立即购买按钮 -->
+            <button class="purchase-btn" id="purchaseBtn">
+                立即购买
+            </button>
+        </div>
+    
+        
+        <script src="../member-common.js"></script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全管理 - 灵境管理后台</title>
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">🏥</div>
+                    <div>
+                        <div class="sidebar-logo-text">灵境管理</div>
+                        <div class="sidebar-logo-sub">Admin Console</div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">主要功能</div>
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="nav-item-icon">📊</span>
+                        <span class="nav-item-text">数据看板</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <span class="nav-item-icon">👥</span>
+                        <span class="nav-item-text">用户管理</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                        <span class="nav-item-icon">📈</span>
+                        <span class="nav-item-text">数据分析</span>
+                    </a>
+                    <a href="membership.html" class="nav-item">
+                        <span class="nav-item-icon">💎</span>
+                        <span class="nav-item-text">会员分析</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统管理</div>
+                    <a href="security.html" class="nav-item active">
+                        <span class="nav-item-icon">🔒</span>
+                        <span class="nav-item-text">安全管理</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="nav-item-icon">⚙️</span>
+                        <span class="nav-item-text">系统设置</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <span class="nav-item-icon">🚪</span>
+                        <span class="nav-item-text">退出登录</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 class="header-title">安全管理</h1>
+                    <p class="header-subtitle">平台安全状态监控与合规管理</p>
+                </div>
+                <div class="header-actions">
+                    <div class="date-range">
+                        <select class="form-select">
+                            <option>实时</option>
+                            <option selected>今日</option>
+                            <option>本周</option>
+                            <option>本月</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary">
+                        <span>🔍</span>
+                        <span>安全扫描</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="security-score-banner">
+                <div class="score-info">
+                    <div class="score-circle">92</div>
+                    <div class="score-details">
+                        <h3>安全评分</h3>
+                        <p>系统运行良好，暂无高危风险</p>
+                    </div>
+                </div>
+                <div class="score-actions">
+                    <button class="btn btn-white">
+                        <span>📊</span>
+                        <span>生成报告</span>
+                    </button>
+                    <button class="btn btn-outline-white">
+                        <span>⚙️</span>
+                        <span>安全设置</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card text-center">
+                    <div class="stat-card-value success">1,234,567</div>
+                    <div class="stat-card-label">今日请求数</div>
+                    <div class="stat-card-trend">
+                        <span class="trend-up">↑ 15.2%</span>
+                    </div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="stat-card-value success">99.99%</div>
+                    <div class="stat-card-label">系统可用性</div>
+                    <div class="stat-card-trend">
+                        <span class="trend-up">↑ 0.01%</span>
+                    </div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="stat-card-value warning">12</div>
+                    <div class="stat-card-label">今日拦截</div>
+                    <div class="stat-card-trend">
+                        <span class="trend-down">↓ 8.3%</span>
+                    </div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="stat-card-value danger">2</div>
+                    <div class="stat-card-label">待处理告警</div>
+                    <div class="stat-card-trend">
+                        <span class="trend-down">↓ 50.0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-sections">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🔒 数据安全</h3>
+                        <div class="card-subtitle">敏感数据加密存储与传输保护</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔐 AES-256 加密
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    用户面部照片、出生信息、健康数据均采用AES-256加密存储，确保敏感信息安全性。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">已加密字段: 32个</span>
+                                    <span class="detail-tag">最近更新: 2小时前</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🌐 HTTPS/TLS 1.2+
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    全站启用HTTPS，采用TLS 1.2+协议，保障数据传输安全，防止中间人攻击。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">证书类型: EV SSL</span>
+                                    <span class="detail-tag">到期时间: 2026-03-15</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔑 密钥管理 (KMS)
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    使用专用密钥管理服务管理API密钥、数据库密码等敏感凭证，支持自动轮换。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">托管密钥: 48个</span>
+                                    <span class="detail-tag">轮换周期: 90天</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🛡️ 用户隐私与合规</h3>
+                        <div class="card-subtitle">遵守个人信息保护法相关法规</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="compliance-list">
+                            <div class="compliance-item">
+                                <div class="compliance-icon checked">✓</div>
+                                <div class="compliance-content">
+                                    <div class="compliance-title">隐私政策明确</div>
+                                    <div class="compliance-desc">明确告知用户数据收集和使用方式，已通过法律审核</div>
+                                </div>
+                                <span class="status-badge success">已合规</span>
+                            </div>
+                            <div class="compliance-item">
+                                <div class="compliance-icon checked">✓</div>
+                                <div class="compliance-content">
+                                    <div class="compliance-title">权限最小化</div>
+                                    <div class="compliance-desc">仅申请必要权限（相机、位置），并提供用户开关选项</div>
+                                </div>
+                                <span class="status-badge success">已合规</span>
+                            </div>
+                            <div class="compliance-item">
+                                <div class="compliance-icon checked">✓</div>
+                                <div class="compliance-content">
+                                    <div class="compliance-title">数据匿名化处理</div>
+                                    <div class="compliance-desc">行为数据去标识化后用于推荐模型训练</div>
+                                </div>
+                                <span class="status-badge success">已合规</span>
+                            </div>
+                            <div class="compliance-item">
+                                <div class="compliance-icon unchecked">!</div>
+                                <div class="compliance-content">
+                                    <div class="compliance-title">第三方审计</div>
+                                    <div class="compliance-desc">计划每年度进行一次第三方安全审计</div>
+                                </div>
+                                <span class="status-badge warning">待完成</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🔐 身份认证与授权</h3>
+                        <div class="card-subtitle">OAuth 2.0 / JWT 多因素认证</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔑 OAuth 2.0 / JWT
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    JSON Web Token用于用户登录与会话管理，支持自动续期机制。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">Token有效期: 7天</span>
+                                    <span class="detail-tag">活跃用户: 12,589</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        📱 多因素认证 (MFA)
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    支持手机号/邮箱+验证码，提高账户安全性，有效防止账号盗用。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">已绑定: 8,234</span>
+                                    <span class="detail-tag">覆盖率: 65.4%</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        👥 RBAC 权限控制
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    基于角色的访问控制，限制不同用户的数据访问范围，保障数据隔离。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">角色数: 12个</span>
+                                    <span class="detail-tag">权限规则: 156条</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🌐 API安全</h3>
+                        <div class="card-subtitle">接口安全防护与访问控制</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🚦 接口限流
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    使用Redis实现接口限流，防止恶意刷接口，保障服务稳定性。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">限制: 60次/分钟</span>
+                                    <span class="detail-tag">今日拦截: 12次</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔐 API网关鉴权
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    所有API请求必须携带有效Token，由网关统一验证，防止未授权访问。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">网关节点: 3个</span>
+                                    <span class="detail-tag">日均请求: 1,234,567</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🛡️ 输入验证
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    防止SQL注入、XSS攻击，对所有输入进行校验和过滤，保障应用安全。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">规则数: 128条</span>
+                                    <span class="detail-tag">今日检测: 45,678次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🛠️ 代码与运维安全</h3>
+                        <div class="card-subtitle">代码质量与运维安全防护</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔍 依赖扫描
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    使用Snyk/Dependabot定期扫描第三方库漏洞，及时修复安全隐患。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">依赖项: 2,456个</span>
+                                    <span class="detail-tag">扫描周期: 每日</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        📊 SonarQube扫描
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    代码质量与安全漏洞扫描，持续集成流程中发现并修复问题。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">代码规范: A级</span>
+                                    <span class="detail-tag">技术债务: 2.3天</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔄 漏洞管理
+                                        <span class="status-badge warning">进行中</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    建立漏洞响应机制，定期进行安全审计和渗透测试，保障系统安全。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">最近审计: 2025-01-10</span>
+                                    <span class="detail-tag">待修复: 0个</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">💾 备份与灾难恢复</h3>
+                        <div class="card-subtitle">数据备份与容灾方案</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        📦 定期备份
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    用户数据、日志、配置定期备份至异地存储（如AWS S3），保障数据安全。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">备份周期: 每日</span>
+                                    <span class="detail-tag">保留时间: 30天</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🏃 灾备方案
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    多可用区部署，自动故障转移，保障业务连续性，避免单点故障。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">可用区: 3个</span>
+                                    <span class="detail-tag">RTO: < 5分钟</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 安全日志</h3>
+                        <div class="card-subtitle">系统安全事件记录与监控</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>类型</th>
+                                        <th>事件描述</th>
+                                        <th>状态</th>
+                                        <th>来源IP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>2025-01-15 14:32:15</td>
+                                        <td><span class="log-type security">🔒 安全</span></td>
+                                        <td>检测到异常登录尝试</td>
+                                        <td><span class="status-badge warning">已处理</span></td>
+                                        <td>192.168.1.105</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-01-15 14:30:22</td>
+                                        <td><span class="log-type info">ℹ️ 系统</span></td>
+                                        <td>系统自动备份完成</td>
+                                        <td><span class="status-badge success">成功</span></td>
+                                        <td>系统</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-01-15 14:28:45</td>
+                                        <td><span class="log-type warning">⚠️ 警告</span></td>
+                                        <td>API请求频率接近限制</td>
+                                        <td><span class="status-badge info">监控中</span></td>
+                                        <td>192.168.1.88</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-01-15 14:25:10</td>
+                                        <td><span class="log-type info">ℹ️ 系统</span></td>
+                                        <td>用户密码强度提升</td>
+                                        <td><span class="status-badge success">成功</span></td>
+                                        <td>用户 139****2233</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-01-15 14:20:33</td>
+                                        <td><span class="log-type security">🔒 安全</span></td>
+                                        <td>检测到可疑SQL注入</td>
+                                        <td><span class="status-badge success">已拦截</span></td>
+                                        <td>10.0.0.55</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination">
+                            <span>显示最近 5 条记录</span>
+                            <div class="pagination-buttons">
+                                <button class="btn btn-secondary">上一页</button>
+                                <button class="btn btn-secondary">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

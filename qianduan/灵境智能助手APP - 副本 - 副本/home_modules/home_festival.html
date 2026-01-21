@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>节气详情 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="traditional_style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background-color: #fff;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .back-btn:hover {
+            background-color: #e9ecef;
+        }
+        
+        .header-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .festival-banner {
+            width: 100%;
+            height: 320px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            padding: 24px;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 4px solid #8b4513;
+        }
+        
+        .festival-banner::before,
+        .festival-banner::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 80px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40" fill="rgba(255,255,255,0.2)"%3E%3Cpath d="M10 20 Q 20 10 30 20 Q 40 30 50 20 Q 40 10 30 20 Q 20 30 10 20 Z"/%3E%3C/svg%3E');
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .festival-banner::before {
+            top: 20px;
+            right: 20px;
+        }
+        
+        .festival-banner::after {
+            bottom: 20px;
+            left: 20px;
+            transform: rotate(180deg);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        .floating-element {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.3;
+            animation: floatAround 15s infinite linear;
+        }
+        
+        .floating-element:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-element:nth-child(2) { top: 40%; left: 80%; animation-delay: 2s; }
+        .floating-element:nth-child(3) { top: 60%; left: 20%; animation-delay: 4s; }
+        .floating-element:nth-child(4) { top: 80%; left: 70%; animation-delay: 6s; }
+        
+        @keyframes floatAround {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -20px) rotate(90deg); }
+            50% { transform: translate(-10px, -30px) rotate(180deg); }
+            75% { transform: translate(-20px, 10px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+        
+        .image-gallery {
+            margin: 24px 0;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+        
+        .image-slider {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(102, 126, 234, 0.5) transparent;
+            padding: 0 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .image-slider::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .image-slider::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+        }
+        
+        .image-slider::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 3px;
+        }
+        
+        .image-slider::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.7);
+        }
+        
+        .image-slide {
+            min-width: 280px;
+            max-width: 280px;
+            height: 180px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #deb887 0%, #f5deb3 100%);
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.6s ease-out;
+            flex-shrink: 0;
+            border: 2px solid #8b4513;
+        }
+        
+        .image-slide:nth-child(2) {
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            animation-delay: 0.1s;
+        }
+        
+        .image-slide:nth-child(3) {
+            background: linear-gradient(135deg, #deb887 0%, #d2b48c 100%);
+            animation-delay: 0.2s;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .image-slide::before {
+            content: '🌸';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 60px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .image-slide:nth-child(2)::before {
+            content: '🌿';
+        }
+        
+        .image-slide:nth-child(3)::before {
+            content: '🌺';
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        .image-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            padding: 16px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .date-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }
+        
+        .festival-name {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .festival-description {
+            font-size: 15px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+        
+        .content-section {
+            padding: 24px 16px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #8b4513;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 24px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border-radius: 4px;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 2px solid #8b4513;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 60px;
+            height: 40px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40" fill="rgba(218,165,32,0.1)"%3E%3Cpath d="M10 20 Q 20 10 30 20 Q 40 30 50 20 Q 40 10 30 20 Q 20 30 10 20 Z"/%3E%3C/svg%3E');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .info-card:nth-child(1) { animation-delay: 0.1s; }
+        .info-card:nth-child(2) { animation-delay: 0.2s; }
+        .info-card:nth-child(3) { animation-delay: 0.3s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .info-icon {
+            animation: iconBounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes iconBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b4513;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(139, 69, 19, 0.2);
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .info-content h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #8b4513;
+            margin-bottom: 6px;
+        }
+        
+        .info-content p {
+            font-size: 14px;
+            color: #5a5a5a;
+            line-height: 1.7;
+        }
+        
+        .tips-list {
+            list-style: none;
+        }
+        
+        .tips-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e8e8e8;
+            font-size: 14px;
+            color: #5a5a5a;
+            line-height: 1.7;
+        }
+        
+        .tips-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .tips-list li::before {
+            content: '•';
+            color: #e74c3c;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="page">
+            <div class="scroll-header">
+                <div class="scroll-title">节气详情</div>
+            </div>
+            
+            <div class="festival-banner">
+                <div class="floating-elements">
+                    <div class="floating-element">❄️</div>
+                    <div class="floating-element">🌨️</div>
+                    <div class="floating-element">☃️</div>
+                    <div class="floating-element">🍲</div>
+                </div>
+                <div class="date-info">
+                    <span>2024年12月7日</span>
+                    <span>星期六</span>
+                </div>
+                <div style="position: relative; z-index: 1;">
+                    <div class="festival-name">大雪</div>
+                    <div class="festival-description">
+                        大雪是二十四节气中的第二十一个节气，每年公历12月6日、7日或8日交节。此时气温显著下降，降雪的可能性增大，标志着仲冬时节的正式到来，天气愈发寒冷。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="image-gallery">
+                <div class="image-slider">
+                    <div class="image-slide">
+                        <div class="image-caption">大雪时节，寒意加深</div>
+                    </div>
+                    <div class="image-slide">
+                        <div class="image-caption">雪覆大地，万物冬藏</div>
+                    </div>
+                    <div class="image-slide">
+                        <div class="image-caption">围炉取暖，静待暖春</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <div class="section-title">节气文化</div>
+                <div class="info-card">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>历史渊源</h4>
+                            <p>
+                                大雪表示降雪量增多、范围更广，并不一定每年都会下大雪。古人通过观察自然变化，将“大雪”作为判断气候寒暖的重要节点，用于指导农事和生活安排。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>农事活动</h4>
+                            <p>
+                                大雪时节，农业生产基本进入休整期。北方地区土地封冻，作物进入越冬阶段；南方则加强防寒防冻措施，确保冬季作物安全生长，为来年丰收打下基础。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-title">养生建议</div>
+                <div class="info-card">
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>饮食调理</h4>
+                            <ul class="tips-list">
+                                <li>宜多食温热、滋补食物，如羊肉、牛肉、黑豆等</li>
+                                <li>可适当进补，提高身体御寒能力</li>
+                                <li>少食生冷寒凉食物，保护脾胃阳气</li>
+                                <li>注意饮食清淡，避免过度油腻</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>运动建议</h4>
+                            <ul class="tips-list">
+                                <li>选择室内或低强度运动，如拉伸、太极、瑜伽</li>
+                                <li>避免在严寒和大风天气下进行户外运动</li>
+                                <li>运动前充分热身，防止肌肉拉伤</li>
+                                <li>运动后注意保暖，避免寒气侵入</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-title">注意事项</div>
+                <div class="info-card">
+                    <ul class="tips-list">
+                        <li>大雪时节气温低，要注意防寒保暖</li>
+                        <li>雨雪天气出行注意防滑，确保安全</li>
+                        <li>保持室内空气流通，防止过于干燥</li>
+                        <li>作息宜早睡晚起，顺应冬季自然规律</li>
+                        <li>注意预防感冒、冻疮等冬季常见问题</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='../home.html'">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../ai-chat.html'">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" onclick="window.location.href='../publish-post.html'">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../member.html'">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../profile.html'">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

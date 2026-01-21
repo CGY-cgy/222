@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据看板 - 灵境管理后台</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">🏥</div>
+                    <div>
+                        <div class="sidebar-logo-text">灵境管理</div>
+                        <div class="sidebar-logo-sub">Admin Console</div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">主要功能</div>
+                    <a href="dashboard.html" class="nav-item active">
+                        <span class="nav-item-icon">📊</span>
+                        <span class="nav-item-text">数据看板</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <span class="nav-item-icon">👥</span>
+                        <span class="nav-item-text">用户管理</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                        <span class="nav-item-icon">📈</span>
+                        <span class="nav-item-text">数据分析</span>
+                    </a>
+                    <a href="membership.html" class="nav-item">
+                        <span class="nav-item-icon">💎</span>
+                        <span class="nav-item-text">会员分析</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统管理</div>
+                    <a href="security.html" class="nav-item">
+                        <span class="nav-item-icon">🔒</span>
+                        <span class="nav-item-text">安全管理</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="nav-item-icon">⚙️</span>
+                        <span class="nav-item-text">系统设置</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <span class="nav-item-icon">🚪</span>
+                        <span class="nav-item-text">退出登录</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 class="header-title">数据看板</h1>
+                    <p class="header-subtitle">实时监控平台运营数据与用户行为</p>
+                </div>
+                <div class="header-actions">
+                    <select class="form-select" style="width: auto;">
+                        <option value="7">最近7天</option>
+                        <option value="30" selected>最近30天</option>
+                        <option value="90">最近90天</option>
+                    </select>
+                    <button class="header-btn primary" onclick="exportReport()">
+                        <span>📥</span>
+                        <span>导出报表</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon users">👥</div>
+                        <span class="stat-trend up">↑ 12.5%</span>
+                    </div>
+                    <div class="stat-value">128,456</div>
+                    <div class="stat-label">注册用户总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon revenue">💰</div>
+                        <span class="stat-trend up">↑ 8.3%</span>
+                    </div>
+                    <div class="stat-value">¥486,920</div>
+                    <div class="stat-label">本月收入</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon active">⚡</div>
+                        <span class="stat-trend up">↑ 15.2%</span>
+                    </div>
+                    <div class="stat-value">45,892</div>
+                    <div class="stat-label">日活跃用户</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon conversion">🎯</div>
+                        <span class="stat-trend down">↓ 2.1%</span>
+                    </div>
+                    <div class="stat-value">23.4%</div>
+                    <div class="stat-label">会员转化率</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">核心功能使用分析</h3>
+                        <div style="display: flex; gap: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color);"></span>
+                                <span>日均使用次数</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="functionUsageChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">功能使用热力图</h3>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: var(--spacing-sm);">过去30天各模块使用频率</div>
+                    <div id="heatmap" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;"></div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text-tertiary);">
+                        <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">AI对话使用情况</h3>
+                        <div style="display: flex; gap: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color);"></span>
+                                <span>对话次数</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--warning-color);"></span>
+                                <span>平均会话长度</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="aiChatChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">内容生态分析</h3>
+                        <div style="display: flex; gap: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color);"></span>
+                                <span>发帖量</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color);"></span>
+                                <span>互动量</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="contentEcosystemChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-md);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">最新动态</h3>
+                        <a href="#" style="font-size: 13px; color: var(--primary-color); text-decoration: none;">查看全部 →</a>
+                    </div>
+                    <div style="max-height: 320px; overflow-y: auto;">
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">李</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">新用户 <strong>李晓明</strong> 注册成功</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">2分钟前</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--success-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">王</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">用户 <strong>王芳</strong> 开通年度会员</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">15分钟前</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--warning-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">张</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">用户 <strong>张伟</strong> 完成健康问卷</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">32分钟前</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--secondary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">刘</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">用户 <strong>刘洋</strong> 发布健康心得帖子</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">1小时前</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0;">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--danger-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">陈</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">用户 <strong>陈静</strong> 使用舌像检测功能</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">2小时前</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">快捷操作</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                        <button class="btn btn-secondary" style="justify-content: flex-start; padding: var(--spacing-md);" onclick="location.href='users.html'">
+                            <span style="width: 40px; height: 40px; border-radius: var(--border-radius-md); background: rgba(102, 126, 234, 0.1); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 18px;">👤</span>
+                            <div style="text-align: left;">
+                                <div style="font-size: 14px; color: var(--text-primary); font-weight: 500;">用户管理</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">查看和管理所有用户</div>
+                            </div>
+                        </button>
+                        <button class="btn btn-secondary" style="justify-content: flex-start; padding: var(--spacing-md);" onclick="location.href='analytics.html'">
+                            <span style="width: 40px; height: 40px; border-radius: var(--border-radius-md); background: rgba(72, 187, 120, 0.1); color: var(--success-color); display: flex; align-items: center; justify-content: center; font-size: 18px;">📊</span>
+                            <div style="text-align: left;">
+                                <div style="font-size: 14px; color: var(--text-primary); font-weight: 500;">数据分析</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">查看详细统计报告</div>
+                            </div>
+                        </button>
+                        <button class="btn btn-secondary" style="justify-content: flex-start; padding: var(--spacing-md);" onclick="location.href='security.html'">
+                            <span style="width: 40px; height: 40px; border-radius: var(--border-radius-md); background: rgba(237, 137, 54, 0.1); color: var(--warning-color); display: flex; align-items: center; justify-content: center; font-size: 18px;">🔐</span>
+                            <div style="text-align: left;">
+                                <div style="font-size: 14px; color: var(--text-primary); font-weight: 500;">安全设置</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">管理账户安全策略</div>
+                            </div>
+                        </button>
+                        <button class="btn btn-secondary" style="justify-content: flex-start; padding: var(--spacing-md);">
+                            <span style="width: 40px; height: 40px; border-radius: var(--border-radius-md); background: rgba(118, 75, 162, 0.1); color: var(--secondary-color); display: flex; align-items: center; justify-content: center; font-size: 18px;">💾</span>
+                            <div style="text-align: left;">
+                                <div style="font-size: 14px; color: var(--text-primary); font-weight: 500;">数据备份</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">立即备份系统数据</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const chartColors = {
+            primary: '#667eea',
+            secondary: '#764ba2',
+            success: '#48bb78',
+            warning: '#ed8936',
+            danger: '#f56565',
+            purple: '#764ba2'
+        };
+
+        function initFunctionUsageChart() {
+            const ctx = document.getElementById('functionUsageChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['命理分析', '健康评估', '饮食推荐', '健康规划', '舌像检测', 'AI对话'],
+                    datasets: [{
+                        label: '日均使用次数',
+                        data: [12500, 9800, 15600, 7200, 8900, 23400],
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(72, 187, 120, 0.8)',
+                            'rgba(237, 137, 54, 0.8)',
+                            'rgba(245, 101, 101, 0.8)',
+                            'rgba(118, 75, 162, 0.8)'
+                        ],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initHeatmap() {
+            const heatmapContainer = document.getElementById('heatmap');
+            const modules = ['命理', '健康', '饮食', '规划', 'AI'];
+            
+            for (let i = 0; i < 30; i++) {
+                const cell = document.createElement('div');
+                cell.style.aspectRatio = '1';
+                cell.style.borderRadius = '4px';
+                const level = Math.floor(Math.random() * 5) + 1;
+                const opacity = level * 0.2;
+                cell.style.background = `rgba(102, 126, 234, ${opacity})`;
+                cell.title = `第${i + 1}天 - ${modules[i % 5]}模块使用`;
+                heatmapContainer.appendChild(cell);
+            }
+        }
+
+        function initAIChatChart() {
+            const ctx = document.getElementById('aiChatChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1日', '5日', '10日', '15日', '20日', '25日', '30日'],
+                    datasets: [{
+                        label: '对话次数',
+                        data: [4200, 4800, 5100, 4900, 5600, 6200, 5800],
+                        borderColor: chartColors.success,
+                        backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: '平均会话长度(分钟)',
+                        data: [8.5, 9.2, 8.8, 10.1, 9.5, 11.2, 10.5],
+                        borderColor: chartColors.warning,
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            beginAtZero: true,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initContentEcosystemChart() {
+            const ctx = document.getElementById('contentEcosystemChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    datasets: [{
+                        label: '发帖量',
+                        data: [156, 189, 234, 198, 267, 312, 289],
+                        borderColor: chartColors.primary,
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '互动量',
+                        data: [892, 1056, 1234, 1189, 1456, 1876, 1623],
+                        borderColor: chartColors.success,
+                        backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function exportReport() {
+            alert('报表导出功能开发中...');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initFunctionUsageChart();
+            initHeatmap();
+            initAIChatChart();
+            initContentEcosystemChart();
+        });
+    </script>
+</body>
+</html>

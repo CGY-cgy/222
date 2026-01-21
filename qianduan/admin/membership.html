@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会员分析 - 灵境管理后台</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="common.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">🏥</div>
+                    <div>
+                        <div class="sidebar-logo-text">灵境管理</div>
+                        <div class="sidebar-logo-sub">Admin Console</div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">主要功能</div>
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="nav-item-icon">📊</span>
+                        <span class="nav-item-text">数据看板</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <span class="nav-item-icon">👥</span>
+                        <span class="nav-item-text">用户管理</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                        <span class="nav-item-icon">📈</span>
+                        <span class="nav-item-text">数据分析</span>
+                    </a>
+                    <a href="membership.html" class="nav-item active">
+                        <span class="nav-item-icon">💎</span>
+                        <span class="nav-item-text">会员分析</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统管理</div>
+                    <a href="security.html" class="nav-item">
+                        <span class="nav-item-icon">🔒</span>
+                        <span class="nav-item-text">安全管理</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="nav-item-icon">⚙️</span>
+                        <span class="nav-item-text">系统设置</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <span class="nav-item-icon">🚪</span>
+                        <span class="nav-item-text">退出登录</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 class="header-title">会员分析</h1>
+                    <p class="header-subtitle">会员转化、收入与留存数据监控</p>
+                </div>
+                <div class="header-actions">
+                    <div class="date-range">
+                        <select class="form-select">
+                            <option value="30" selected>最近30天</option>
+                            <option value="90">最近90天</option>
+                            <option value="180">最近半年</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary">
+                        <span>📊</span>
+                        <span>导出报表</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="stats-grid" style="margin-bottom: var(--spacing-lg);">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-title">总收入</div>
+                        <div class="stat-card-icon">💰</div>
+                    </div>
+                    <div class="stat-card-value">¥1,286,450</div>
+                    <div class="stat-card-trend">
+                        <span class="trend-up">↑ 18.6%</span>
+                        <span class="trend-period">较上月</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-title">付费会员数</div>
+                        <div class="stat-card-icon">👑</div>
+                    </div>
+                    <div class="stat-card-value">45,892</div>
+                    <div class="stat-card-trend">
+                        <span class="trend-up">↑ 12.3%</span>
+                        <span class="trend-period">较上月</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-title">付费转化率</div>
+                        <div class="stat-card-icon">📈</div>
+                    </div>
+                    <div class="stat-card-value">8.5%</div>
+                    <div class="stat-card-trend">
+                        <span class="trend-up">↑ 1.2%</span>
+                        <span class="trend-period">较上月</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-title">ARPU</div>
+                        <div class="stat-card-icon">💎</div>
+                    </div>
+                    <div class="stat-card-value">¥28.0</div>
+                    <div class="stat-card-trend">
+                        <span class="trend-up">↑ 5.6%</span>
+                        <span class="trend-period">较上月</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: var(--spacing-lg);">
+                <div class="card-header">
+                    <h3 class="card-title">会员转化漏斗</h3>
+                    <div class="card-subtitle">从注册到付费全链路转化分析</div>
+                </div>
+                <div class="card-body">
+                    <div class="funnel-container">
+                        <div class="funnel-step step-1">
+                            <span>注册用户: 1,234,567</span>
+                        </div>
+                        <div class="funnel-arrow">↓ 68.5%</div>
+                        <div class="funnel-step step-2">
+                            <span>活跃用户: 845,678</span>
+                        </div>
+                        <div class="funnel-arrow">↓ 42.3%</div>
+                        <div class="funnel-step step-3">
+                            <span>试用用户: 357,890</span>
+                        </div>
+                        <div class="funnel-arrow">↓ 23.8%</div>
+                        <div class="funnel-step step-4">
+                            <span>付费会员: 85,234</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">会员套餐销售分布</h3>
+                        <div class="card-subtitle">各套餐销量与收入占比</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="packageDistChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">收入趋势</h3>
+                        <div class="card-subtitle">月度会员收入变化</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="revenueTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: var(--spacing-lg);">
+                <div class="card-header">
+                    <h3 class="card-title">会员套餐对比</h3>
+                    <div class="card-subtitle">三种套餐的详细数据对比</div>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-lg);">
+                        <div style="padding: var(--spacing-lg); background: var(--bg-tertiary); border-radius: var(--border-radius-lg); text-align: center;">
+                            <div style="display: inline-block; padding: 6px 16px; background: rgba(102, 126, 234, 0.1); color: var(--primary-color); border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: var(--spacing-md);">基础版</div>
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary);">¥29</div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: var(--spacing-lg);">/月</div>
+                            <div style="text-align: left; margin-bottom: var(--spacing-lg);">
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>基础健康评估</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>每日饮食推荐</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary);">
+                                    <span style="color: var(--text-light);">✗</span>
+                                    <span>AI健康规划</span>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">28,456</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">订阅人数</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">¥825,234</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">月收入</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: var(--spacing-lg); background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.02)); border: 2px solid rgba(255, 215, 0, 0.3); border-radius: var(--border-radius-lg); text-align: center; position: relative;">
+                            <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); display: inline-block; padding: 6px 16px; background: linear-gradient(135deg, #FFD700, #FFA500); color: white; border-radius: 20px; font-size: 12px; font-weight: 600;">热门推荐</div>
+                            <div style="display: inline-block; padding: 6px 16px; background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1)); color: #B8860B; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: var(--spacing-md);">专业版</div>
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary);">¥99</div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: var(--spacing-lg);">/月</div>
+                            <div style="text-align: left; margin-bottom: var(--spacing-lg);">
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>全部基础功能</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>AI健康规划</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary);">
+                                    <span style="color: var(--text-light);">✗</span>
+                                    <span>专属顾问服务</span>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">12,876</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">订阅人数</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">¥1,274,724</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">月收入</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: var(--spacing-lg); background: var(--bg-tertiary); border-radius: var(--border-radius-lg); text-align: center;">
+                            <div style="display: inline-block; padding: 6px 16px; background: rgba(118, 75, 162, 0.1); color: var(--secondary-color); border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: var(--spacing-md);">企业版</div>
+                            <div style="font-size: 32px; font-weight: 700; color: var(--text-primary);">¥299</div>
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: var(--spacing-lg);">/月</div>
+                            <div style="text-align: left; margin-bottom: var(--spacing-lg);">
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>全部专业功能</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>专属顾问服务</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 13px; color: var(--text-secondary);">
+                                    <span style="color: var(--success-color);">✓</span>
+                                    <span>API接口调用</span>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">4,560</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">订阅人数</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">¥1,363,440</div>
+                                    <div style="font-size: 12px; color: var(--text-tertiary);">月收入</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-lg);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">会员留存率</h3>
+                        <div class="card-subtitle">各周期留存数据分析</div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 80px; font-size: 14px; color: var(--text-secondary);">次日留存</div>
+                                <div style="flex: 1; height: 24px; background: var(--bg-tertiary); border-radius: 12px; overflow: hidden;">
+                                    <div style="width: 68.5%; height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--primary-light)); border-radius: 12px;"></div>
+                                </div>
+                                <div style="width: 50px; text-align: right; font-size: 14px; font-weight: 600; color: var(--text-primary);">68.5%</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 80px; font-size: 14px; color: var(--text-secondary);">7日留存</div>
+                                <div style="flex: 1; height: 24px; background: var(--bg-tertiary); border-radius: 12px; overflow: hidden;">
+                                    <div style="width: 45.2%; height: 100%; background: linear-gradient(90deg, var(--success-color), #68d391); border-radius: 12px;"></div>
+                                </div>
+                                <div style="width: 50px; text-align: right; font-size: 14px; font-weight: 600; color: var(--text-primary);">45.2%</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 80px; font-size: 14px; color: var(--text-secondary);">30日留存</div>
+                                <div style="flex: 1; height: 24px; background: var(--bg-tertiary); border-radius: 12px; overflow: hidden;">
+                                    <div style="width: 32.8%; height: 100%; background: linear-gradient(90deg, var(--warning-color), #f6ad55); border-radius: 12px;"></div>
+                                </div>
+                                <div style="width: 50px; text-align: right; font-size: 14px; font-weight: 600; color: var(--text-primary);">32.8%</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                <div style="width: 80px; font-size: 14px; color: var(--text-secondary);">90日留存</div>
+                                <div style="flex: 1; height: 24px; background: var(--bg-tertiary); border-radius: 12px; overflow: hidden;">
+                                    <div style="width: 25.4%; height: 100%; background: linear-gradient(90deg, var(--danger-color), #fc8181); border-radius: 12px;"></div>
+                                </div>
+                                <div style="width: 50px; text-align: right; font-size: 14px; font-weight: 600; color: var(--text-primary);">25.4%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">续费行为分析</h3>
+                        <div class="card-subtitle">会员续费与流失情况</div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                            <div style="padding: var(--spacing-md); background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(72, 187, 120, 0.05)); border-radius: var(--border-radius-md); text-align: center;">
+                                <div style="font-size: 28px; font-weight: 600; color: var(--success-color);">78.5%</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">续费率</div>
+                            </div>
+                            <div style="padding: var(--spacing-md); background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(245, 101, 101, 0.05)); border-radius: var(--border-radius-md); text-align: center;">
+                                <div style="font-size: 28px; font-weight: 600; color: var(--danger-color);">21.5%</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">流失率</div>
+                            </div>
+                        </div>
+                        <div class="chart-container" style="height: 180px;">
+                            <canvas id="renewalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .funnel-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: var(--spacing-lg);
+        }
+        
+        .funnel-step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 56px;
+            border-radius: var(--border-radius-md);
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            width: 100%;
+            max-width: 600px;
+            transition: all var(--transition-normal);
+        }
+        
+        .funnel-step:hover {
+            transform: scale(1.02);
+        }
+        
+        .funnel-step.step-1 {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+        
+        .funnel-step.step-2 {
+            background: linear-gradient(135deg, var(--success-color), #38a169);
+        }
+        
+        .funnel-step.step-3 {
+            background: linear-gradient(135deg, var(--warning-color), #dd6b20);
+        }
+        
+        .funnel-step.step-4 {
+            background: linear-gradient(135deg, var(--secondary-color), #6b46c1);
+        }
+        
+        .funnel-arrow {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+    </style>
+
+    <!-- 所有功能由 common.js 提供 -->
+</body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面部/手相分析 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="traditional_style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e6f3ff 0%, #b3d9ff 100%);
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"%3E%3Cdefs%3E%3Cpattern id="clouds" width="200" height="100" patternUnits="userSpaceOnUse"%3E%3Cpath d="M0 50 Q 50 20 100 50 Q 150 80 200 50 Q 150 20 100 50 Q 50 80 0 50 Z" fill="rgba(255,255,255,0.3)"/%3E%3C/pattern%3E%3C/defs%3E%3Crect width="100%" height="100%" fill="%23e6f3ff"/%3E%3Crect width="100%" height="100%" fill="url(%23clouds)"/%3E%3Cg transform="translate(0, 100)"%3E%3Cpath d="M0 300 Q 100 250 200 300 Q 300 350 400 300 Q 500 250 600 300 Q 700 350 800 300 Q 900 250 1000 300 L 1000 1000 L 0 1000 Z" fill="%23b3d9ff" opacity="0.5"/%3E%3C/g%3E%3C/svg%3E');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: transparent;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* 卷轴标题样式 */
+        .scroll-header {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 16px 0;
+        }
+        
+        .scroll-title {
+            position: relative;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            padding: 12px 32px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid #8b4513;
+            font-size: 20px;
+            font-weight: bold;
+            color: #8b4513;
+            text-align: center;
+        }
+        
+        .scroll-title::before,
+        .scroll-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 30px;
+            background-color: #8b4513;
+            transform: translateY(-50%);
+        }
+        
+        .scroll-title::before {
+            left: -10px;
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .scroll-title::after {
+            right: -10px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .module-nav {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            padding: 4px;
+        }
+        
+        .module-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .module-nav::-webkit-scrollbar-thumb {
+            background: rgba(139, 69, 19, 0.3);
+            border-radius: 2px;
+        }
+        
+        .nav-tab {
+            padding: 8px 16px;
+            background-color: transparent;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #8b4513;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 2px solid transparent;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .nav-tab:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            border-color: #8b4513;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 上传区域样式 */
+        .upload-section {
+            position: relative;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            border: 2px solid #8b4513;
+            border-radius: 12px;
+            padding: 24px 20px;
+            margin-bottom: 24px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 云纹装饰 */
+        .upload-section::before,
+        .upload-section::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40"%3E%3Cpath d="M10 20 Q 20 10 30 20 Q 40 30 50 20 Q 40 10 30 20 Q 20 30 10 20 Z" fill="rgba(255,255,255,0.6)"/%3E%3C/svg%3E');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .upload-section::before {
+            top: -10px;
+            left: 20px;
+            transform: rotate(-15deg);
+        }
+        
+        .upload-section::after {
+            bottom: -10px;
+            right: 20px;
+            transform: rotate(15deg);
+        }
+        
+        .upload-area {
+            position: relative;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 3px solid #8b4513;
+            border-radius: 16px;
+            padding: 40px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .upload-area:hover {
+            background: linear-gradient(135deg, #f5f5dc 0%, #fffaf0 100%);
+            box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .upload-icon i {
+            font-size: 64px;
+            color: #8b4513;
+        }
+        
+        .upload-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 8px;
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .upload-hint {
+            font-size: 14px;
+            color: #8b4513;
+            opacity: 0.8;
+        }
+        
+        .upload-options {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .upload-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid #8b4513;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .upload-btn.primary {
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            color: #8b4513;
+        }
+        
+        .upload-btn.secondary {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            border-color: #8b4513;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 预览区域 */
+        .preview-section {
+            display: none;
+            margin-bottom: 24px;
+        }
+        
+        .preview-section.active {
+            display: block;
+        }
+        
+        .preview-image {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #f5f5dc 0%, #fffaf0 100%);
+            border: 3px solid #8b4513;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 分析类型按钮 */
+        .analysis-type {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .type-btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 8px;
+            border: 2px solid #8b4513;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            font-size: 16px;
+            font-weight: bold;
+            color: #8b4513;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .type-btn:hover {
+            background: linear-gradient(135deg, #deb887 0%, #f5deb3 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .type-btn.active {
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+        }
+        
+        /* 分析说明卡片 */
+        .info-card {
+            position: relative;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 3px solid #8b4513;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 卡片边框装饰 */
+        .info-card::before,
+        .info-card::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"%3E%3Cpath d="M10 20 Q 15 15 20 20 Q 25 25 30 20 Q 25 15 20 20 Q 15 25 10 20 Z" fill="rgba(139,69,19,0.3)"/%3E%3C/svg%3E');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .info-card::before {
+            top: -10px;
+            left: -10px;
+        }
+        
+        .info-card::after {
+            bottom: -10px;
+            right: -10px;
+        }
+        
+        .info-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .info-title i {
+            color: #e74c3c;
+            font-size: 20px;
+        }
+        
+        .info-text {
+            font-size: 15px;
+            color: #8b4513;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        /* 开始分析按钮 */
+        .analyze-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 8px;
+            border: 3px solid #8b4513;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .analyze-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(231, 76, 60, 0.4);
+        }
+        
+        .analyze-btn:disabled {
+            background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+            border-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 375px) {
+            .page {
+                padding: 12px;
+            }
+            
+            .scroll-title {
+                font-size: 18px;
+                padding: 10px 24px;
+            }
+            
+            .nav-tab {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
+            
+            .upload-text {
+                font-size: 16px;
+            }
+            
+            .upload-btn {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+            
+            .type-btn {
+                font-size: 14px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="page">
+            <!-- 卷轴标题 -->
+            <div class="scroll-header">
+                <div class="scroll-title">命理分析与心理抚慰</div>
+            </div>
+            
+            <!-- 功能导航 -->
+            <div class="module-nav">
+                <div class="nav-tab active" onclick="window.location.href='home_fortune.html'">面部/手相分析</div>
+                <div class="nav-tab" onclick="window.location.href='home_birth_analysis.html'">出生信息分析</div>
+                <div class="nav-tab" onclick="window.location.href='home_mental_assessment.html'">心理状态自评</div>
+                <div class="nav-tab" onclick="window.location.href='home_history_reports.html'">历史报告</div>
+            </div>
+            
+            <div class="upload-section">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="upload-text">点击上传照片</div>
+                    <div class="upload-hint">支持面部照片或手相照片</div>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                
+                <div class="upload-options">
+                    <button class="upload-btn primary" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-image"></i>
+                        <span>从相册选择</span>
+                    </button>
+                    <button class="upload-btn secondary" onclick="openCamera()">
+                        <i class="fas fa-camera"></i>
+                        <span>拍照</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preview-section" id="previewSection">
+                <img id="previewImage" class="preview-image" alt="预览图片">
+            </div>
+            
+            <div class="analysis-type">
+                <button class="type-btn active" onclick="selectType('face')">面部分析</button>
+                <button class="type-btn" onclick="selectType('palm')">手相分析</button>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-title">
+                    <i class="fas fa-info-circle"></i>
+                    <span>分析说明</span>
+                </div>
+                <div class="info-text">
+                    <p id="analysisInfo">面部分析可以通过分析面部特征，为您提供性格、运势方面的参考信息。请上传清晰的面部正面照片，光线充足，面部完整可见。</p>
+                </div>
+            </div>
+            
+            <button class="analyze-btn" id="analyzeBtn" disabled onclick="startAnalysis()">
+                开始分析
+            </button>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='../home.html'">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../ai-chat.html'">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" onclick="window.location.href='../publish-post.html'">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../member.html'">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../profile.html'">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedType = 'face';
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('previewSection').classList.add('active');
+                    document.getElementById('analyzeBtn').disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function openCamera() {
+            document.getElementById('fileInput').setAttribute('capture', 'environment');
+            document.getElementById('fileInput').click();
+        }
+        
+        function selectType(type) {
+            selectedType = type;
+            const buttons = document.querySelectorAll('.type-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const infoText = document.getElementById('analysisInfo');
+            if (type === 'face') {
+                infoText.textContent = '面部分析可以通过分析面部特征，为您提供性格、运势等方面的参考信息。请上传清晰的面部正面照片，确保光线充足，面部完整可见。';
+            } else {
+                infoText.textContent = '手相分析可以通过分析手掌纹路，为您提供性格、健康、事业等方面的参考信息。请上传清晰的手掌照片，确保光线充足，手掌完整可见。';
+            }
+        }
+        
+        function startAnalysis() {
+            alert('分析功能开发中，请稍候...');
+        }
+    </script>
+</body>
+</html>
+

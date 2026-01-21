@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账户与安全 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 复用profile.html中的样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* 头部导航 */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #f5f7fa;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        /* 功能菜单区域 */
+        .menu-section {
+            margin-bottom: 24px;
+        }
+        
+        .menu-group {
+            background-color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+        }
+        
+        .menu-text {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .menu-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .menu-status {
+            font-size: 14px;
+            color: #27ae60;
+        }
+        
+        .menu-arrow {
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+        
+        /* 绑定按钮样式 */
+        .bind-btn {
+            padding: 4px 12px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .bind-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .unbind-btn {
+            padding: 4px 12px;
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .unbind-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        /* 注销账号区域 */
+        .logout-section {
+            margin-top: 40px;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #fff;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .logout-btn:hover {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        
+        /* 确认弹窗 */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            width: 90%;
+            max-width: 320px;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #2c3e50;
+        }
+        
+        .modal-text {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-cancel {
+            background-color: #f5f7fa;
+            color: #2c3e50;
+        }
+        
+        .modal-confirm {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 8px 0;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item.active i, .nav-item.active span {
+            color: #3498db;
+        }
+        
+        .publish-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .publish-icon {
+            position: absolute;
+            bottom: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .publish-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        .publish-icon i {
+            font-size: 24px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.location.href='../profile.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="page-title">账户与安全</div>
+            </div>
+        </div>
+        
+        <!-- 功能菜单区域 -->
+        <div class="page">
+            <!-- 账号绑定管理 -->
+            <div class="menu-section">
+                <div class="menu-group">
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #3498db;">
+                                <i class="fab fa-weixin"></i>
+                            </div>
+                            <div class="menu-text">微信</div>
+                        </div>
+                        <div class="menu-right">
+                            <div class="menu-status">已绑定</div>
+                            <button class="unbind-btn" onclick="unbindAccount('wechat')">解绑</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #27ae60;">
+                                <i class="fab fa-qq"></i>
+                            </div>
+                            <div class="menu-text">QQ</div>
+                        </div>
+                        <div class="menu-right">
+                            <button class="bind-btn" onclick="bindAccount('qq')">绑定</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #e74c3c;">
+                                <i class="fab fa-weibo"></i>
+                            </div>
+                            <div class="menu-text">微博</div>
+                        </div>
+                        <div class="menu-right">
+                            <button class="bind-btn" onclick="bindAccount('weibo')">绑定</button>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #f39c12;">
+                                <i class="fab fa-alipay"></i>
+                            </div>
+                            <div class="menu-text">支付宝</div>
+                        </div>
+                        <div class="menu-right">
+                            <div class="menu-status">已绑定</div>
+                            <button class="unbind-btn" onclick="unbindAccount('alipay')">解绑</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 安全设置 -->
+                <div class="menu-group">
+                    <div class="menu-item" onclick="changePassword()">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #9b59b6;">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="menu-text">修改密码</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item" onclick="changePhone()">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #1abc9c;">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="menu-text">绑定手机</div>
+                        </div>
+                        <div class="menu-right">
+                            <span style="color: #7f8c8d; font-size: 14px;">138****8888</span>
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item" onclick="changeEmail()">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #34495e;">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="menu-text">绑定邮箱</div>
+                        </div>
+                        <div class="menu-right">
+                            <span style="color: #7f8c8d; font-size: 14px;">zh***@example.com</span>
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 注销账号 -->
+            <div class="logout-section">
+                <button class="logout-btn" onclick="showCancelAccountModal()">
+                    <i class="fas fa-trash-alt"></i> 注销账号
+                </button>
+            </div>
+        </div>
+        
+        <!-- 确认弹窗 -->
+        <div class="confirm-modal" id="confirmModal">
+            <div class="modal-content">
+                <div class="modal-title">确认操作</div>
+                <div class="modal-text" id="modalText">确定要执行此操作吗？</div>
+                <div class="modal-buttons">
+                    <button class="modal-btn modal-cancel" onclick="hideModal()">取消</button>
+                    <button class="modal-btn modal-confirm" onclick="confirmAction()">确认</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <div class="nav-item" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" data-page="ai-chat">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" data-page="publish-post">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" data-page="member">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item active" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+        
+        <script>
+            let currentAction = null;
+            let currentAccount = null;
+            
+            // 初始化页面，从localStorage读取绑定状态
+            function init() {
+                // 获取绑定状态
+                const bindStatus = getBindStatus();
+                
+                // 更新UI显示
+                updateBindUI(bindStatus);
+            }
+            
+            // 获取绑定状态
+            function getBindStatus() {
+                const defaultStatus = {
+                    wechat: true,
+                    qq: false,
+                    weibo: false,
+                    alipay: true
+                };
+                
+                const savedStatus = localStorage.getItem('accountBindStatus');
+                return savedStatus ? JSON.parse(savedStatus) : defaultStatus;
+            }
+            
+            // 保存绑定状态
+            function saveBindStatus(status) {
+                localStorage.setItem('accountBindStatus', JSON.stringify(status));
+            }
+            
+            // 更新绑定UI
+            function updateBindUI(status) {
+                Object.keys(status).forEach(type => {
+                    const accountName = getAccountName(type);
+                    const menuItems = document.querySelectorAll('.menu-item');
+                    let menuItem = null;
+                    
+                    // 查找包含特定文本的菜单项
+                    menuItems.forEach(item => {
+                        if (item.querySelector('.menu-text').textContent === accountName) {
+                            menuItem = item;
+                        }
+                    });
+                    
+                    if (menuItem) {
+                        const menuRight = menuItem.querySelector('.menu-right');
+                        menuRight.innerHTML = '';
+                        
+                        if (status[type]) {
+                            const statusSpan = document.createElement('span');
+                            statusSpan.className = 'menu-status';
+                            statusSpan.textContent = '已绑定';
+                            
+                            const unbindBtn = document.createElement('button');
+                            unbindBtn.className = 'unbind-btn';
+                            unbindBtn.textContent = '解绑';
+                            unbindBtn.onclick = () => unbindAccount(type);
+                            
+                            menuRight.appendChild(statusSpan);
+                            menuRight.appendChild(unbindBtn);
+                        } else {
+                            const bindBtn = document.createElement('button');
+                            bindBtn.className = 'bind-btn';
+                            bindBtn.textContent = '绑定';
+                            bindBtn.onclick = () => bindAccount(type);
+                            
+                            menuRight.appendChild(bindBtn);
+                        }
+                    }
+                });
+            }
+            
+            // 账号绑定功能
+            function bindAccount(accountType) {
+                console.log('绑定账号:', accountType);
+                
+                // 模拟绑定成功
+                alert('正在跳转到' + getAccountName(accountType) + '绑定页面...');
+                
+                // 更新绑定状态
+                const bindStatus = getBindStatus();
+                bindStatus[accountType] = true;
+                saveBindStatus(bindStatus);
+                
+                // 更新UI
+                updateBindUI(bindStatus);
+            }
+            
+            // 账号解绑功能
+            function unbindAccount(accountType) {
+                currentAction = 'unbind';
+                currentAccount = accountType;
+                document.getElementById('modalText').innerHTML = '确定要解绑' + getAccountName(accountType) + '账号吗？<br>解绑后将无法使用该账号登录。';
+                document.getElementById('confirmModal').style.display = 'flex';
+            }
+            
+            // 修改密码
+            function changePassword() {
+                console.log('修改密码');
+                alert('正在跳转到修改密码页面...');
+            }
+            
+            // 修改手机
+            function changePhone() {
+                console.log('修改手机号');
+                alert('正在跳转到修改手机号页面...');
+            }
+            
+            // 修改邮箱
+            function changeEmail() {
+                console.log('修改邮箱');
+                alert('正在跳转到修改邮箱页面...');
+            }
+            
+            // 显示注销账号弹窗
+            function showCancelAccountModal() {
+                currentAction = 'cancelAccount';
+                document.getElementById('modalText').innerHTML = '确定要注销账号吗？<br>注销后所有数据将被永久删除，无法恢复！';
+                document.getElementById('confirmModal').style.display = 'flex';
+            }
+            
+            // 隐藏弹窗
+            function hideModal() {
+                document.getElementById('confirmModal').style.display = 'none';
+                currentAction = null;
+                currentAccount = null;
+            }
+            
+            // 确认操作
+            function confirmAction() {
+                if (currentAction === 'unbind') {
+                    console.log('确认解绑账号:', currentAccount);
+                    
+                    // 更新绑定状态
+                    const bindStatus = getBindStatus();
+                    bindStatus[currentAccount] = false;
+                    saveBindStatus(bindStatus);
+                    
+                    // 更新UI
+                    updateBindUI(bindStatus);
+                    
+                    alert(getAccountName(currentAccount) + '账号解绑成功！');
+                    hideModal();
+                } else if (currentAction === 'cancelAccount') {
+                    console.log('确认注销账号');
+                    alert('账号注销成功！');
+                    // 这里可以添加跳转到登录页面的逻辑
+                    hideModal();
+                }
+            }
+            
+            // 获取账号名称
+            function getAccountName(type) {
+                const names = {
+                    'wechat': '微信',
+                    'qq': 'QQ',
+                    'weibo': '微博',
+                    'alipay': '支付宝'
+                };
+                return names[type] || type;
+            }
+            
+            // 底部导航
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.getAttribute('data-page');
+                    let url = '';
+                    
+                    switch(page) {
+                        case 'home':
+                            url = '../home.html';
+                            break;
+                        case 'ai-chat':
+                            url = '../ai-chat.html';
+                            break;
+                        case 'publish-post':
+                            url = '../publish-post.html';
+                            break;
+                        case 'member':
+                            url = '../member.html';
+                            break;
+                        case 'profile':
+                            url = '../profile.html';
+                            break;
+                    }
+                    
+                    if (url) {
+                        window.location.href = url;
+                    }
+                });
+            });
+            
+            // 页面加载完成后初始化
+            document.addEventListener('DOMContentLoaded', init);
+        </script>
+    </div>
+</body>
+</html>

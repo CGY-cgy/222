@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置 - 灵境管理后台</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-lg) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        .item-info {
+            flex: 1;
+            padding-right: var(--spacing-lg);
+        }
+        .item-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .item-desc {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin: 0;
+            line-height: 1.5;
+        }
+        .item-action {
+            margin-left: var(--spacing-md);
+        }
+        .version-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xl);
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius-lg);
+            color: #fff;
+            margin-bottom: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+        }
+        .version-icon {
+            width: 72px;
+            height: 72px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        .version-details h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 6px 0;
+        }
+        .version-details p {
+            font-size: 14px;
+            opacity: 0.9;
+            margin: 0;
+        }
+        .version-badge {
+            margin-left: auto;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-full);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .api-key-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px;
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-fast);
+        }
+        .api-key-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+        }
+        .api-key-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        .api-key-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .api-key-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .api-key-value {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-family: 'SF Mono', Monaco, monospace;
+            background: rgba(0, 0, 0, 0.04);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .cache-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px;
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-fast);
+        }
+        .cache-item:hover {
+            border-color: var(--primary-color);
+        }
+        .cache-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        .cache-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        .cache-icon.blue { background: rgba(102, 126, 234, 0.1); }
+        .cache-icon.green { background: rgba(72, 187, 120, 0.1); }
+        .cache-icon.orange { background: rgba(237, 137, 54, 0.1); }
+        .cache-icon.purple { background: rgba(118, 75, 162, 0.1); }
+        .cache-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .cache-size {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+        .feature-flag {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-fast);
+        }
+        .feature-flag:hover {
+            border-color: var(--primary-color);
+        }
+        .feature-info {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+        }
+        .feature-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-top: 4px;
+        }
+        .feature-status.enabled { background: var(--success-color); box-shadow: 0 0 8px rgba(72, 187, 120, 0.4); }
+        .feature-status.disabled { background: var(--danger-color); }
+        .feature-status.beta { background: var(--warning-color); box-shadow: 0 0 8px rgba(237, 137, 54, 0.4); }
+        .feature-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .feature-desc {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+        .integration-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-lg);
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-fast);
+        }
+        .integration-card:hover {
+            border-color: var(--primary-color);
+        }
+        .integration-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        .integration-logo {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+        .integration-logo.wechat { background: rgba(7, 193, 96, 0.12); }
+        .integration-logo.apple { background: rgba(0, 0, 0, 0.06); }
+        .integration-logo.huawei { background: rgba(204, 0, 0, 0.1); }
+        .integration-logo.xiaomi { background: rgba(255, 153, 0, 0.1); }
+        .integration-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .integration-status {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+        .danger-zone {
+            border: 2px solid rgba(245, 101, 101, 0.2);
+            background: linear-gradient(180deg, rgba(245, 101, 101, 0.03) 0%, rgba(245, 101, 101, 0.08) 100%);
+        }
+        .danger-zone .section-icon {
+            background: linear-gradient(135deg, var(--danger-color), #ff6b6b) !important;
+            box-shadow: 0 4px 12px rgba(245, 101, 101, 0.3) !important;
+        }
+        .danger-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            background: var(--bg-primary);
+            border-radius: var(--border-radius-md);
+            border: 1px solid rgba(245, 101, 101, 0.15);
+            margin-bottom: var(--spacing-md);
+        }
+        .danger-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 6px 0;
+        }
+        .danger-info p {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin: 0;
+        }
+        
+        /* 成功提示消息样式 */
+        .success-message {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background: var(--success-light);
+            color: var(--success-color);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-lg);
+            font-weight: 500;
+            box-shadow: var(--shadow-sm);
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon"></div>
+                    <div>
+                        <div class="sidebar-logo-text">灵境管理</div>
+                        <div class="sidebar-logo-sub">Admin Console</div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">主要功能</div>
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="nav-item-icon">📊</span>
+                        <span class="nav-item-text">数据看板</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <span class="nav-item-icon">👥</span>
+                        <span class="nav-item-text">用户管理</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                        <span class="nav-item-icon">📈</span>
+                        <span class="nav-item-text">数据分析</span>
+                    </a>
+                    <a href="membership.html" class="nav-item">
+                        <span class="nav-item-icon">💎</span>
+                        <span class="nav-item-text">会员分析</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统管理</div>
+                    <a href="security.html" class="nav-item">
+                        <span class="nav-item-icon">🔒</span>
+                        <span class="nav-item-text">安全管理</span>
+                    </a>
+                    <a href="settings.html" class="nav-item active">
+                        <span class="nav-item-icon">⚙️</span>
+                        <span class="nav-item-text">系统设置</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <span class="nav-item-icon">🚪</span>
+                        <span class="nav-item-text">退出登录</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 class="header-title">系统设置</h1>
+                    <p class="header-subtitle">配置平台参数与偏好设置</p>
+                </div>
+                <div class="header-actions">
+                    <input type="file" id="importSettings" accept=".xlsx,.xls" style="display: none;">
+                    <button class="btn btn-secondary" id="btnImport">
+                        <span>📥</span>
+                        <span>导入设置</span>
+                    </button>
+                    <button class="btn btn-secondary" id="btnExport">
+                        <span>📤</span>
+                        <span>导出设置</span>
+                    </button>
+                    <button class="btn btn-primary" id="btnSave">
+                        <span>💾</span>
+                        <span>保存设置</span>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- 成功提示消息 -->
+            <div id="saveSuccess" class="success-message" style="display: none;">
+                <span>✅</span>
+                <span>设置已成功保存</span>
+            </div>
+            
+            <div class="version-info">
+                <div class="version-icon">🚀</div>
+                <div class="version-details">
+                    <h3>系统版本 v2.5.0</h3>
+                    <p>最后更新：2024年1月15日 · 构建版本 2024011501</p>
+                </div>
+                <div class="version-badge">最新版本</div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <h2 class="settings-section-title">
+                        <span class="section-icon">🌐</span>
+                        语言与地区
+                    </h2>
+                </div>
+                <div class="settings-card">
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">默认语言</h3>
+                            <p class="item-desc">设置平台默认显示语言，用户可在个人设置中覆盖此选项</p>
+                        </div>
+                        <div class="item-action">
+                            <select class="select-field">
+                                <option>简体中文</option>
+                                <option>English</option>
+                                <option>日本語</option>
+                                <option>한국어</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">地区格式</h3>
+                            <p class="item-desc">设置日期、时间和数字的显示格式</p>
+                        </div>
+                        <div class="item-action">
+                            <select class="select-field">
+                                <option>中国 (zh-CN)</option>
+                                <option>美国 (en-US)</option>
+                                <option>欧洲 (eu)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">自动检测语言</h3>
+                            <p class="item-desc">根据浏览器设置自动检测并应用最合适的语言</p>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch active"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <h2 class="settings-section-title">
+                        <span class="section-icon">🎨</span>
+                        主题与外观
+                    </h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary btn-sm">恢复默认</button>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">深色模式</h3>
+                            <p class="item-desc">启用后系统将使用深色主题，减少眼睛疲劳</p>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">Compact 模式</h3>
+                            <p class="item-desc">减小间距，在同一屏幕显示更多内容</p>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">动画效果</h3>
+                            <p class="item-desc">启用界面过渡动画，提供更流畅的使用体验</p>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch active"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <h2 class="settings-section-title">
+                        <span class="section-icon">🔔</span>
+                        通知设置
+                    </h2>
+                </div>
+                <div class="settings-card">
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">系统通知</h3>
+                            <p class="item-desc">接收平台重要的系统更新和维护通知</p>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch active"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">安全警报</h3>
+                            <p class="item-desc">接收异常登录、密码修改等安全相关通知</p>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch active"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">用户反馈</h3>
+                            <p class="item-desc">接收用户提交的建议和问题报告</p>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch active"></div>
+                        </div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="item-info">
+                            <h3 class="item-title">邮件通知</h3>
+                            <p class="item-desc">将重要通知同时发送到管理员邮箱</p>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <h2 class="settings-section-title">
+                        <span class="section-icon">🔑</span>
+                        API 密钥管理
+                    </h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary">
+                            <span>+</span>
+                            <span>新建密钥</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <div class="api-key-list">
+                        <div class="api-key-item">
+                            <div class="api-key-info">
+                                <div class="api-key-icon">🔐</div>
+                                <div>
+                                    <div class="api-key-name">生产环境密钥</div>
+                                    <span class="api-key-value">sk_live_****************************a4f2</span>
+                                </div>
+                            </div>
+                            <div class="item-action">
+                                <button class="btn btn-danger btn-sm">撤销</button>
+                            </div>
+                        </div>
+                        <div class="api-key-item">
+                            <div class="api-key-info">
+                                <div class="api-key-icon">🧪</div>
+                                <div>
+                                    <div class="api-key-name">测试环境密钥</div>
+                                    <span class="api-key-value">sk_test_****************************8b3c</span>
+                                </div>
+                            </div>
+                            <div class="item-action">
+                                <button class="btn btn-danger btn-sm">撤销</button>
+                            </div>
+                        </div>
+                        <div class="api-key-item">
+                            <div class="api-key-info">
+                                <div class="api-key-icon">📱</div>
+                                <div>
+                                    <div class="api-key-name">移动端集成密钥</div>
+                                    <span class="api-key-value">sk_mobile_****************************2d7e</span>
+                                </div>
+                            </div>
+                            <div class="item-action">
+                                <button class="btn btn-danger btn-sm">撤销</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <h2 class="settings-section-title">
+                        <span class="section-icon">💾</span>
+                        缓存管理
+                    </h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary">
+                            <span>🗑️</span>
+                            <span>清理全部缓存</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <div class="cache-item">
+                        <div class="cache-info">
+                            <div class="cache-icon blue">📦</div>
+                            <div>
+                                <div class="cache-name">系统缓存</div>
+                                <div class="cache-size">包含临时文件和系统生成的中间数据</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <span class="stat-value">256 MB</span>
+                            <button class="btn btn-secondary btn-sm" style="margin-left: var(--spacing-md);">清理</button>
+                        </div>
+                    </div>
+                    <div class="cache-item">
+                        <div class="cache-info">
+                            <div class="cache-icon green">🖼️</div>
+                            <div>
+                                <div class="cache-name">图片缓存</div>
+                                <div class="cache-size">用户上传和系统生成的图片文件</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <span class="stat-value">1.2 GB</span>
+                            <button class="btn btn-secondary btn-sm" style="margin-left: var(--spacing-md);">清理</button>
+                        </div>
+                    </div>
+                    <div class="cache-item">
+                        <div class="cache-info">
+                            <div class="cache-icon orange">📊</div>
+                            <div>
+                                <div class="cache-name">数据分析缓存</div>
+                                <div class="cache-size">报表和统计数据的临时存储</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <span class="stat-value">512 MB</span>
+                            <button class="btn btn-secondary btn-sm" style="margin-left: var(--spacing-md);">清理</button>
+                        </div>
+                    </div>
+                    <div class="cache-item">
+                        <div class="cache-info">
+                            <div class="cache-icon purple">🤖</div>
+                            <div>
+                                <div class="cache-name">AI 模型缓存</div>
+                                <div class="cache-size">已下载的机器学习模型文件</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <span class="stat-value">3.8 GB</span>
+                            <button class="btn btn-secondary btn-sm" style="margin-left: var(--spacing-md);">清理</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <h2 class="settings-section-title">
+                        <span class="section-icon">🚀</span>
+                        功能开关
+                    </h2>
+                </div>
+                <div class="settings-card">
+                    <div class="feature-flag">
+                        <div class="feature-info">
+                            <div class="feature-status enabled"></div>
+                            <div>
+                                <div class="feature-name">AI 健康建议</div>
+                                <div class="feature-desc">基于用户数据生成个性化的健康建议和提醒</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch active"></div>
+                        </div>
+                    </div>
+                    <div class="feature-flag">
+                        <div class="feature-info">
+                            <div class="feature-status enabled"></div>
+                            <div>
+                                <div class="feature-name">社区功能</div>
+                                <div class="feature-desc">用户分享、健康话题讨论和互动功能</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch active"></div>
+                        </div>
+                    </div>
+                    <div class="feature-flag">
+                        <div class="feature-info">
+                            <div class="feature-status beta"></div>
+                            <div>
+                                <div class="feature-name">AR 舌诊</div>
+                                <div class="feature-desc">增强现实技术辅助的舌像分析功能（测试阶段）</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch active"></div>
+                        </div>
+                    </div>
+                    <div class="feature-flag">
+                        <div class="feature-info">
+                            <div class="feature-status disabled"></div>
+                            <div>
+                                <div class="feature-name">家庭灵境管理</div>
+                                <div class="feature-desc">家庭成员健康数据关联和管理功能</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <div class="toggle-switch"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-header">
+                    <h2 class="settings-section-title">
+                        <span class="section-icon">🔗</span>
+                        第三方集成
+                    </h2>
+                </div>
+                <div class="settings-card">
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-logo wechat">💬</div>
+                            <div>
+                                <div class="integration-name">微信登录</div>
+                                <div class="integration-status">已接入 · 12,458 用户使用</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <button class="btn btn-secondary btn-sm">配置</button>
+                        </div>
+                    </div>
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-logo apple">🍎</div>
+                            <div>
+                                <div class="integration-name">Apple 登录</div>
+                                <div class="integration-status">已接入 · 3,212 用户使用</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <button class="btn btn-secondary btn-sm">配置</button>
+                        </div>
+                    </div>
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-logo huawei">📱</div>
+                            <div>
+                                <div class="integration-name">华为账号</div>
+                                <div class="integration-status">已接入 · 5,847 用户使用</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <button class="btn btn-secondary btn-sm">配置</button>
+                        </div>
+                    </div>
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-logo xiaomi">📲</div>
+                            <div>
+                                <div class="integration-name">小米账号</div>
+                                <div class="integration-status">待接入</div>
+                            </div>
+                        </div>
+                        <div class="item-action">
+                            <button class="btn btn-primary btn-sm">接入</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section danger-zone">
+                <div class="settings-section-header">
+                    <h2 class="settings-section-title">
+                        <span class="section-icon">⚠️</span>
+                        危险操作
+                    </h2>
+                </div>
+                <div class="settings-card">
+                    <div class="danger-item">
+                        <div class="danger-info">
+                            <h4>重置所有用户密码</h4>
+                            <p>所有用户将被要求在下次登录时重置密码</p>
+                        </div>
+                        <div class="item-action">
+                            <button class="btn btn-danger">执行重置</button>
+                        </div>
+                    </div>
+                    <div class="danger-item">
+                        <div class="danger-info">
+                            <h4>清除所有数据</h4>
+                            <p>不可恢复地删除所有用户数据（保留系统配置）</p>
+                        </div>
+                        <div class="item-action">
+                            <button class="btn btn-danger">开始删除</button>
+                        </div>
+                    </div>
+                    <div class="danger-item">
+                        <div class="danger-info">
+                            <h4>停用平台</h4>
+                            <p>立即停止平台服务，所有用户无法访问</p>
+                        </div>
+                        <div class="item-action">
+                            <button class="btn btn-danger">停用平台</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化切换开关
+            initToggleSwitches();
+            
+            // 初始化按钮事件
+            initButtonEvents();
+            
+            // 初始化缓存清理功能
+            initCacheCleanup();
+            
+            // 初始化危险操作确认
+            initDangerOperations();
+            
+            // 初始化API密钥管理
+            initApiKeyManagement();
+            
+            // 初始化第三方集成
+            initIntegrations();
+        });
+        
+        // 初始化切换开关
+        function initToggleSwitches() {
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    // 添加切换动画
+                    this.style.transition = 'all var(--transition-normal)';
+                });
+            });
+        }
+        
+        // 初始化按钮事件
+        function initButtonEvents() {
+            // 保存设置按钮
+            const btnSave = document.getElementById('btnSave');
+            if (btnSave) {
+                btnSave.addEventListener('click', saveSettings);
+            }
+            
+            // 导出设置按钮
+            const btnExport = document.getElementById('btnExport');
+            if (btnExport) {
+                btnExport.addEventListener('click', exportSettings);
+            }
+            
+            // 导入设置按钮
+            const btnImport = document.getElementById('btnImport');
+            const importSettings = document.getElementById('importSettings');
+            if (btnImport && importSettings) {
+                btnImport.addEventListener('click', function() {
+                    importSettings.click();
+                });
+                
+                importSettings.addEventListener('change', function(e) {
+                    if (e.target.files && e.target.files[0]) {
+                        importSettingsFromFile(e.target.files[0]);
+                    }
+                });
+            }
+        }
+        
+        // 保存设置功能
+        function saveSettings() {
+            // 显示保存状态
+            const btnSave = document.getElementById('btnSave');
+            const originalText = btnSave.innerHTML;
+            btnSave.innerHTML = '<span>⏳</span><span>保存中...</span>';
+            btnSave.disabled = true;
+            
+            // 模拟保存过程
+            setTimeout(() => {
+                btnSave.innerHTML = originalText;
+                btnSave.disabled = false;
+                
+                // 显示成功消息
+                showSuccessMessage();
+            }, 1500);
+        }
+        
+        // 显示成功消息
+        function showSuccessMessage() {
+            const successMessage = document.getElementById('saveSuccess');
+            if (successMessage) {
+                successMessage.style.display = 'flex';
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // 导出设置功能
+        function exportSettings() {
+            // 收集当前设置
+            const settings = collectCurrentSettings();
+            
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            
+            // 创建设置工作表
+            const settingsData = [
+                ['设置项', '值']
+            ];
+            
+            // 将设置转换为适合Excel的格式
+            for (const [key, value] of Object.entries(settings)) {
+                if (typeof value === 'object') {
+                    for (const [subKey, subValue] of Object.entries(value)) {
+                        settingsData.push([`${key}.${subKey}`, subValue]);
+                    }
+                } else {
+                    settingsData.push([key, value]);
+                }
+            }
+            
+            const settingsSheet = XLSX.utils.aoa_to_sheet(settingsData);
+            XLSX.utils.book_append_sheet(wb, settingsSheet, '系统设置');
+            
+            // 导出为Excel文件
+            const fileName = `系统设置_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+        
+        // 收集当前设置
+        function collectCurrentSettings() {
+            const settings = {
+                language: document.querySelector('select').value,
+                darkMode: document.querySelector('.toggle-switch:nth-child(1)').classList.contains('active'),
+                compactMode: document.querySelector('.toggle-switch:nth-child(2)').classList.contains('active'),
+                animations: document.querySelector('.toggle-switch:nth-child(3)').classList.contains('active'),
+                systemNotifications: document.querySelector('.toggle-switch:nth-child(4)').classList.contains('active'),
+                securityAlerts: document.querySelector('.toggle-switch:nth-child(5)').classList.contains('active'),
+                userFeedback: document.querySelector('.toggle-switch:nth-child(6)').classList.contains('active'),
+                emailNotifications: document.querySelector('.toggle-switch:nth-child(7)').classList.contains('active'),
+                aiHealthAdvice: document.querySelector('.toggle-switch:nth-child(8)').classList.contains('active'),
+                communityFeatures: document.querySelector('.toggle-switch:nth-child(9)').classList.contains('active'),
+                arTongueDiagnosis: document.querySelector('.toggle-switch:nth-child(10)').classList.contains('active'),
+                familyManagement: document.querySelector('.toggle-switch:nth-child(11)').classList.contains('active')
+            };
+            
+            return settings;
+        }
+        
+        // 从文件导入设置
+        function importSettingsFromFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const wb = XLSX.read(data, { type: 'array' });
+                    
+                    // 获取设置工作表
+                    const ws = wb.Sheets['系统设置'];
+                    if (!ws) {
+                        alert('文件格式不正确，未找到系统设置工作表');
+                        return;
+                    }
+                    
+                    // 转换为JSON格式
+                    const settingsData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+                    
+                    // 显示导入确认
+                    if (confirm('确定要导入设置吗？这将覆盖当前所有设置。')) {
+                        // 这里可以添加实际的设置导入逻辑
+                        alert('设置已成功导入，部分设置可能需要刷新页面才能生效。');
+                    }
+                } catch (error) {
+                    alert('导入失败：' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        
+        // 初始化缓存清理功能
+        function initCacheCleanup() {
+            // 清理全部缓存按钮
+            const btnCleanAllCache = document.querySelector('.section-actions .btn-secondary');
+            if (btnCleanAllCache) {
+                btnCleanAllCache.addEventListener('click', function() {
+                    if (confirm('确定要清理全部缓存吗？这可能会影响系统性能直到缓存重新生成。')) {
+                        // 模拟清理过程
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<span>⏳</span><span>清理中...</span>';
+                        this.disabled = true;
+                        
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.disabled = false;
+                            alert('全部缓存已清理完成！');
+                        }, 2000);
+                    }
+                });
+            }
+            
+            // 单个缓存清理按钮
+            document.querySelectorAll('.cache-item .btn-secondary').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const cacheName = this.closest('.cache-item').querySelector('.cache-name').textContent;
+                    if (confirm(`确定要清理${cacheName}吗？`)) {
+                        // 模拟清理过程
+                        const originalText = this.textContent;
+                        this.textContent = '清理中...';
+                        this.disabled = true;
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.disabled = false;
+                            alert(`${cacheName}已清理完成！`);
+                        }, 1500);
+                    }
+                });
+            });
+        }
+        
+        // 初始化危险操作确认
+        function initDangerOperations() {
+            document.querySelectorAll('.danger-item .btn-danger').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const operation = this.closest('.danger-item').querySelector('h4').textContent;
+                    if (confirm(`确定要执行"${operation}"吗？此操作不可恢复！`)) {
+                        // 模拟操作过程
+                        const originalText = this.textContent;
+                        this.textContent = '执行中...';
+                        this.disabled = true;
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.disabled = false;
+                            alert(`${operation}操作已完成！`);
+                        }, 2000);
+                    }
+                });
+            });
+        }
+        
+        // 初始化API密钥管理
+        function initApiKeyManagement() {
+            // 新建密钥按钮
+            const btnNewKey = document.querySelector('.section-actions .btn-primary');
+            if (btnNewKey) {
+                btnNewKey.addEventListener('click', function() {
+                    alert('新建密钥功能将在后续版本中实现！');
+                });
+            }
+            
+            // 撤销密钥按钮
+            document.querySelectorAll('.api-key-item .btn-danger').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const keyName = this.closest('.api-key-item').querySelector('.api-key-name').textContent;
+                    if (confirm(`确定要撤销"${keyName}"吗？此操作不可恢复！`)) {
+                        // 模拟撤销过程
+                        const originalText = this.textContent;
+                        this.textContent = '撤销中...';
+                        this.disabled = true;
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.disabled = false;
+                            alert(`${keyName}已成功撤销！`);
+                        }, 1500);
+                    }
+                });
+            });
+        }
+        
+        // 初始化第三方集成
+        function initIntegrations() {
+            document.querySelectorAll('.integration-card .btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const integrationName = this.closest('.integration-card').querySelector('.integration-name').textContent;
+                    alert(`${integrationName}配置功能将在后续版本中实现！`);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命理信息管理 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 页面通用样式 */
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* 顶部导航栏 */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        
+        .nav-btn:hover {
+            background-color: #f0f0f0;
+        }
+        
+        /* 表单样式 */
+        .form-section {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #2c3e50;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #fff;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+        }
+        
+        /* 性别选择样式 */
+        .gender-options {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .gender-option {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .gender-option.active {
+            border-color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        
+        .gender-option i {
+            font-size: 20px;
+            margin-bottom: 4px;
+            color: #666;
+        }
+        
+        .gender-option.active i {
+            color: #3498db;
+        }
+        
+        .gender-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .gender-option.active .gender-text {
+            color: #3498db;
+        }
+        
+        /* 八字图表样式 */
+        .bazi-chart {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #3498db;
+        }
+        
+        .bazi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(4, auto);
+            gap: 12px;
+            max-width: 240px;
+            margin: 0 auto;
+        }
+        
+        .bazi-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .bazi-item:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+            border-color: #3498db;
+        }
+        
+        .bazi-character {
+            font-size: 28px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 4px;
+        }
+        
+        .bazi-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* 保存按钮 */
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 16px;
+        }
+        
+        .save-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .save-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 8px 0;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item.active i, .nav-item.active span {
+            color: #3498db;
+        }
+        
+        .publish-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .publish-icon {
+            position: absolute;
+            bottom: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .publish-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        .publish-icon i {
+            font-size: 24px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <div class="top-nav">
+            <button class="nav-btn" onclick="goBack()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="nav-title">命理信息管理</div>
+            <button class="nav-btn" onclick="saveBazi()">
+                <i class="fas fa-check"></i>
+            </button>
+        </div>
+        
+        <!-- 命理信息编辑表单 -->
+        <div class="page">
+            <div class="form-section">
+                <!-- 八字图表展示 -->
+                <div class="bazi-chart">
+                    <div class="chart-title">八字命盘</div>
+                    <div class="bazi-grid">
+                        <div class="bazi-item">
+                            <div class="bazi-character">戊</div>
+                            <div class="bazi-label">年柱</div>
+                        </div>
+                        <div class="bazi-item">
+                            <div class="bazi-character">子</div>
+                            <div class="bazi-label">年支</div>
+                        </div>
+                        <div class="bazi-item">
+                            <div class="bazi-character">甲</div>
+                            <div class="bazi-label">月柱</div>
+                        </div>
+                        <div class="bazi-item">
+                            <div class="bazi-character">子</div>
+                            <div class="bazi-label">月支</div>
+                        </div>
+                        <div class="bazi-item">
+                            <div class="bazi-character">戊</div>
+                            <div class="bazi-label">日柱</div>
+                        </div>
+                        <div class="bazi-item">
+                            <div class="bazi-character">子</div>
+                            <div class="bazi-label">日支</div>
+                        </div>
+                        <div class="bazi-item">
+                            <div class="bazi-character">壬</div>
+                            <div class="bazi-label">时柱</div>
+                        </div>
+                        <div class="bazi-item">
+                            <div class="bazi-character">辰</div>
+                            <div class="bazi-label">时支</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 出生信息录入 -->
+                <div class="form-group">
+                    <label for="birthDate" class="form-label">出生年月日</label>
+                    <input type="date" id="birthDate" class="form-input" placeholder="请选择出生年月日">
+                </div>
+                
+                <div class="form-group">
+                    <label for="birthTime" class="form-label">出生时间</label>
+                    <input type="time" id="birthTime" class="form-input" placeholder="请选择出生时间">
+                </div>
+                
+                <div class="form-group">
+                    <label for="birthLocation" class="form-label">出生地点</label>
+                    <select id="birthLocation" class="form-select">
+                        <option value="">请选择出生地点</option>
+                        <option value="北京">北京市</option>
+                        <option value="上海">上海市</option>
+                        <option value="广州">广州市</option>
+                        <option value="深圳">深圳市</option>
+                        <option value="杭州">杭州市</option>
+                        <option value="成都">成都市</option>
+                        <option value="武汉">武汉市</option>
+                        <option value="西安">西安市</option>
+                        <option value="重庆">重庆市</option>
+                        <option value="南京">南京市</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">性别</label>
+                    <div class="gender-options">
+                        <div class="gender-option active" onclick="selectGender('male')">
+                            <i class="fas fa-mars"></i>
+                            <div class="gender-text">男</div>
+                        </div>
+                        <div class="gender-option" onclick="selectGender('female')">
+                            <i class="fas fa-venus"></i>
+                            <div class="gender-text">女</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+    
+    <script>
+        // 返回上一页
+        function goBack() {
+            window.location.href = '../profile.html';
+        }
+        
+        // 性别选择
+        function selectGender(gender) {
+            const options = document.querySelectorAll('.gender-option');
+            options.forEach(option => option.classList.remove('active'));
+            
+            if (gender === 'male') {
+                options[0].classList.add('active');
+            } else {
+                options[1].classList.add('active');
+            }
+        }
+        
+        // 保存八字信息
+        function saveBazi() {
+            const birthDate = document.getElementById('birthDate').value;
+            const birthTime = document.getElementById('birthTime').value;
+            const birthLocation = document.getElementById('birthLocation').value;
+            const gender = document.querySelector('.gender-option.active').querySelector('.gender-text').textContent;
+            
+            // 表单验证
+            if (!birthDate) {
+                alert('请选择出生年月日');
+                return;
+            }
+            
+            if (!birthTime) {
+                alert('请选择出生时间');
+                return;
+            }
+            
+            if (!birthLocation) {
+                alert('请选择出生地点');
+                return;
+            }
+            
+            // 构建数据对象
+            const baziData = {
+                birthDate: birthDate,
+                birthTime: birthTime,
+                birthLocation: birthLocation,
+                gender: gender,
+                baziCharacters: ['戊', '子', '甲', '子', '戊', '子', '壬', '辰'] // 示例八字
+            };
+            
+            // 模拟数据提交
+            console.log('保存的八字信息:', baziData);
+            
+            // 保存到localStorage
+            localStorage.setItem('userBazi', JSON.stringify(baziData));
+            
+            // 更新八字图表显示
+            updateBaziChart(baziData.baziCharacters);
+            
+            // 保存成功提示
+            alert('命理信息保存成功');
+        }
+        
+        // 更新八字图表
+        function updateBaziChart(characters) {
+            const baziItems = document.querySelectorAll('.bazi-character');
+            baziItems.forEach((item, index) => {
+                if (characters[index]) {
+                    item.textContent = characters[index];
+                }
+            });
+        }
+        
+        // 初始化页面数据
+        function init() {
+            // 从localStorage获取保存的八字信息
+            const savedBazi = localStorage.getItem('userBazi');
+            if (savedBazi) {
+                const baziData = JSON.parse(savedBazi);
+                
+                // 填充表单数据
+                if (baziData.birthDate) {
+                    document.getElementById('birthDate').value = baziData.birthDate;
+                }
+                if (baziData.birthTime) {
+                    document.getElementById('birthTime').value = baziData.birthTime;
+                }
+                if (baziData.birthLocation) {
+                    document.getElementById('birthLocation').value = baziData.birthLocation;
+                }
+                if (baziData.gender) {
+                    selectGender(baziData.gender === '男' ? 'male' : 'female');
+                }
+                
+                // 更新八字图表
+                if (baziData.baziCharacters) {
+                    updateBaziChart(baziData.baziCharacters);
+                }
+            }
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
+    </script>
+    
+    <!-- 引入外部JavaScript文件 -->
+    <script src="../script.js"></script>
+    <script src="../member-common.js"></script>
+</body>
+</html>

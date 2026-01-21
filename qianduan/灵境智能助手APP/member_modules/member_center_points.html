@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵境智能助手 - 积分中心</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../member-common.css">
+    <style>
+        /* 积分中心样式 */
+        /* 积分余额卡片 */
+        .points-balance-card {
+            width: 100%;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            border-radius: 16px;
+            padding: 24px;
+            color: #fff;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .points-balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .points-balance-card::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -50%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        
+        .points-balance-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .points-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        
+        .points-amount {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .points-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .points-btn {
+            flex: 1;
+            padding: 8px 16px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .points-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* 积分记录 */
+        .points-records {
+            margin-bottom: 24px;
+        }
+        
+        .records-tabs {
+            display: flex;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .tab-item {
+            padding: 12px 0;
+            margin-right: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #7f8c8d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-item.active {
+            color: #f39c12;
+        }
+        
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #f39c12;
+        }
+        
+        .records-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .record-item {
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .record-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .record-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .record-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .record-points {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .record-points.income {
+            color: #27ae60;
+        }
+        
+        .record-points.expense {
+            color: #e74c3c;
+        }
+        
+        .record-date {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        /* 积分规则 */
+        .points-rules {
+            margin-bottom: 24px;
+        }
+        
+        .rules-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .rule-item {
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .rule-item:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .rule-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .rule-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .rule-desc {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        /* 积分兑换 */
+        .points-exchange {
+            margin-bottom: 24px;
+        }
+        
+        .exchange-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .exchange-item {
+            padding: 16px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .exchange-item:hover {
+            border-color: #f39c12;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.1);
+        }
+        
+        .exchange-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background-color: #fef5e7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f39c12;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+        
+        .exchange-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .exchange-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f39c12;
+        }
+        
+        /* 积分活动 */
+        .points-activities {
+            margin-bottom: 24px;
+        }
+        
+        .activities-list {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        
+        .activity-item {
+            min-width: 200px;
+            padding: 16px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .activity-item:hover {
+            border-color: #f39c12;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.1);
+        }
+        
+        .activity-image {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 32px;
+        }
+        
+        .activity-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .activity-desc {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 页面内容 -->
+        <div class="page" id="page-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <button class="back-btn" onclick="window.location.href='member_center.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="page-title">积分中心</div>
+                <div class="header-actions">
+                    <button class="header-action-btn" title="积分规则">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 积分余额卡片 -->
+            <div class="points-balance-card">
+                <div class="points-balance-content">
+                    <div class="points-title">当前积分余额</div>
+                    <div class="points-amount">8,560</div>
+                    <div class="points-actions">
+                        <button class="points-btn" onclick="showExchange()">积分兑换</button>
+                        <button class="points-btn" onclick="showRecords()">积分明细</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 积分记录 -->
+            <div class="points-records">
+                <div class="section-title">积分记录</div>
+                <div class="records-tabs">
+                    <div class="tab-item active" onclick="switchTab('income')">收入</div>
+                    <div class="tab-item" onclick="switchTab('expense')">支出</div>
+                </div>
+                <div class="records-list" id="recordsList">
+                    <!-- 收入记录 -->
+                    <div class="record-item">
+                        <div class="record-header">
+                            <div class="record-title">每日签到</div>
+                            <div class="record-points income">+10</div>
+                        </div>
+                        <div class="record-date">2025-12-28 08:30:00</div>
+                    </div>
+                    <div class="record-item">
+                        <div class="record-header">
+                            <div class="record-title">分享好友</div>
+                            <div class="record-points income">+50</div>
+                        </div>
+                        <div class="record-date">2025-12-27 14:20:00</div>
+                    </div>
+                    <div class="record-item">
+                        <div class="record-header">
+                            <div class="record-title">完成任务</div>
+                            <div class="record-points income">+100</div>
+                        </div>
+                        <div class="record-date">2025-12-26 16:45:00</div>
+                    </div>
+                    <div class="record-item">
+                        <div class="record-header">
+                            <div class="record-title">会员月签到奖励</div>
+                            <div class="record-points income">+500</div>
+                        </div>
+                        <div class="record-date">2025-12-01 09:15:00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 积分规则 -->
+            <div class="points-rules">
+                <div class="section-title">积分获取规则</div>
+                <div class="rules-list">
+                    <div class="rule-item">
+                        <div class="rule-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="rule-title">每日签到</div>
+                        <div class="rule-desc">每天签到获得10积分</div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                        <div class="rule-title">分享好友</div>
+                        <div class="rule-desc">分享成功获得50积分</div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="rule-title">完成任务</div>
+                        <div class="rule-desc">完成任务获得100积分</div>
+                    </div>
+                    <div class="rule-item">
+                        <div class="rule-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="rule-title">会员奖励</div>
+                        <div class="rule-desc">会员每月额外获得500积分</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 积分兑换 -->
+            <div class="points-exchange">
+                <div class="section-title">积分兑换</div>
+                <div class="exchange-list">
+                    <div class="exchange-item" onclick="exchangeItem('vip', 5000)">
+                        <div class="exchange-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="exchange-title">月度会员</div>
+                        <div class="exchange-price">5,000 积分</div>
+                    </div>
+                    <div class="exchange-item" onclick="exchangeItem('coupon', 1000)">
+                        <div class="exchange-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <div class="exchange-title">10元优惠券</div>
+                        <div class="exchange-price">1,000 积分</div>
+                    </div>
+                    <div class="exchange-item" onclick="exchangeItem('course', 3000)">
+                        <div class="exchange-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="exchange-title">AI课程</div>
+                        <div class="exchange-price">3,000 积分</div>
+                    </div>
+                    <div class="exchange-item" onclick="exchangeItem('gift', 2000)">
+                        <div class="exchange-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <div class="exchange-title">精美礼品</div>
+                        <div class="exchange-price">2,000 积分</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 积分活动 -->
+            <div class="points-activities">
+                <div class="section-title">积分活动</div>
+                <div class="activities-list">
+                    <div class="activity-item" onclick="showActivity('double')">
+                        <div class="activity-image">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="activity-title">双倍积分日</div>
+                        <div class="activity-desc">周末签到双倍积分</div>
+                    </div>
+                    <div class="activity-item" onclick="showActivity('task')">
+                        <div class="activity-image">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="activity-title">任务挑战赛</div>
+                        <div class="activity-desc">完成任务赢取更多积分</div>
+                    </div>
+                    <div class="activity-item" onclick="showActivity('referral')">
+                        <div class="activity-image">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="activity-title">邀请好友</div>
+                        <div class="activity-desc">邀请好友获得额外积分</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航栏 -->
+       
+        <script src="../member-common.js"></script>
+        <script>
+            // 页面初始化
+            document.addEventListener('DOMContentLoaded', function() {
+                // 积分余额动画
+                const pointsAmount = document.querySelector('.points-amount');
+                if (pointsAmount) {
+                    const targetPoints = 8560;
+                    let currentPoints = 0;
+                    const increment = targetPoints / 50;
+                    const timer = setInterval(() => {
+                        currentPoints += increment;
+                        if (currentPoints >= targetPoints) {
+                            currentPoints = targetPoints;
+                            clearInterval(timer);
+                        }
+                        pointsAmount.textContent = currentPoints.toLocaleString();
+                    }, 20);
+                }
+            });
+            
+            // 切换积分记录标签
+            function switchTab(type) {
+                // 更新标签样式
+                const tabItems = document.querySelectorAll('.tab-item');
+                tabItems.forEach(item => item.classList.remove('active'));
+                event.target.classList.add('active');
+                
+                // 更新记录列表
+                const recordsList = document.getElementById('recordsList');
+                if (type === 'income') {
+                    recordsList.innerHTML = `
+                        <div class="record-item">
+                            <div class="record-header">
+                                <div class="record-title">每日签到</div>
+                                <div class="record-points income">+10</div>
+                            </div>
+                            <div class="record-date">2025-12-28 08:30:00</div>
+                        </div>
+                        <div class="record-item">
+                            <div class="record-header">
+                                <div class="record-title">分享好友</div>
+                                <div class="record-points income">+50</div>
+                            </div>
+                            <div class="record-date">2025-12-27 14:20:00</div>
+                        </div>
+                        <div class="record-item">
+                            <div class="record-header">
+                                <div class="record-title">完成任务</div>
+                                <div class="record-points income">+100</div>
+                            </div>
+                            <div class="record-date">2025-12-26 16:45:00</div>
+                        </div>
+                        <div class="record-item">
+                            <div class="record-header">
+                                <div class="record-title">会员月签到奖励</div>
+                                <div class="record-points income">+500</div>
+                            </div>
+                            <div class="record-date">2025-12-01 09:15:00</div>
+                        </div>
+                    `;
+                } else {
+                    recordsList.innerHTML = `
+                        <div class="record-item">
+                            <div class="record-header">
+                                <div class="record-title">兑换月度会员</div>
+                                <div class="record-points expense">-5,000</div>
+                            </div>
+                            <div class="record-date">2025-11-20 10:30:00</div>
+                        </div>
+                        <div class="record-item">
+                            <div class="record-header">
+                                <div class="record-title">兑换10元优惠券</div>
+                                <div class="record-points expense">-1,000</div>
+                            </div>
+                            <div class="record-date">2025-11-15 15:20:00</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            // 积分兑换
+            function exchangeItem(type, points) {
+                const items = {
+                    'vip': '月度会员',
+                    'coupon': '10元优惠券',
+                    'course': 'AI课程',
+                    'gift': '精美礼品'
+                };
+                
+                if (confirm(`确定要使用${points.toLocaleString()}积分兑换${items[type]}吗？`)) {
+                    alert('兑换成功！');
+                }
+            }
+            
+            // 显示活动详情
+            function showActivity(type) {
+                const activities = {
+                    'double': '双倍积分日：周末期间所有签到和任务积分双倍！',
+                    'task': '任务挑战赛：完成指定任务获得额外积分奖励！',
+                    'referral': '邀请好友：每邀请一位好友注册可获得200积分！'
+                };
+                alert(activities[type]);
+            }
+            
+            // 显示积分兑换页面
+            function showExchange() {
+                // 滚动到兑换区域
+                document.querySelector('.points-exchange').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // 显示积分明细
+            function showRecords() {
+                // 滚动到记录区域
+                document.querySelector('.points-records').scrollIntoView({ behavior: 'smooth' });
+            }
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵境智能助手 - 我的</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 页面通用样式 */
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* 个人中心页面头部 */
+        .profile-header {
+            text-align: center;
+            padding: 24px 0;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 0 0 24px 24px;
+            color: #fff;
+            position: relative;
+        }
+        
+        .header-actions {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .header-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .header-action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #fff;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #667eea;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .profile-name {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .profile-level {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 0 24px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        /* 功能菜单区域 */
+        .menu-section {
+            margin-bottom: 24px;
+        }
+        
+        .menu-group {
+            background-color: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .menu-item:active {
+            background-color: #e9ecef;
+        }
+        
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+        }
+        
+        .menu-text {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .menu-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .menu-badge {
+            padding: 2px 8px;
+            background-color: #e74c3c;
+            color: #fff;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .menu-arrow {
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+        
+        /* 隐私设置开关样式 */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background-color: #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background-color: #3498db;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            left: 26px;
+        }
+        
+        /* 关于和退出区域 */
+        .about-section {
+            margin-bottom: 24px;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .logout-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 8px 0;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item.active i, .nav-item.active span {
+            color: #3498db;
+        }
+        
+        .publish-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .publish-icon {
+            position: absolute;
+            bottom: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .publish-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        .publish-icon i {
+            font-size: 24px;
+            color: #fff;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 414px) {
+            .app-container {
+                max-width: 100%;
+            }
+            
+            .bottom-nav {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 个人中心页面内容 -->
+        <div class="page active" id="profile">
+            <!-- 个人中心页面头部 -->
+            <div class="profile-header">
+                <div class="header-actions">
+                    <button class="header-action-btn" title="设置">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="header-action-btn" title="更多">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+                
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                
+                <div class="profile-name">张小明</div>
+                <div class="profile-level">青铜会员 · LV.5</div>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">关注</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">38</div>
+                        <div class="stat-label">粉丝</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">积分</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">动态</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 功能菜单区域 -->
+            <div class="menu-section">
+                <!-- 个人信息菜单组 -->
+                <div class="menu-group">
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #3498db;">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <div class="menu-text">个人信息</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #27ae60;">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="menu-text">健康档案</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #e67e22;">
+                                <i class="fas fa-moon"></i>
+                            </div>
+                            <div class="menu-text">命理信息</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 设置菜单组 -->
+                <div class="menu-group">
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #e74c3c;">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="menu-text">消息通知</div>
+                        </div>
+                        <div class="menu-right">
+                            <div class="toggle-switch active">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #1abc9c;">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="menu-text">隐私设置</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #e74c3c;">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <div class="menu-text">账户与安全</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #34495e;">
+                                <i class="fas fa-language"></i>
+                            </div>
+                            <div class="menu-text">语言设置</div>
+                        </div>
+                        <div class="menu-right">
+                            <span style="color: #7f8c8d; font-size: 14px;">简体中文</span>
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #e67e22;">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="menu-text">主题设置</div>
+                        </div>
+                        <div class="menu-right">
+                            <span style="color: #7f8c8d; font-size: 14px;">浅色</span>
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 关于和退出区域 -->
+            <div class="about-section">
+                <div class="menu-group">
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #95a5a6;">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="menu-text">关于我们</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #7f8c8d;">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="menu-text">帮助中心</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-item">
+                        <div class="menu-left">
+                            <div class="menu-icon" style="background-color: #6c757d;">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="menu-text">用户协议</div>
+                        </div>
+                        <div class="menu-right">
+                            <i class="fas fa-chevron-right menu-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 退出登录按钮 -->
+            <button class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> 退出登录
+            </button>
+        </div>
+        
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <div class="nav-item" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" data-page="ai-chat">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" data-page="publish-post">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" data-page="member">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item active" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+        <script>
+            // 确保当前页面的导航项处于活动状态
+            document.addEventListener('DOMContentLoaded', function() {
+                const currentPage = 'profile';
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    if (item.getAttribute('data-page') === currentPage) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            });
+        </script>
+    </div>
+    
+    <style>
+        /* Toast提示样式 */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 12px 24px;
+            background-color: rgba(44, 62, 80, 0.9);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+    <script>
+        // Toast提示函数
+        function showToast(message) {
+            // 创建Toast元素
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            
+            // 添加到页面
+            document.body.appendChild(toast);
+            
+            // 显示Toast
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // 隐藏并移除Toast
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+        
+        // 切换开关功能
+        const toggleSwitches = document.querySelectorAll('.toggle-switch');
+        toggleSwitches.forEach(toggleSwitch => {
+            toggleSwitch.addEventListener('click', () => {
+                toggleSwitch.classList.toggle('active');
+                const isActive = toggleSwitch.classList.contains('active');
+                console.log('Toggle switched:', isActive);
+            });
+        });
+        
+        // 菜单项点击效果和页面跳转
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (item.querySelector('.toggle-switch')) return; // 跳过开关项
+                
+                item.style.backgroundColor = '#e9ecef';
+                setTimeout(() => {
+                    item.style.backgroundColor = '';
+                }, 150);
+                
+                const menuText = item.querySelector('.menu-text').textContent;
+                
+                // 页面跳转逻辑
+                switch(menuText) {
+                    case '个人信息':
+                        window.location.href = 'profile_modules/profile_base.html';
+                        break;
+                    case '健康档案':
+                        window.location.href = 'profile_modules/profile_health.html';
+                        break;
+                    case '命理信息':
+                        window.location.href = 'profile_modules/profile_bazi.html';
+                        break;
+                    case '隐私设置':
+                        window.location.href = 'profile_modules/profile_privacy.html';
+                        break;
+                    case '账户与安全':
+                        window.location.href = 'profile_modules/profile_security.html';
+                        break;
+                    case '消息通知':
+                        // 消息通知功能，暂时保留alert
+                        alert('消息通知功能');
+                        break;
+                    case '语言设置':
+                        // 语言设置功能，仅支持简体中文
+                        const langSetting = item.querySelector('.menu-right span');
+                        if (langSetting && langSetting.textContent === '简体中文') {
+                            // 已经是简体中文，显示提示
+                            showToast('当前已是简体中文');
+                        }
+                        break;
+                    case '主题设置':
+                        // 主题设置功能，仅支持浅色主题
+                        const themeSetting = item.querySelector('.menu-right span');
+                        if (themeSetting && themeSetting.textContent === '浅色') {
+                            // 已经是浅色主题，显示提示
+                            showToast('当前已是浅色主题');
+                        }
+                        break;
+                    case '关于我们':
+                        alert('关于我们功能');
+                        break;
+                    case '帮助中心':
+                        alert('帮助中心功能');
+                        break;
+                    case '用户协议':
+                        alert('用户协议功能');
+                        break;
+                    
+                    
+                    default:
+                        alert(`点击了：${menuText}`);
+                }
+            });
+        });
+        
+        // 退出登录功能
+        const logoutBtn = document.querySelector('.logout-btn');
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('确定要退出登录吗？')) {
+                logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 退出中...';
+                logoutBtn.disabled = true;
+                
+                setTimeout(() => {
+                    alert('退出登录成功！');
+                    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> 退出登录';
+                    logoutBtn.disabled = false;
+                }, 1500);
+            }
+        });
+        
+        // 头像点击功能
+        const profileAvatar = document.querySelector('.profile-avatar');
+        profileAvatar.addEventListener('click', () => {
+            alert('更换头像功能');
+        });
+        
+        // 统计数据点击功能
+        const statItems = document.querySelectorAll('.stat-item');
+        statItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const statLabel = item.querySelector('.stat-label').textContent;
+                alert(`查看${statLabel}详情`);
+            });
+        });
+        
+        // 头部按钮功能
+        const headerBtns = document.querySelectorAll('.header-action-btn');
+        headerBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const icon = btn.querySelector('i');
+                let action = '';
+                
+                if (icon.classList.contains('fa-cog')) {
+                    action = '设置';
+                } else if (icon.classList.contains('fa-ellipsis-v')) {
+                    action = '更多';
+                }
+                
+                alert(`点击了${action}按钮`);
+            });
+        });
+        
+        // 主题管理功能
+        function applyLightTheme() {
+            // 设置浅色主题样式
+            document.body.style.backgroundColor = '#f5f7fa';
+            document.body.style.color = '#2c3e50';
+            
+            // 确保所有菜单组都是浅色背景
+            const menuGroups = document.querySelectorAll('.menu-group');
+            menuGroups.forEach(group => {
+                group.style.backgroundColor = '#fff';
+                group.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.05)';
+            });
+            
+            // 确保所有菜单项都是浅色背景
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.style.borderBottom = '1px solid #f0f0f0';
+                item.addEventListener('mouseenter', () => {
+                    item.style.backgroundColor = '#f8f9fa';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.backgroundColor = '';
+                });
+            });
+            
+            // 确保底部导航栏是浅色背景
+            const bottomNav = document.querySelector('.bottom-nav');
+            if (bottomNav) {
+                bottomNav.style.backgroundColor = '#fff';
+                bottomNav.style.borderTop = '1px solid #e0e0e0';
+            }
+            
+            // 确保退出按钮样式正确
+            const logoutBtn = document.querySelector('.logout-btn');
+            if (logoutBtn) {
+                logoutBtn.style.backgroundColor = '#e74c3c';
+                logoutBtn.style.color = '#fff';
+            }
+        }
+        
+        // 页面加载时应用浅色主题
+        document.addEventListener('DOMContentLoaded', applyLightTheme);
+        
+        // 页面跳转功能
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.getAttribute('data-page');
+                if (page) {
+                    // 实现平滑过渡效果
+                    document.body.style.opacity = '0';
+                    document.body.style.transition = 'opacity 0.3s ease';
+                    
+                    setTimeout(() => {
+                        window.location.href = `${page}.html`;
+                    }, 300);
+                }
+            });
+        });
+        
+        // 微交互效果
+        const interactiveElements = document.querySelectorAll('.profile-avatar, .logout-btn, .header-action-btn, .nav-item');
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                element.style.transform = 'translateY(-2px)';
+                element.style.transition = 'transform 0.2s ease';
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                element.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

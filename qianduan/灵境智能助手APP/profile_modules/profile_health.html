@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康档案 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 复用profile.html中的样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* 头部导航 */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background-color: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #f5f7fa;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .page-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        /* 健康档案卡片 */
+        .health-card {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .card-more {
+            font-size: 14px;
+            color: #3498db;
+            cursor: pointer;
+        }
+        
+        /* 健康数据概览 */
+        .health-overview {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            padding: 16px 0;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        /* 响应式布局 - 小屏幕设备 */
+        @media (max-width: 375px) {
+            .health-overview {
+                padding: 12px 0;
+            }
+            
+            .overview-item {
+                width: 33.33%;
+                margin-bottom: 12px;
+            }
+            
+            .overview-value {
+                font-size: 16px;
+            }
+            
+            .overview-label {
+                font-size: 11px;
+            }
+        }
+        
+        /* 响应式布局 - 超小屏幕设备 */
+        @media (max-width: 320px) {
+            .overview-item {
+                width: 50%;
+            }
+        }
+        
+        .overview-item {
+            text-align: center;
+        }
+        
+        .overview-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e74c3c;
+            margin-bottom: 4px;
+        }
+        
+        .overview-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        /* 健康档案列表 */
+        .health-list {
+            background-color: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .health-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+            animation: slideInUp 0.3s ease-out forwards;
+            opacity: 0;
+        }
+        
+        /* 为每个健康档案项添加交错动画效果 */
+        .health-item:nth-child(1) { animation-delay: 0.1s; }
+        .health-item:nth-child(2) { animation-delay: 0.2s; }
+        .health-item:nth-child(3) { animation-delay: 0.3s; }
+        .health-item:nth-child(4) { animation-delay: 0.4s; }
+        .health-item:nth-child(5) { animation-delay: 0.5s; }
+        .health-item:nth-child(6) { animation-delay: 0.6s; }
+        .health-item:nth-child(7) { animation-delay: 0.7s; }
+        
+        .health-item:last-child {
+            border-bottom: none;
+        }
+        
+        .health-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+        
+        .health-item:active {
+            background-color: #e9ecef;
+        }
+        
+        .health-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .health-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+        }
+        
+        .health-text {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .health-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .health-status {
+            padding: 2px 8px;
+            background-color: #27ae60;
+            color: #fff;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .health-arrow {
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            padding: 8px 0;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item.active i, .nav-item.active span {
+            color: #3498db;
+        }
+        
+        .publish-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .publish-icon {
+            position: absolute;
+            bottom: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .publish-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        .publish-icon i {
+            font-size: 24px;
+            color: #fff;
+        }
+        
+        /* 模态框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #f5f7fa;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #2c3e50;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        /* 按钮样式 */
+        .btn-cancel {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
+            color: #2c3e50;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .btn-cancel:hover {
+            background-color: #f5f7fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-cancel:active {
+            transform: translateY(0);
+        }
+        
+        .btn-save {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #3498db;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .btn-save:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-save:active {
+            transform: translateY(0);
+        }
+        
+        /* 模态框动画 */
+        .modal-overlay {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+        }
+        
+        .modal-content {
+            transform: scale(0.9) translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.show .modal-content {
+            transform: scale(1) translateY(0);
+        }
+        
+        /* 动画关键帧 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 健康卡片动画 */
+        .health-card {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 页面头部 -->
+        <div class="page-header">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.location.href='../profile.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="page-title">健康档案</div>
+            </div>
+        </div>
+        
+        <!-- 健康数据概览 -->
+        <div class="page">
+            <div class="health-card">
+                <div class="card-header">
+                    <div class="card-title">健康数据概览</div>
+                    <div class="card-more">查看详情</div>
+                </div>
+                <div class="health-overview">
+                    <div class="overview-item">
+                        <div class="overview-value">175</div>
+                        <div class="overview-label">身高(cm)</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">65</div>
+                        <div class="overview-label">体重(kg)</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">72</div>
+                        <div class="overview-label">血压(mmHg)</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">68</div>
+                        <div class="overview-label">心率(bpm)</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">21.2</div>
+                        <div class="overview-label">BMI</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">5.6</div>
+                        <div class="overview-label">血糖(mmol/L)</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-value">36.5</div>
+                        <div class="overview-label">体温(°C)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 健康档案列表 -->
+            <div class="health-list">
+                <div class="health-item" onclick="profile_health_clickItem(this);">
+                    <div class="health-left">
+                        <div class="health-icon" style="background-color: #e74c3c;">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <div class="health-text">体检记录</div>
+                    </div>
+                    <div class="health-right">
+                        <div class="health-status">已更新</div>
+                        <i class="fas fa-chevron-right health-arrow"></i>
+                    </div>
+                </div>
+                
+                <div class="health-item" onclick="profile_health_clickItem(this);">
+                    <div class="health-left">
+                        <div class="health-icon" style="background-color: #3498db;">
+                            <i class="fas fa-prescription"></i>
+                        </div>
+                        <div class="health-text">用药记录</div>
+                    </div>
+                    <div class="health-right">
+                        <i class="fas fa-chevron-right health-arrow"></i>
+                    </div>
+                </div>
+                
+                <div class="health-item" onclick="profile_health_clickItem(this);">
+                    <div class="health-left">
+                        <div class="health-icon" style="background-color: #27ae60;">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div class="health-text">运动记录</div>
+                    </div>
+                    <div class="health-right">
+                        <div class="health-status">已更新</div>
+                        <i class="fas fa-chevron-right health-arrow"></i>
+                    </div>
+                </div>
+                
+                <div class="health-item" onclick="profile_health_clickItem(this);">
+                    <div class="health-left">
+                        <div class="health-icon" style="background-color: #f39c12;">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <div class="health-text">饮食记录</div>
+                    </div>
+                    <div class="health-right">
+                        <i class="fas fa-chevron-right health-arrow"></i>
+                    </div>
+                </div>
+                
+                <div class="health-item" onclick="profile_health_clickItem(this);">
+                    <div class="health-left">
+                        <div class="health-icon" style="background-color: #9b59b6;">
+                            <i class="fas fa-notes-medical"></i>
+                        </div>
+                        <div class="health-text">病历记录</div>
+                    </div>
+                    <div class="health-right">
+                        <i class="fas fa-chevron-right health-arrow"></i>
+                    </div>
+                </div>
+                
+                <div class="health-item" onclick="profile_health_clickItem(this);">
+                    <div class="health-left">
+                        <div class="health-icon" style="background-color: #1abc9c;">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="health-text">血型信息</div>
+                    </div>
+                    <div class="health-right">
+                        <i class="fas fa-chevron-right health-arrow"></i>
+                    </div>
+                </div>
+                
+                <div class="health-item" onclick="profile_health_clickItem(this);">
+                    <div class="health-left">
+                        <div class="health-icon" style="background-color: #e67e22;">
+                            <i class="fas fa-allergies"></i>
+                        </div>
+                        <div class="health-text">过敏记录</div>
+                    </div>
+                    <div class="health-right">
+                        <i class="fas fa-chevron-right health-arrow"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <div class="nav-item" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" data-page="ai-chat">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" data-page="publish-post">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" data-page="member">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item active" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+        
+        <!-- 健康数据编辑模态框 -->
+        <div class="modal-overlay" id="editHealthModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">编辑健康数据</div>
+                    <button class="modal-close" onclick="profile_health_closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">身高(cm)</label>
+                        <input type="number" class="form-input" id="editHeight" placeholder="请输入身高">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">体重(kg)</label>
+                        <input type="number" class="form-input" id="editWeight" placeholder="请输入体重" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">血压(mmHg)</label>
+                        <input type="number" class="form-input" id="editBloodPressure" placeholder="请输入血压">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">心率(bpm)</label>
+                        <input type="number" class="form-input" id="editHeartRate" placeholder="请输入心率">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">BMI</label>
+                        <input type="number" class="form-input" id="editBMI" placeholder="请输入BMI" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">血糖(mmol/L)</label>
+                        <input type="number" class="form-input" id="editBloodSugar" placeholder="请输入血糖" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">体温(°C)</label>
+                        <input type="number" class="form-input" id="editBodyTemperature" placeholder="请输入体温" step="0.1">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick="profile_health_closeModal()">取消</button>
+                    <button class="btn-save" onclick="profile_health_saveEdit()">保存</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 健康记录列表模态框 -->
+        <div class="modal-overlay" id="recordListModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title" id="recordListTitle">健康记录列表</div>
+                    <button class="modal-close" onclick="profile_health_closeRecordListModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 id="recordListSubtitle" style="font-size: 16px; font-weight: 500; margin: 0;"></h3>
+                        <button class="btn-save" onclick="profile_health_openRecordModalFromList()" style="padding: 6px 12px; font-size: 13px;">
+                            <i class="fas fa-plus" style="margin-right: 4px;"></i>添加记录
+                        </button>
+                    </div>
+                    <div id="recordList" style="max-height: 400px; overflow-y: auto;">
+                        <!-- 记录列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick="profile_health_closeRecordListModal()">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康记录编辑模态框 -->
+        <div class="modal-overlay" id="editRecordModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title" id="recordModalTitle">添加健康记录</div>
+                    <button class="modal-close" onclick="profile_health_closeRecordModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="recordType">
+                    <input type="hidden" id="recordId">
+                    <div class="form-group">
+                        <label class="form-label">记录名称</label>
+                        <input type="text" class="form-input" id="recordName" placeholder="请输入记录名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">记录内容</label>
+                        <textarea class="form-input" id="recordContent" rows="4" placeholder="请输入记录内容"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">记录日期</label>
+                        <input type="date" class="form-input" id="recordDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注信息</label>
+                        <textarea class="form-input" id="recordNote" rows="2" placeholder="请输入备注信息"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-cancel" onclick="profile_health_closeRecordModal()">取消</button>
+                    <button class="btn-save" onclick="profile_health_saveRecord()">保存</button>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // 健康档案数据模型
+            let profile_health_data = {
+                overview: {
+                    height: 175,
+                    weight: 65,
+                    bloodPressure: 72,
+                    heartRate: 68,
+                    bmi: 21.2,
+                    bloodSugar: 5.6,
+                    bodyTemperature: 36.5
+                },
+                records: {
+                    '体检记录': { status: '已更新', data: [
+                        {
+                            id: '1',
+                            name: '年度体检',
+                            content: '身高：175cm，体重：65kg，BMI：21.2，血压：120/80mmHg，心率：68bpm，血糖：5.6mmol/L',
+                            date: '2024-12-15',
+                            note: '体检结果正常，建议保持良好生活习惯',
+                            createTime: '2024-12-15T10:30:00.000Z',
+                            updateTime: '2024-12-15T10:30:00.000Z'
+                        },
+                        {
+                            id: '2',
+                            name: '入职体检',
+                            content: '身高：175cm，体重：64kg，BMI：20.9，血压：118/78mmHg，心率：65bpm，血糖：5.4mmol/L',
+                            date: '2024-06-01',
+                            note: '体检结果合格，符合入职要求',
+                            createTime: '2024-06-01T14:20:00.000Z',
+                            updateTime: '2024-06-01T14:20:00.000Z'
+                        }
+                    ]},
+                    '用药记录': { status: '已更新', data: [
+                        {
+                            id: '3',
+                            name: '感冒药',
+                            content: '药品名称：感冒清热颗粒，剂量：1袋/次，频率：3次/日，用法：温水冲服',
+                            date: '2024-12-20',
+                            note: '饭后服用，避免辛辣食物',
+                            createTime: '2024-12-20T09:15:00.000Z',
+                            updateTime: '2024-12-20T09:15:00.000Z'
+                        },
+                        {
+                            id: '4',
+                            name: '维生素C',
+                            content: '药品名称：维生素C片，剂量：1片/次，频率：1次/日',
+                            date: '2024-12-10',
+                            note: '增强免疫力，建议长期服用',
+                            createTime: '2024-12-10T16:45:00.000Z',
+                            updateTime: '2024-12-10T16:45:00.000Z'
+                        }
+                    ]},
+                    '运动记录': { status: '已更新', data: [
+                        {
+                            id: '5',
+                            name: '跑步',
+                            content: '运动类型：户外跑步，时长：30分钟，距离：3.5公里，配速：8"45"/公里，消耗热量：250千卡',
+                            date: '2024-12-25',
+                            note: '天气寒冷，注意保暖',
+                            createTime: '2024-12-25T16:30:00.000Z',
+                            updateTime: '2024-12-25T16:30:00.000Z'
+                        },
+                        {
+                            id: '6',
+                            name: '游泳',
+                            content: '运动类型：蛙泳，时长：45分钟，距离：1500米，消耗热量：350千卡',
+                            date: '2024-12-20',
+                            note: '游泳后及时擦干身体，避免感冒',
+                            createTime: '2024-12-20T19:00:00.000Z',
+                            updateTime: '2024-12-20T19:00:00.000Z'
+                        }
+                    ]},
+                    '饮食记录': { status: '已更新', data: [
+                        {
+                            id: '7',
+                            name: '早餐',
+                            content: '食物：全麦面包2片，牛奶250ml，鸡蛋1个，苹果1个',
+                            date: '2024-12-27',
+                            note: '营养均衡，包含碳水化合物、蛋白质和维生素',
+                            createTime: '2024-12-27T08:00:00.000Z',
+                            updateTime: '2024-12-27T08:00:00.000Z'
+                        },
+                        {
+                            id: '8',
+                            name: '午餐',
+                            content: '食物：米饭100g，清蒸鱼150g，青菜200g，番茄鸡蛋汤1碗',
+                            date: '2024-12-27',
+                            note: '低脂肪，高蛋白，多蔬菜',
+                            createTime: '2024-12-27T12:30:00.000Z',
+                            updateTime: '2024-12-27T12:30:00.000Z'
+                        }
+                    ]},
+                    '病历记录': { status: '已更新', data: [
+                        {
+                            id: '9',
+                            name: '感冒',
+                            content: '症状：咳嗽、流鼻涕、发烧38.5°C，诊断：普通感冒，治疗：休息、多喝水、服用感冒清热颗粒',
+                            date: '2024-12-20',
+                            note: '症状持续3天，已康复',
+                            createTime: '2024-12-20T10:00:00.000Z',
+                            updateTime: '2024-12-20T10:00:00.000Z'
+                        },
+                        {
+                            id: '10',
+                            name: '年度体检',
+                            content: '检查项目：血常规、尿常规、肝功能、肾功能、心电图、胸部CT，结果：所有指标正常',
+                            date: '2024-12-15',
+                            note: '建议保持良好生活习惯，定期复查',
+                            createTime: '2024-12-15T14:00:00.000Z',
+                            updateTime: '2024-12-15T14:00:00.000Z'
+                        }
+                    ]},
+                    '血型信息': { status: '已更新', data: [
+                        {
+                            id: '11',
+                            name: '血型',
+                            content: '血型：A型，Rh因子：阳性',
+                            date: '2024-12-15',
+                            note: '血型信息来源于年度体检',
+                            createTime: '2024-12-15T14:00:00.000Z',
+                            updateTime: '2024-12-15T14:00:00.000Z'
+                        }
+                    ]},
+                    '过敏记录': { status: '已更新', data: [
+                        {
+                            id: '12',
+                            name: '青霉素过敏',
+                            content: '过敏药物：青霉素类药物，症状：皮疹、瘙痒、呼吸困难',
+                            date: '2024-12-15',
+                            note: '避免使用所有青霉素类药物',
+                            createTime: '2024-12-15T14:00:00.000Z',
+                            updateTime: '2024-12-15T14:00:00.000Z'
+                        },
+                        {
+                            id: '13',
+                            name: '花粉过敏',
+                            content: '过敏原：春季花粉，症状：打喷嚏、流鼻涕、眼睛瘙痒',
+                            date: '2024-04-01',
+                            note: '春季外出时建议佩戴口罩',
+                            createTime: '2024-04-01T09:00:00.000Z',
+                            updateTime: '2024-04-01T09:00:00.000Z'
+                        }
+                    ]}
+                }
+            };
+            
+            // 初始化健康档案数据
+            function profile_health_initData() {
+                const savedData = localStorage.getItem('profile_health_data');
+                if (savedData) {
+                    profile_health_data = JSON.parse(savedData);
+                    profile_health_updateOverview();
+                    profile_health_updateRecords();
+                } else {
+                    // 保存初始数据
+                    profile_health_saveData();
+                }
+            }
+            
+            // 保存健康档案数据
+            function profile_health_saveData() {
+                localStorage.setItem('profile_health_data', JSON.stringify(profile_health_data));
+                console.log('健康档案数据已保存到localStorage');
+            }
+            
+            // 更新健康数据概览显示
+            function profile_health_updateOverview() {
+                const overview = profile_health_data.overview;
+                const overviewItems = document.querySelectorAll('.overview-item');
+                
+                if (overviewItems.length >= 7) {
+                    overviewItems[0].querySelector('.overview-value').textContent = overview.height;
+                    overviewItems[1].querySelector('.overview-value').textContent = overview.weight;
+                    overviewItems[2].querySelector('.overview-value').textContent = overview.bloodPressure;
+                    overviewItems[3].querySelector('.overview-value').textContent = overview.heartRate;
+                    overviewItems[4].querySelector('.overview-value').textContent = overview.bmi;
+                    overviewItems[5].querySelector('.overview-value').textContent = overview.bloodSugar;
+                    overviewItems[6].querySelector('.overview-value').textContent = overview.bodyTemperature;
+                }
+            }
+            
+            // 更新健康档案记录显示
+            function profile_health_updateRecords() {
+                const records = profile_health_data.records;
+                document.querySelectorAll('.health-item').forEach(item => {
+                    const text = item.querySelector('.health-text').textContent;
+                    const statusElement = item.querySelector('.health-status');
+                    if (statusElement) {
+                        statusElement.textContent = records[text].status;
+                        if (records[text].status === '') {
+                            statusElement.style.display = 'none';
+                        } else {
+                            statusElement.style.display = 'inline-block';
+                        }
+                    }
+                });
+            }
+            
+            // 健康档案项目点击事件 - 暴露为全局函数
+            window.profile_health_clickItem = function(item) {
+                console.log('点击事件触发，item:', item);
+                const text = item.querySelector('.health-text').textContent;
+                console.log('点击了健康档案项目:', text);
+                
+                // 根据不同的健康档案类型跳转到对应的独立页面
+                let targetUrl;
+                switch(text) {
+                    case '体检记录':
+                        targetUrl = 'profile_health_physical_exam.html';
+                        break;
+                    case '用药记录':
+                        targetUrl = 'profile_health_medication.html';
+                        break;
+                    case '运动记录':
+                        targetUrl = 'profile_health_exercise.html';
+                        break;
+                    case '饮食记录':
+                        targetUrl = 'profile_health_diet.html';
+                        break;
+                    case '病历记录':
+                        targetUrl = 'profile_health_medical_record.html';
+                        break;
+                    case '血型信息':
+                        targetUrl = 'profile_health_blood_type.html';
+                        break;
+                    case '过敏记录':
+                        targetUrl = 'profile_health_allergy.html';
+                        break;
+                    default:
+                        alert('正在跳转到' + text + '页面...');
+                        return;
+                }
+                
+                console.log('准备跳转到:', targetUrl);
+                console.log('当前URL:', window.location.href);
+                console.log('当前路径:', window.location.pathname);
+                
+                // 直接使用相对路径跳转
+                window.location.href = targetUrl;
+            }
+            
+            // 处理体检记录
+            function profile_health_handlePhysicalExam() {
+                console.log('处理体检记录');
+                // 显示体检记录列表
+                profile_health_showRecordList('体检记录');
+            }
+            
+            // 处理用药记录
+            function profile_health_handleMedication() {
+                console.log('处理用药记录');
+                // 显示用药记录列表
+                profile_health_showRecordList('用药记录');
+            }
+            
+            // 处理运动记录
+            function profile_health_handleExercise() {
+                console.log('处理运动记录');
+                // 显示运动记录列表
+                profile_health_showRecordList('运动记录');
+            }
+            
+            // 处理饮食记录
+            function profile_health_handleDiet() {
+                console.log('处理饮食记录');
+                // 显示饮食记录列表
+                profile_health_showRecordList('饮食记录');
+            }
+            
+            // 处理病历记录
+            function profile_health_handleMedicalRecord() {
+                console.log('处理病历记录');
+                // 显示病历记录列表
+                profile_health_showRecordList('病历记录');
+            }
+            
+            // 处理血型信息
+            function profile_health_handleBloodType() {
+                console.log('处理血型信息');
+                // 显示血型信息列表
+                profile_health_showRecordList('血型信息');
+            }
+            
+            // 处理过敏记录
+            function profile_health_handleAllergy() {
+                console.log('处理过敏记录');
+                // 显示过敏记录列表
+                profile_health_showRecordList('过敏记录');
+            }
+            
+            // 打开健康数据编辑模态框
+            function profile_health_viewDetails() {
+                console.log('查看健康数据详情');
+                // 填充当前数据到表单
+                const overview = profile_health_data.overview;
+                document.getElementById('editHeight').value = overview.height;
+                document.getElementById('editWeight').value = overview.weight;
+                document.getElementById('editBloodPressure').value = overview.bloodPressure;
+                document.getElementById('editHeartRate').value = overview.heartRate;
+                document.getElementById('editBMI').value = overview.bmi;
+                document.getElementById('editBloodSugar').value = overview.bloodSugar;
+                document.getElementById('editBodyTemperature').value = overview.bodyTemperature;
+                // 显示模态框
+                document.getElementById('editHealthModal').classList.add('show');
+            }
+            
+            // 关闭模态框
+            function profile_health_closeModal() {
+                document.getElementById('editHealthModal').classList.remove('show');
+            }
+            
+            // 保存编辑的健康数据
+            function profile_health_saveEdit() {
+                // 获取表单数据
+                const height = parseInt(document.getElementById('editHeight').value);
+                const weight = parseFloat(document.getElementById('editWeight').value);
+                const bloodPressure = parseInt(document.getElementById('editBloodPressure').value);
+                const heartRate = parseInt(document.getElementById('editHeartRate').value);
+                const bmi = parseFloat(document.getElementById('editBMI').value);
+                const bloodSugar = parseFloat(document.getElementById('editBloodSugar').value);
+                const bodyTemperature = parseFloat(document.getElementById('editBodyTemperature').value);
+                
+                // 验证数据
+                if (isNaN(height) || isNaN(weight) || isNaN(bloodPressure) || isNaN(heartRate) || isNaN(bmi) || isNaN(bloodSugar) || isNaN(bodyTemperature)) {
+                    alert('请输入有效的健康数据');
+                    return;
+                }
+                
+                // 更新数据模型
+                profile_health_data.overview = {
+                    height: height,
+                    weight: weight,
+                    bloodPressure: bloodPressure,
+                    heartRate: heartRate,
+                    bmi: bmi,
+                    bloodSugar: bloodSugar,
+                    bodyTemperature: bodyTemperature
+                };
+                
+                // 保存到localStorage
+                profile_health_saveData();
+                
+                // 更新页面显示
+                profile_health_updateOverview();
+                
+                // 关闭模态框
+                profile_health_closeModal();
+                
+                // 显示成功提示
+                alert('健康数据已更新成功');
+            }
+            
+            // 打开健康记录编辑模态框
+            function profile_health_openRecordModal(recordType, record = null) {
+                document.getElementById('recordType').value = recordType;
+                
+                if (record) {
+                    // 编辑模式
+                    document.getElementById('recordModalTitle').textContent = '编辑健康记录';
+                    document.getElementById('recordId').value = record.id;
+                    document.getElementById('recordName').value = record.name;
+                    document.getElementById('recordContent').value = record.content;
+                    document.getElementById('recordDate').value = record.date;
+                    document.getElementById('recordNote').value = record.note || '';
+                } else {
+                    // 添加模式
+                    document.getElementById('recordModalTitle').textContent = '添加健康记录';
+                    document.getElementById('recordId').value = '';
+                    document.getElementById('recordName').value = '';
+                    document.getElementById('recordContent').value = '';
+                    // 设置默认日期为今天
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('recordDate').value = today;
+                    document.getElementById('recordNote').value = '';
+                }
+                
+                // 显示模态框
+                document.getElementById('editRecordModal').classList.add('show');
+            }
+            
+            // 关闭健康记录模态框
+            function profile_health_closeRecordModal() {
+                document.getElementById('editRecordModal').classList.remove('show');
+            }
+            
+            // 显示健康记录列表
+            function profile_health_showRecordList(recordType) {
+                // 保存当前记录类型，供后续使用
+                window.currentRecordType = recordType;
+                
+                // 设置模态框标题
+                document.getElementById('recordListTitle').textContent = recordType;
+                document.getElementById('recordListSubtitle').textContent = '共 ' + profile_health_data.records[recordType].data.length + ' 条记录';
+                
+                // 生成记录列表
+                const recordList = document.getElementById('recordList');
+                const records = profile_health_data.records[recordType].data;
+                
+                if (records.length === 0) {
+                    recordList.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 30px;">暂无记录</div>';
+                } else {
+                    recordList.innerHTML = records.map(record => `
+                        <div style="border: 1px solid #f0f0f0; border-radius: 8px; padding: 12px; margin-bottom: 10px; background-color: #fafafa; transition: background-color 0.3s ease;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                <div>
+                                    <h4 style="font-size: 14px; font-weight: 500; margin: 0; color: #2c3e50;">${record.name}</h4>
+                                    <p style="font-size: 12px; color: #7f8c8d; margin: 2px 0;">${record.date}</p>
+                                </div>
+                                <div style="display: flex; gap: 6px;">
+                                    <button onclick="profile_health_editRecordFromList('${recordType}', '${record.id}')" style="padding: 4px 8px; background-color: #3498db; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;">
+                                        <i class="fas fa-edit" style="margin-right: 2px;"></i>编辑
+                                    </button>
+                                    <button onclick="profile_health_deleteRecord('${recordType}', '${record.id}')" style="padding: 4px 8px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; font-size: 11px; cursor: pointer;">
+                                        <i class="fas fa-trash" style="margin-right: 2px;"></i>删除
+                                    </button>
+                                </div>
+                            </div>
+                            <p style="font-size: 13px; color: #555; margin: 8px 0; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${record.content}</p>
+                            ${record.note ? `<p style="font-size: 12px; color: #7f8c8d; margin: 4px 0;">备注: ${record.note}</p>` : ''}
+                        </div>
+                    `).join('');
+                }
+                
+                // 显示模态框
+                document.getElementById('recordListModal').classList.add('show');
+            }
+            
+            // 关闭健康记录列表模态框
+            function profile_health_closeRecordListModal() {
+                document.getElementById('recordListModal').classList.remove('show');
+                window.currentRecordType = null;
+            }
+            
+            // 从列表打开添加记录模态框
+            function profile_health_openRecordModalFromList() {
+                profile_health_openRecordModal(window.currentRecordType);
+                profile_health_closeRecordListModal();
+            }
+            
+            // 从列表打开编辑记录模态框
+            function profile_health_editRecordFromList(recordType, recordId) {
+                const record = profile_health_getRecordById(recordType, recordId);
+                if (record) {
+                    profile_health_openRecordModal(recordType, record);
+                    profile_health_closeRecordListModal();
+                }
+            }
+            
+            // 删除健康记录
+            function profile_health_deleteRecord(recordType, recordId) {
+                if (confirm('确定要删除这条记录吗？')) {
+                    // 删除记录
+                    profile_health_data.records[recordType].data = profile_health_data.records[recordType].data.filter(record => record.id !== recordId);
+                    
+                    // 更新记录状态
+                    profile_health_data.records[recordType].status = '已更新';
+                    
+                    // 保存到localStorage
+                    profile_health_saveData();
+                    
+                    // 更新页面显示
+                    profile_health_updateRecords();
+                    
+                    // 重新显示记录列表
+                    profile_health_showRecordList(recordType);
+                    
+                    // 显示成功提示
+                    alert('记录已删除成功');
+                }
+            }
+            
+            // 保存健康记录
+            function profile_health_saveRecord() {
+                // 获取表单数据
+                const recordType = document.getElementById('recordType').value;
+                const recordId = document.getElementById('recordId').value;
+                const name = document.getElementById('recordName').value;
+                const content = document.getElementById('recordContent').value;
+                const date = document.getElementById('recordDate').value;
+                const note = document.getElementById('recordNote').value;
+                
+                // 验证数据
+                if (!name || !content || !date) {
+                    alert('请填写必要的记录信息');
+                    return;
+                }
+                
+                // 创建记录对象
+                const record = {
+                    id: recordId || Date.now().toString(),
+                    name: name,
+                    content: content,
+                    date: date,
+                    note: note,
+                    createTime: recordId ? profile_health_getRecordById(recordType, recordId).createTime : new Date().toISOString(),
+                    updateTime: new Date().toISOString()
+                };
+                
+                // 保存记录
+                if (recordId) {
+                    // 更新现有记录
+                    const recordIndex = profile_health_data.records[recordType].data.findIndex(r => r.id === recordId);
+                    if (recordIndex !== -1) {
+                        profile_health_data.records[recordType].data[recordIndex] = record;
+                    }
+                } else {
+                    // 添加新记录
+                    profile_health_data.records[recordType].data.unshift(record);
+                }
+                
+                // 更新记录状态
+                profile_health_data.records[recordType].status = '已更新';
+                
+                // 保存到localStorage
+                profile_health_saveData();
+                
+                // 更新页面显示
+                profile_health_updateRecords();
+                
+                // 关闭模态框
+                profile_health_closeRecordModal();
+                
+                // 显示成功提示
+                alert('健康记录已保存成功');
+            }
+            
+            // 根据ID获取记录
+            function profile_health_getRecordById(recordType, recordId) {
+                return profile_health_data.records[recordType].data.find(record => record.id === recordId);
+            }
+            
+            // 底部导航
+            function profile_health_navigate(page) {
+                console.log('切换到页面:', page);
+                // 这里可以添加页面切换逻辑
+                switch(page) {
+                    case 'home':
+                        window.location.href = '../home.html';
+                        break;
+                    case 'ai-chat':
+                        window.location.href = '../ai-chat.html';
+                        break;
+                    case 'publish-post':
+                        window.location.href = '../publish-post.html';
+                        break;
+                    case 'member':
+                        window.location.href = '../member.html';
+                        break;
+                    case 'profile':
+                        window.location.href = '../profile.html';
+                        break;
+                }
+            }
+            
+            // 绑定事件监听器
+            function profile_health_bindEvents() {
+                console.log('开始绑定事件监听器');
+                
+                // 健康档案项目已经通过HTML的onclick属性绑定了点击事件
+                const healthItems = document.querySelectorAll('.health-item');
+                console.log('找到的健康项目数量:', healthItems.length);
+                
+                // 添加视觉反馈，确认元素可点击
+                healthItems.forEach((item, index) => {
+                    console.log(`检查第${index+1}个健康项目`);
+                    item.style.cursor = 'pointer';
+                });
+                
+                // 健康数据概览查看详情
+                const cardMore = document.querySelector('.card-more');
+                if (cardMore) {
+                    cardMore.addEventListener('click', profile_health_viewDetails);
+                    console.log('绑定查看详情事件');
+                } else {
+                    console.log('未找到.card-more元素');
+                }
+                
+                // 底部导航
+                const navItems = document.querySelectorAll('.nav-item');
+                console.log('找到的导航项目数量:', navItems.length);
+                navItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const page = this.getAttribute('data-page');
+                        profile_health_navigate(page);
+                    });
+                });
+                
+                // 发布按钮点击事件（确保点击publish-icon也能触发导航）
+                const publishIcon = document.querySelector('.publish-icon');
+                if (publishIcon) {
+                    publishIcon.addEventListener('click', function() {
+                        const page = this.closest('.nav-item').getAttribute('data-page');
+                        profile_health_navigate(page);
+                    });
+                    console.log('绑定发布按钮事件');
+                } else {
+                    console.log('未找到.publish-icon元素');
+                }
+                
+                console.log('事件监听器绑定完成');
+            }
+            
+            // 页面加载完成后初始化
+            document.addEventListener('DOMContentLoaded', function() {
+                profile_health_initData();
+                profile_health_bindEvents();
+            });
+        </script>
+        
+        <!-- 引入外部JavaScript文件 -->
+        <script src="../script.js"></script>
+        <script src="../member-common.js"></script>
+    </div>
+</body>
+</html>

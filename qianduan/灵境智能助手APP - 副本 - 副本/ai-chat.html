@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵境智能助手 - AI对话</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 页面通用样式 */
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        /* AI对话页面样式 */
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .chat-subtitle {
+    font-size: 12px;
+    color: #7f8c8d;
+    margin-top: 4px;
+}
+
+        .chat-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+        .chat-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .chat-action-btn:hover {
+            background-color: #e9ecef;
+            color: #3498db;
+        }
+        
+        .chat-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+        
+        /* 对话消息样式 */
+        .message {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        
+        .message-avatar.ai {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .message-avatar.user {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .message-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        
+        .message-bubble.ai {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-bubble.user {
+            background-color: #3498db;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        
+        /* 智能回答样式 */
+        .smart-answer {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        
+        .smart-answer-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1976d2;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .smart-answer-content {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        /* 快速提问按钮 */
+        .quick-questions {
+            margin-bottom: 16px;
+        }
+        
+        .quick-question-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #7f8c8d;
+            margin-bottom: 12px;
+        }
+        
+        .quick-question-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .quick-question-btn {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            background-color: #fff;
+            color: #2c3e50;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-question-btn:hover {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: #fff;
+        }
+        
+        /* 输入区域样式 */
+        .input-area {
+            margin-top: 16px;
+            padding: 16px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            background-color: #f8f9fa;
+        }
+        
+        .input-container textarea {
+            flex: 1;
+            border: none;
+            background-color: transparent;
+            resize: none;
+            font-size: 14px;
+            color: #2c3e50;
+            line-height: 1.5;
+            max-height: 100px;
+        }
+        
+        .input-container textarea:focus {
+            outline: none;
+        }
+        
+        .input-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .input-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .input-action-btn:hover {
+            background-color: #e9ecef;
+            color: #3498db;
+        }
+        
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .send-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #2c3e50);
+            transform: scale(1.05);
+        }
+        
+        /* 历史对话记录 */
+        .history-section {
+            margin-top: 24px;
+        }
+        
+        .history-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 16px;
+        }
+        
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .history-item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .history-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .history-item-details {
+            flex: 1;
+        }
+        
+        .history-item-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .history-item-date {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .history-item-action {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 414px;
+            height: 60px;
+            background-color: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 16px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+          
+            padding: 8px 0;
+            flex: 1;
+        }
+        
+        .nav-item i {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .nav-item.active i, .nav-item.active span {
+            color: #3498db;
+        }
+        
+        .publish-btn-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        
+        .publish-icon {
+            position: absolute;
+            bottom: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            cursor: pointer;
+            
+        }
+        .role-switch-icon {
+    margin-left: 6px;
+    font-size: 12px;
+    color: #95a5a6;
+    cursor: pointer;
+}
+
+.role-switch-icon:hover {
+    color: #34495e;
+}
+
+        
+        .publish-icon i {
+            font-size: 24px;
+            color: #fff;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 414px) {
+            .app-container {
+                max-width: 100%;
+            }
+            
+            .bottom-nav {
+                max-width: 100%;
+            }
+            
+            .message-bubble {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- AI对话页面内容 -->
+        <div class="page active" id="ai-chat">
+            <!-- 聊天头部 -->
+            <div class="chat-header">
+                <div class="chat-title">灵境AI助手</div>
+                <div class="chat-actions">
+                  
+                    <button class="chat-action-btn" title="历史记录" onclick="location.href='ai-chat_history.html'">
+                        <i class="fas fa-history"></i>
+                    </button>
+                    
+                    <button class="chat-action-btn" title="设置" onclick="location.href='profile.html'">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="chat-action-btn" title="分享">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="chat-subtitle">
+                当前角色：
+                <span id="aiRoleText">温暖型</span>
+                <i class="fas fa-exchange-alt role-switch-icon"
+                   title="切换角色"
+                   onclick="location.href='ai-chat_vip.html'">
+                </i>
+            </div>
+            
+            
+            <!-- 智能回答提示 -->
+            <div class="smart-answer">
+                <div class="smart-answer-title">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>AI智能回答</span>
+                </div>
+                <div class="smart-answer-content">
+                    我是您的灵境AI助手，随时为您提供命理分析、健康建议、心理抚慰等服务。您可以直接提问，或选择下方的快捷问题。
+                </div>
+            </div>
+            
+            <!-- 对话内容区域 -->
+            <div class="chat-content">
+                <!-- AI欢迎消息 -->
+                <div class="message ai">
+                    <div class="message-avatar ai"></div>
+                    <div class="message-bubble ai">
+                        您好！欢迎使用灵境AI助手。我可以为您提供命理分析、健康建议、心理测试等服务。请问有什么可以帮助您的吗？
+                    </div>
+                </div>
+                
+                <!-- 用户消息 -->
+                <div class="message user">
+                    <div class="message-avatar user"></div>
+                    <div class="message-bubble user">
+                        你好，我想了解一下今天的运势。
+                    </div>
+                </div>
+                
+                <!-- AI回答 -->
+                <div class="message ai">
+                    <div class="message-avatar ai"></div>
+                    <div class="message-bubble ai">
+                        今天整体运势良好，适合进行新的计划和挑战。事业上可能会遇到一些小的机遇，要善于把握。财运方面，建议保守投资，避免冒险。感情上，单身的朋友可能会遇到不错的异性缘，已有伴侣的朋友则需要多一些沟通和理解。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 快速提问按钮 -->
+            <div class="quick-questions">
+                <div class="quick-question-title">快速提问</div>
+                <div class="quick-question-buttons">
+                    <button class="quick-question-btn">今日运势</button>
+                    <button class="quick-question-btn">健康建议</button>
+                    <button class="quick-question-btn">心理测试</button>
+                    <button class="quick-question-btn">周公解梦</button>
+                    <button class="quick-question-btn">情感分析</button>
+                    <button class="quick-question-btn">学习计划</button>
+                </div>
+            </div>
+            
+            <!-- 输入区域 -->
+            <div class="input-area">
+                <div class="input-row">
+                    <div class="input-container">
+                        <textarea placeholder="请输入您的问题或需求..." rows="1"></textarea>
+                        <div class="input-actions">
+                            <button class="input-action-btn"><i class="fas fa-microphone"></i></button>
+                            <button class="input-action-btn"><i class="fas fa-image"></i></button>
+                            <button class="input-action-btn"><i class="fas fa-paperclip"></i></button>
+                        </div>
+                    </div>
+            
+                    <button class="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            
+            
+            <!-- 历史对话记录 -->
+            
+        </div>
+        
+        <!-- 底部导航栏 -->
+        <div class="bottom-nav">
+            <div class="nav-item" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item active" data-page="ai-chat">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item " data-page="publish-post">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" data-page="member">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+        <script>
+            // 确保当前页面的导航项处于活动状态
+            document.addEventListener('DOMContentLoaded', function() {
+                const currentPage = 'ai-chat';
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => {
+                    if (item.getAttribute('data-page') === currentPage) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            });
+        </script>
+    </div>
+    
+    <script>
+        // 文本域自动调整高度
+        const textarea = document.querySelector('.input-container textarea');
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+        }
+        
+        // 发送消息功能
+        const sendBtn = document.querySelector('.send-btn');
+        if (sendBtn) {
+            sendBtn.addEventListener('click', () => {
+                const textarea = document.querySelector('.input-container textarea');
+                const message = textarea.value.trim();
+                
+                if (message) {
+                    // 添加用户消息
+                    addUserMessage(message);
+                    
+                    // 清空输入框
+                    textarea.value = '';
+                    textarea.style.height = 'auto';
+                    
+                    // 模拟AI回复
+                    setTimeout(() => {
+                        addAIMessage(getAIResponse(message));
+                    }, 1000);
+                }
+            });
+        }
+        
+        // 回车键发送消息
+        if (textarea) {
+            textarea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendBtn.click();
+                }
+            });
+        }
+        
+        // 添加用户消息
+        function addUserMessage(content) {
+            const chatContent = document.querySelector('.chat-content');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user';
+            messageDiv.innerHTML = `
+                <div class="message-avatar user"></div>
+                <div class="message-bubble user">${content}</div>
+            `;
+            chatContent.appendChild(messageDiv);
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+        
+        // 添加AI消息
+        function addAIMessage(content) {
+            const chatContent = document.querySelector('.chat-content');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ai';
+            messageDiv.innerHTML = `
+                <div class="message-avatar ai"></div>
+                <div class="message-bubble ai">${content}</div>
+            `;
+            chatContent.appendChild(messageDiv);
+            chatContent.scrollTop = chatContent.scrollHeight;
+        }
+        
+        // 模拟AI回复
+        function getAIResponse(message) {
+            const responses = [
+                '非常感谢您的提问！根据您的需求，我为您提供以下建议...',
+                '这个问题很有趣！让我为您详细解答一下...',
+                '您的问题很有深度。经过分析，我的建议是...',
+                '感谢您的信任！我将为您提供专业的分析和建议...',
+                '针对您的问题，我整理了以下信息供您参考...'
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+        
+        // 快速提问按钮功能
+        const quickQuestionBtns = document.querySelectorAll('.quick-question-btn');
+        quickQuestionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const question = btn.textContent;
+                addUserMessage(question);
+                
+                setTimeout(() => {
+                    addAIMessage(`关于"${question}"，我的建议是...`);
+                }, 1000);
+            });
+        });
+        
+        // 页面跳转功能
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.getAttribute('data-page');
+                if (page) {
+                    // 实现平滑过渡效果
+                    document.body.style.opacity = '0';
+                    document.body.style.transition = 'opacity 0.3s ease';
+                    
+                    setTimeout(() => {
+                        window.location.href = `${page}.html`;
+                    }, 300);
+                }
+            });
+        });
+        
+        // 微交互效果
+        const buttons = document.querySelectorAll('.chat-action-btn, .input-action-btn, .send-btn, .history-item');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                button.style.transform = 'translateY(-2px)';
+                button.style.transition = 'transform 0.2s ease';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'translateY(0)';
+            });
+            
+        
+        });
+    </script>
+</body>
+</html>

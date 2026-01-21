@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史报告 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="traditional_style.css">
+    <style>
+        /* 筛选标签样式 */
+        .filter-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .filter-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .filter-tabs::-webkit-scrollbar-thumb {
+            background: rgba(139, 69, 19, 0.3);
+            border-radius: 2px;
+        }
+        
+        .filter-tab {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #8b4513;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .filter-tab:hover {
+            background: linear-gradient(135deg, #deb887 0%, #f5deb3 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .filter-tab.active {
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+        }
+        
+        /* 报告列表样式 */
+        .report-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .report-card {
+            position: relative;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 3px solid #8b4513;
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        /* 云纹装饰 */
+        .report-card::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 80px;
+            height: 60px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40"%3E%3Cpath d="M10 20 Q 20 10 30 20 Q 40 30 50 20 Q 40 10 30 20 Q 20 30 10 20 Z" fill="rgba(245,222,179,0.6)"/%3E%3C/svg%3E');
+            background-size: contain;
+            background-repeat: no-repeat;
+            transform: rotate(15deg);
+        }
+        
+        .report-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .report-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .report-type {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .report-icon {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b4513;
+            font-size: 24px;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .report-info {
+            flex: 1;
+            margin-left: 8px;
+        }
+        
+        .report-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 6px;
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .report-date {
+            font-size: 14px;
+            color: #a0522d;
+            font-style: italic;
+        }
+        
+        .report-arrow {
+            color: #8b4513;
+            font-size: 20px;
+            opacity: 0.7;
+        }
+        
+        .report-summary {
+            font-size: 14px;
+            color: #8b4513;
+            line-height: 1.6;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid #f5deb3;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 空状态样式 */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            border: 3px solid #8b4513;
+            border-radius: 16px;
+            margin-top: 40px;
+        }
+        
+        .empty-state i {
+            font-size: 80px;
+            color: #8b4513;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 12px;
+            font-family: 'Microsoft YaHei', serif;
+        }
+        
+        .empty-state p {
+            font-size: 14px;
+            color: #8b4513;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="page">
+            <div class="scroll-header">
+                <div class="scroll-title">命理分析与心理抚慰</div>
+            </div>
+            
+            <!-- 功能导航 -->
+            <div class="module-nav">
+                <div class="nav-tab" onclick="window.location.href='home_fortune.html'">面部/手相</div>
+                <div class="nav-tab" onclick="window.location.href='home_birth_analysis.html'">出生信息</div>
+                <div class="nav-tab" onclick="window.location.href='home_mental_assessment.html'">心理自评</div>
+                <div class="nav-tab active" onclick="window.location.href='home_history_reports.html'">历史报告</div>
+            </div>
+            
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterReports('all')">全部</button>
+                <button class="filter-tab" onclick="filterReports('face')">面部分析</button>
+                <button class="filter-tab" onclick="filterReports('birth')">命理分析</button>
+                <button class="filter-tab" onclick="filterReports('mental')">心理评估</button>
+            </div>
+            
+            <div class="report-list" id="reportList">
+                <div class="report-card" data-type="face">
+                    <div class="report-header">
+                        <div class="report-type">
+                            <div class="report-icon face">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="report-info">
+                                <div class="report-title">面部分析报告</div>
+                                <div class="report-date">2024年3月15日</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right report-arrow"></i>
+                    </div>
+                    <div class="report-summary">
+                        根据您的面部特征分析，您具有温和的性格特点，运势整体平稳，建议保持积极乐观的心态...
+                    </div>
+                </div>
+                
+                <div class="report-card" data-type="birth">
+                    <div class="report-header">
+                        <div class="report-type">
+                            <div class="report-icon birth">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="report-info">
+                                <div class="report-title">出生信息命理分析</div>
+                                <div class="report-date">2024年3月10日</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right report-arrow"></i>
+                    </div>
+                    <div class="report-summary">
+                        根据您的出生信息，您的八字为：甲子年、乙丑月、丙寅日、丁卯时。五行分析显示您属于木火相生类型...
+                    </div>
+                </div>
+                
+                <div class="report-card" data-type="mental">
+                    <div class="report-header">
+                        <div class="report-type">
+                            <div class="report-icon mental">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="report-info">
+                                <div class="report-title">心理状态评估报告</div>
+                                <div class="report-date">2024年3月5日</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right report-arrow"></i>
+                    </div>
+                    <div class="report-summary">
+                        根据您的心理状态自评，您的整体心理健康状况良好。建议继续保持规律作息，适当进行放松活动...
+                    </div>
+                </div>
+                
+                <div class="report-card" data-type="face">
+                    <div class="report-header">
+                        <div class="report-type">
+                            <div class="report-icon face">
+                                <i class="fas fa-hand-paper"></i>
+                            </div>
+                            <div class="report-info">
+                                <div class="report-title">手相分析报告</div>
+                                <div class="report-date">2024年2月28日</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right report-arrow"></i>
+                    </div>
+                    <div class="report-summary">
+                        根据您的手相特征，您的事业线清晰，财运稳定。感情线显示您重视感情，建议在人际关系中保持真诚...
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='../home.html'">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../ai-chat.html'">
+                <i class="fas fa-robot"></i>
+                <span>AI助手</span>
+            </div>
+            <div class="nav-item publish-btn-wrapper" onclick="window.location.href='../publish-post.html'">
+                <div class="publish-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../member.html'">
+                <i class="fas fa-crown"></i>
+                <span>会员</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='../profile.html'">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function filterReports(type) {
+            const tabs = document.querySelectorAll('.filter-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const reports = document.querySelectorAll('.report-card');
+            reports.forEach(report => {
+                if (type === 'all' || report.dataset.type === type) {
+                    report.style.display = 'block';
+                } else {
+                    report.style.display = 'none';
+                }
+            });
+        }
+        
+        const reportCards = document.querySelectorAll('.report-card');
+        reportCards.forEach(card => {
+            card.addEventListener('click', () => {
+                alert('查看报告详情');
+            });
+        });
+    </script>
+</body>
+</html>
+

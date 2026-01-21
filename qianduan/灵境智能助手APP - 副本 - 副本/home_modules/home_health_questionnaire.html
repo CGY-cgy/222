@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康问卷 - 灵境智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="traditional_style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .back-btn:hover {
+            background-color: #e9ecef;
+        }
+        
+        .header-title {
+            flex: 1;
+            font-size: 20px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .module-nav {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+            background: linear-gradient(135deg, #f5deb3 0%, #deb887 100%);
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            padding: 4px;
+        }
+        
+        .module-nav::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .module-nav::-webkit-scrollbar-thumb {
+            background: rgba(139, 69, 19, 0.3);
+            border-radius: 2px;
+        }
+        
+        .nav-tab {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #8b4513;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 2px solid #8b4513;
+        }
+        
+        .nav-tab:hover {
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe4b5 100%);
+            transform: translateY(-1px);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            border-color: #8b4513;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 2px solid #8b4513;
+            border-radius: 8px;
+            height: 8px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        
+        .question-card {
+            position: relative;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            border: 2px solid #8b4513;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 云纹装饰 */
+        .question-card::before,
+        .question-card::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 40px;
+            background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 40" fill="rgba(139, 69, 19, 0.1)"%3E%3Cpath d="M10 20 Q 20 10 30 20 Q 40 30 50 20 Q 40 10 30 20 Q 20 30 10 20 Z"/%3E%3C/svg%3E');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .question-card::before {
+            top: 10px;
+            right: 10px;
+        }
+        
+        .question-card::after {
+            bottom: 10px;
+            left: 10px;
+            transform: rotate(180deg);
+        }
+        
+        .question-category {
+            font-size: 12px;
+            color: #e74c3c;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #8b4513;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option-item {
+            padding: 14px 16px;
+            border: 2px solid #8b4513;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #fffaf0 0%, #f5f5dc 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .option-item:hover {
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe4b5 100%);
+            transform: translateY(-1px);
+        }
+        
+        .option-item.selected {
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, #ffe4e1 0%, #ffcccb 100%);
+        }
+        
+        .option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #8b4513;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background-color: #fff;
+        }
+        
+        .option-item.selected .option-radio {
+            border-color: #e74c3c;
+        }
+        
+        .option-item.selected .option-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border-radius: 50%;
+        }
+        
+        .option-text {
+            flex: 1;
+            font-size: 15px;
+            color: #5a5a5a;
+            line-height: 1.5;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid #8b4513;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(139, 69, 19, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            background: linear-gradient(135deg, #d3d3d3 0%, #a9a9a9 100%);
+            border-color: #a9a9a9;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="page">
+            <!-- 卷轴标题 -->
+            <div class="scroll-header">
+                <div class="scroll-title">动态健康画像</div>
+            </div>
+            
+            <!-- 功能导航 -->
+            <div class="module-nav">
+                <div class="nav-tab" onclick="window.location.href='home_tongue_upload.html'">舌象照片上传</div>
+                <div class="nav-tab active" onclick="window.location.href='home_health_questionnaire.html'">健康问卷填写</div>
+                <div class="nav-tab" onclick="window.location.href='home_health_portrait.html'">查看健康画像</div>
+            </div>
+            
+            <div class="progress-text">第 <span id="currentQuestion">1</span> / <span id="totalQuestions">12</span> 题</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 8.33%"></div>
+            </div>
+            
+            <div class="question-card" id="questionCard">
+                <div class="question-category" id="questionCategory">睡眠质量</div>
+                <div class="question-text" id="questionText">您昨晚的睡眠质量如何？</div>
+                <div class="options-list" id="optionsList">
+                    <div class="option-item" onclick="selectOption(0)">
+                        <div class="option-radio"></div>
+                        <div class="option-text">很差，几乎没睡</div>
+                    </div>
+                    <div class="option-item" onclick="selectOption(1)">
+                        <div class="option-radio"></div>
+                        <div class="option-text">较差，睡眠不足</div>
+                    </div>
+                    <div class="option-item" onclick="selectOption(2)">
+                        <div class="option-radio"></div>
+                        <div class="option-text">一般，基本正常</div>
+                    </div>
+                    <div class="option-item" onclick="selectOption(3)">
+                        <div class="option-radio"></div>
+                        <div class="option-text">很好，睡眠充足</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="submit-btn" id="nextBtn" onclick="nextQuestion()" disabled>
+                下一题
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        const questions = [
+            { category: '睡眠质量', text: '您昨晚的睡眠质量如何？', options: ['很差，几乎没睡', '较差，睡眠不足', '一般，基本正常', '很好，睡眠充足'] },
+            { category: '睡眠质量', text: '您通常几点入睡？', options: ['22:00之前', '22:00-23:00', '23:00-24:00', '24:00之后'] },
+            { category: '疲劳度', text: '您今天感到疲劳的程度如何？', options: ['非常疲劳', '比较疲劳', '一般', '精力充沛'] },
+            { category: '疲劳度', text: '您的工作或学习压力大吗？', options: ['压力很大', '压力较大', '压力一般', '压力较小'] },
+            { category: '情绪状态', text: '您今天的情绪状态如何？', options: ['非常低落', '比较低落', '一般', '心情愉悦'] },
+            { category: '情绪状态', text: '您是否感到焦虑或紧张？', options: ['经常感到', '偶尔感到', '很少感到', '几乎没有'] },
+            { category: '食欲', text: '您今天的食欲如何？', options: ['很差', '较差', '一般', '很好'] },
+            { category: '食欲', text: '您是否有消化不良的症状？', options: ['经常有', '偶尔有', '很少', '没有'] },
+            { category: '运动', text: '您本周的运动频率如何？', options: ['几乎没有', '1-2次', '3-4次', '5次以上'] },
+            { category: '运动', text: '您每次运动的时间大约多久？', options: ['不到30分钟', '30-60分钟', '60-90分钟', '90分钟以上'] },
+            { category: '其他', text: '您是否有其他不适症状？', options: ['有多个症状', '有1-2个症状', '偶尔有', '没有'] },
+            { category: '其他', text: '您对目前的健康状况满意吗？', options: ['很不满意', '不太满意', '一般', '比较满意'] }
+        ];
+        
+        let currentQuestionIndex = 0;
+        let answers = [];
+        
+        function selectOption(index) {
+            const options = document.querySelectorAll('.option-item');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            document.getElementById('nextBtn').disabled = false;
+        }
+        
+        function nextQuestion() {
+            const selectedOption = document.querySelector('.option-item.selected');
+            if (!selectedOption) return;
+            
+            const optionIndex = Array.from(document.querySelectorAll('.option-item')).indexOf(selectedOption);
+            answers.push(optionIndex);
+            
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                updateQuestion();
+            } else {
+                submitQuestionnaire();
+            }
+        }
+        
+        function updateQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('questionCategory').textContent = question.category;
+            document.getElementById('questionText').textContent = question.text;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            
+            const optionsList = document.getElementById('optionsList');
+            optionsList.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const optionItem = document.createElement('div');
+                optionItem.className = 'option-item';
+                optionItem.onclick = () => selectOption(index);
+                optionItem.innerHTML = `
+                    <div class="option-radio"></div>
+                    <div class="option-text">${option}</div>
+                `;
+                optionsList.appendChild(optionItem);
+            });
+            
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('progressFill').style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                document.getElementById('nextBtn').textContent = '提交问卷';
+            }
+        }
+        
+        function submitQuestionnaire() {
+            alert('问卷提交成功！正在生成健康画像...');
+            // 这里可以跳转到健康画像页面
+            // window.location.href = 'home_health_portrait.html';
+        }
+    </script>
+</body>
+</html>
+
