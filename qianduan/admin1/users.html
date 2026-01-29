@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 灵境管理后台</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon"></div>
+                    <div>
+                        <div class="sidebar-logo-text">灵境管理</div>
+                        <div class="sidebar-logo-sub">Admin Console</div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">主要功能</div>
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="nav-item-icon">📊</span>
+                        <span class="nav-item-text">数据看板</span>
+                    </a>
+                    <a href="users.html" class="nav-item active">
+                        <span class="nav-item-icon">👥</span>
+                        <span class="nav-item-text">用户管理</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                        <span class="nav-item-icon">📈</span>
+                        <span class="nav-item-text">数据分析</span>
+                    </a>
+                    <a href="membership.html" class="nav-item">
+                        <span class="nav-item-icon">💎</span>
+                        <span class="nav-item-text">会员分析</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统管理</div>
+                    <a href="security.html" class="nav-item">
+                        <span class="nav-item-icon">🔒</span>
+                        <span class="nav-item-text">安全管理</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="nav-item-icon">⚙️</span>
+                        <span class="nav-item-text">系统设置</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <span class="nav-item-icon">🚪</span>
+                        <span class="nav-item-text">退出登录</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 class="header-title">用户管理</h1>
+                    <p class="header-subtitle">管理平台用户账户与权限</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="exportExcel()">
+                        <span>📊</span>
+                        <span>导出Excel</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 搜索卡片 -->
+            <div class="card" style="margin-bottom: var(--spacing-lg); padding: var(--spacing-lg);">
+                <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-md);">搜索条件</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                    <div class="form-group">
+                        <label class="form-label">用户ID</label>
+                        <input type="text" class="form-input" id="searchId" placeholder="请输入用户ID">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">手机号</label>
+                        <input type="text" class="form-input" id="searchPhone" placeholder="请输入手机号">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">昵称</label>
+                        <input type="text" class="form-input" id="searchNickname" placeholder="请输入昵称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">会员状态</label>
+                        <select class="form-select" id="searchMemberStatus">
+                            <option value="">全部</option>
+                            <option value="normal">普通用户</option>
+                            <option value="vip">VIP会员</option>
+                            <option value="svip">SVIP会员</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">账户状态</label>
+                        <select class="form-select" id="searchAccountStatus">
+                            <option value="">全部</option>
+                            <option value="active">已启用</option>
+                            <option value="inactive">已禁用</option>
+                            <option value="banned">已封禁</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: var(--spacing-md);">
+                    <button class="btn btn-primary" onclick="searchUsers()">
+                        <span>🔍</span>
+                        <span>搜索</span>
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetSearch()">
+                        <span>🔄</span>
+                        <span>重置</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="margin-bottom: var(--spacing-md);">
+                    <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary);">用户列表</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <th style="text-align: left; padding: var(--spacing-md); font-size: 13px; font-weight: 500; color: var(--text-secondary); background: var(--bg-tertiary);">用户</th>
+                                <th style="text-align: left; padding: var(--spacing-md); font-size: 13px; font-weight: 500; color: var(--text-secondary); background: var(--bg-tertiary);">手机号</th>
+                                <th style="text-align: left; padding: var(--spacing-md); font-size: 13px; font-weight: 500; color: var(--text-secondary); background: var(--bg-tertiary);">注册时间</th>
+                                <th style="text-align: left; padding: var(--spacing-md); font-size: 13px; font-weight: 500; color: var(--text-secondary); background: var(--bg-tertiary);">最后登录</th>
+                                <th style="text-align: left; padding: var(--spacing-md); font-size: 13px; font-weight: 500; color: var(--text-secondary); background: var(--bg-tertiary);">会员状态</th>
+                                <th style="text-align: left; padding: var(--spacing-md); font-size: 13px; font-weight: 500; color: var(--text-secondary); background: var(--bg-tertiary);">账户状态</th>
+                                <th style="text-align: left; padding: var(--spacing-md); font-size: 13px; font-weight: 500; color: var(--text-secondary); background: var(--bg-tertiary);">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                        <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">李</div>
+                                        <div>
+                                            <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">李晓明</div>
+                                            <div style="font-size: 12px; color: var(--text-tertiary);">ID: 100001</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">138****1234</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-01-15 09:30</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-12-27 14:25</td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(118, 75, 162, 0.1); color: var(--secondary-color);">SVIP</span></td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(72, 187, 120, 0.1); color: var(--success-color);">已启用</span></td>
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; gap: var(--spacing-sm);">
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px;" title="查看详情" onclick="viewUserDetail('100001')">👁️</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--warning-color);" title="重置密码" onclick="resetPassword('100001')">🔑</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--success-color);" title="切换状态" onclick="toggleStatus('100001')">⚡</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                        <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--success-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">王</div>
+                                        <div>
+                                            <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">王芳</div>
+                                            <div style="font-size: 12px; color: var(--text-tertiary);">ID: 100002</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">139****5678</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-02-20 14:15</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-12-26 18:42</td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(255, 215, 0, 0.15); color: #B8860B;">VIP</span></td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(72, 187, 120, 0.1); color: var(--success-color);">已启用</span></td>
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; gap: var(--spacing-sm);">
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px;" title="查看详情" onclick="viewUserDetail('100002')">👁️</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--warning-color);" title="重置密码" onclick="resetPassword('100002')">🔑</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--success-color);" title="切换状态" onclick="toggleStatus('100002')">⚡</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                        <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--warning-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">张</div>
+                                        <div>
+                                            <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">张伟</div>
+                                            <div style="font-size: 12px; color: var(--text-tertiary);">ID: 100003</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">136****9012</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-03-10 08:45</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-12-27 10:18</td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: var(--bg-tertiary); color: var(--text-secondary);">普通用户</span></td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(72, 187, 120, 0.1); color: var(--success-color);">已启用</span></td>
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; gap: var(--spacing-sm);">
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px;" title="查看详情" onclick="viewUserDetail('100003')">👁️</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--warning-color);" title="重置密码" onclick="resetPassword('100003')">🔑</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--success-color);" title="切换状态" onclick="toggleStatus('100003')">⚡</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                        <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--info-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">刘</div>
+                                        <div>
+                                            <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">刘洋</div>
+                                            <div style="font-size: 12px; color: var(--text-tertiary);">ID: 100004</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">137****3456</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-04-05 16:30</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-12-25 22:15</td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(118, 75, 162, 0.1); color: var(--secondary-color);">SVIP</span></td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(237, 137, 54, 0.1); color: var(--warning-color);">已禁用</span></td>
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; gap: var(--spacing-sm);">
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px;" title="查看详情" onclick="viewUserDetail('100004')">👁️</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--warning-color);" title="重置密码" onclick="resetPassword('100004')">🔑</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--success-color);" title="切换状态" onclick="toggleStatus('100004')">⚡</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                                        <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--danger-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">陈</div>
+                                        <div>
+                                            <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">陈静</div>
+                                            <div style="font-size: 12px; color: var(--text-tertiary);">ID: 100005</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">135****7890</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-05-18 11:20</td>
+                                <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">2024-12-27 08:55</td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(255, 215, 0, 0.15); color: #B8860B;">VIP</span></td>
+                                <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; background: rgba(245, 101, 101, 0.1); color: var(--danger-color);">已封禁</span></td>
+                                <td style="padding: var(--spacing-md);">
+                                    <div style="display: flex; gap: var(--spacing-sm);">
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px;" title="查看详情" onclick="viewUserDetail('100005')">👁️</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--warning-color);" title="重置密码" onclick="resetPassword('100005')">🔑</button>
+                                        <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--success-color);" title="切换状态" onclick="toggleStatus('100005')">⚡</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-lg); padding-top: var(--spacing-md); border-top: 1px solid var(--border-color); flex-wrap: wrap; gap: var(--spacing-md);">
+                    <div style="font-size: 14px; color: var(--text-secondary);">共 1,234 条记录，每页 10 条</div>
+                    <div style="display: flex; gap: var(--spacing-sm);">
+                        <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.5;">上一页</button>
+                        <button class="btn btn-primary btn-sm">1</button>
+                        <button class="btn btn-secondary btn-sm">2</button>
+                        <button class="btn btn-secondary btn-sm">3</button>
+                        <span style="padding: 6px 10px; color: var(--text-secondary);">...</span>
+                        <button class="btn btn-secondary btn-sm">124</button>
+                        <button class="btn btn-secondary btn-sm">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 用户详情模态框 -->
+    <div class="modal-overlay" id="userDetailModal">
+        <div class="modal">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-lg); border-bottom: 1px solid var(--border-color);">
+                <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary);">用户详情</h3>
+                <button class="btn btn-secondary btn-sm" style="padding: 8px; border-radius: var(--border-radius-full);" onclick="closeModal()">✕</button>
+            </div>
+            <div style="padding: var(--spacing-lg);">
+                <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-lg); padding-bottom: var(--spacing-md); border-bottom: 1px solid var(--border-color);">
+                    <div style="width: 80px; height: 80px; border-radius: var(--border-radius-full); background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 28px;">李</div>
+                    <div>
+                        <h4 style="font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-xs);">李晓明</h4>
+                        <div style="display: flex; gap: var(--spacing-md); font-size: 14px; color: var(--text-secondary);">
+                            <span>ID: 100001</span>
+                            <span>138****1234</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                    <div style="background: var(--bg-tertiary); padding: var(--spacing-md); border-radius: var(--border-radius-md);">
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">注册时间</div>
+                        <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">2024-01-15 09:30</div>
+                    </div>
+                    <div style="background: var(--bg-tertiary); padding: var(--spacing-md); border-radius: var(--border-radius-md);">
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">最后登录</div>
+                        <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">2024-12-27 14:25</div>
+                    </div>
+                    <div style="background: var(--bg-tertiary); padding: var(--spacing-md); border-radius: var(--border-radius-md);">
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">会员状态</div>
+                        <div style="font-size: 14px; font-weight: 500; color: var(--secondary-color);">SVIP会员</div>
+                    </div>
+                    <div style="background: var(--bg-tertiary); padding: var(--spacing-md); border-radius: var(--border-radius-md);">
+                        <div style="font-size: 12px; color: var(--text-tertiary); margin-bottom: 4px;">账户状态</div>
+                        <div style="font-size: 14px; font-weight: 500; color: var(--success-color);">已启用</div>
+                    </div>
+                </div>
+                <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05)); padding: var(--spacing-lg); border-radius: var(--border-radius-lg);">
+                    <div style="display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md);">
+                        <div style="width: 80px; height: 80px; border-radius: var(--border-radius-full); background: var(--success-color); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 700;">92</div>
+                        <div>
+                            <h4 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">健康评分</h4>
+                            <p style="font-size: 14px; color: var(--text-secondary);">基于舌像和问卷的综合评估</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm);">
+                        <span style="padding: 6px 12px; background: var(--primary-color); color: white; border-radius: 20px; font-size: 13px; font-weight: 500;">平和质</span>
+                        <span style="padding: 6px 12px; background: rgba(102, 126, 234, 0.1); color: var(--primary-color); border-radius: 20px; font-size: 13px; font-weight: 500;">气虚质</span>
+                        <span style="padding: 6px 12px; background: rgba(102, 126, 234, 0.1); color: var(--primary-color); border-radius: 20px; font-size: 13px; font-weight: 500;">阳虚质</span>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: var(--spacing-md); padding: var(--spacing-lg); border-top: 1px solid var(--border-color);">
+                <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
+                <button class="btn btn-primary" onclick="openEditModal(currentViewedUserId)">修改信息</button>
+                <button class="btn btn-warning">重置密码</button>
+                <button class="btn btn-danger">封禁账户</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改用户信息模态框 -->
+    <div class="modal-overlay" id="editUserModal">
+        <div class="modal" style="max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-lg); border-bottom: 1px solid var(--border-color);">
+                <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary);">修改用户信息</h3>
+                <button class="btn btn-secondary btn-sm" style="padding: 8px; border-radius: var(--border-radius-full);" onclick="closeEditModal()">✕</button>
+            </div>
+            <div style="padding: var(--spacing-lg);">
+                <form id="editUserForm">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                        <div class="form-group">
+                            <label class="form-label">用户ID</label>
+                            <input type="text" class="form-input" id="editUserId" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">姓名</label>
+                            <input type="text" class="form-input" id="editUserName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">手机号</label>
+                            <input type="tel" class="form-input" id="editUserPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">会员状态</label>
+                            <select class="form-select" id="editUserMemberStatus" required>
+                                <option value="normal">普通用户</option>
+                                <option value="vip">VIP会员</option>
+                                <option value="svip">SVIP会员</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">账户状态</label>
+                            <select class="form-select" id="editUserAccountStatus" required>
+                                <option value="active">已启用</option>
+                                <option value="inactive">已禁用</option>
+                                <option value="banned">已封禁</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">健康评分</label>
+                            <input type="number" class="form-input" id="editUserHealthScore" min="0" max="100" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">体质类型</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-top: var(--spacing-sm);">
+                            <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-tertiary); border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="constitution" value="平和质" style="margin: 0;">
+                                <span>平和质</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-tertiary); border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="constitution" value="气虚质" style="margin: 0;">
+                                <span>气虚质</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-tertiary); border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="constitution" value="阳虚质" style="margin: 0;">
+                                <span>阳虚质</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-tertiary); border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="constitution" value="阴虚质" style="margin: 0;">
+                                <span>阴虚质</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-tertiary); border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="constitution" value="痰湿质" style="margin: 0;">
+                                <span>痰湿质</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-tertiary); border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="constitution" value="湿热质" style="margin: 0;">
+                                <span>湿热质</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-tertiary); border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="constitution" value="血瘀质" style="margin: 0;">
+                                <span>血瘀质</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-tertiary); border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="constitution" value="气郁质" style="margin: 0;">
+                                <span>气郁质</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg-tertiary); border-radius: 20px; cursor: pointer;">
+                                <input type="checkbox" name="constitution" value="特禀质" style="margin: 0;">
+                                <span>特禀质</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: var(--spacing-md); padding: var(--spacing-lg); border-top: 1px solid var(--border-color);">
+                <button class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveUserChanges()">保存修改</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 用户数据
+        const users = [
+            { id: '100001', name: '李晓明', phone: '138****1234', fullPhone: '13812341234', memberStatus: 'svip', accountStatus: 'active', registerTime: '2024-01-15 09:30', lastLogin: '2024-12-27 14:25', healthScore: 92, constitution: ['平和质', '气虚质', '阳虚质'] },
+            { id: '100002', name: '王芳', phone: '139****5678', fullPhone: '13956785678', memberStatus: 'vip', accountStatus: 'active', registerTime: '2024-02-20 14:15', lastLogin: '2024-12-26 18:42', healthScore: 85, constitution: ['痰湿质', '阴虚质'] },
+            { id: '100003', name: '张伟', phone: '136****9012', fullPhone: '13690129012', memberStatus: 'normal', accountStatus: 'active', registerTime: '2024-03-10 08:45', lastLogin: '2024-12-27 10:18', healthScore: 78, constitution: ['湿热质', '血瘀质'] },
+            { id: '100004', name: '刘洋', phone: '137****3456', fullPhone: '13734563456', memberStatus: 'svip', accountStatus: 'inactive', registerTime: '2024-04-05 16:30', lastLogin: '2024-12-25 22:15', healthScore: 88, constitution: ['平和质', '气郁质'] },
+            { id: '100005', name: '陈静', phone: '135****7890', fullPhone: '13578907890', memberStatus: 'vip', accountStatus: 'banned', registerTime: '2024-05-18 11:20', lastLogin: '2024-12-27 08:55', healthScore: 80, constitution: ['痰湿质', '湿热质', '血瘀质'] },
+            { id: '100006', name: '赵强', phone: '134****2345', fullPhone: '13423452345', memberStatus: 'normal', accountStatus: 'active', registerTime: '2024-06-25 13:45', lastLogin: '2024-12-27 09:30', healthScore: 75, constitution: ['气虚质', '阳虚质'] },
+            { id: '100007', name: '孙丽', phone: '133****6789', fullPhone: '13367896789', memberStatus: 'svip', accountStatus: 'active', registerTime: '2024-07-12 10:20', lastLogin: '2024-12-26 16:45', healthScore: 95, constitution: ['平和质', '阴虚质'] },
+            { id: '100008', name: '周杰', phone: '132****0123', fullPhone: '13201230123', memberStatus: 'vip', accountStatus: 'active', registerTime: '2024-08-30 15:10', lastLogin: '2024-12-27 11:20', healthScore: 82, constitution: ['痰湿质', '气郁质'] },
+            { id: '100009', name: '吴敏', phone: '131****4567', fullPhone: '13145674567', memberStatus: 'normal', accountStatus: 'active', registerTime: '2024-09-18 09:50', lastLogin: '2024-12-25 14:30', healthScore: 79, constitution: ['湿热质', '阳虚质'] },
+            { id: '100010', name: '郑华', phone: '130****8901', fullPhone: '13089018901', memberStatus: 'svip', accountStatus: 'active', registerTime: '2024-10-22 14:25', lastLogin: '2024-12-27 13:15', healthScore: 90, constitution: ['平和质', '血瘀质'] }
+        ];
+
+        // 当前显示的用户列表
+        let currentUsers = [...users];
+        let currentPage = 1;
+        const pageSize = 5;
+        let currentViewedUserId = '';
+
+        // 渲染用户列表
+        function renderUsers(usersToRender = currentUsers) {
+            const tbody = document.querySelector('table tbody');
+            tbody.innerHTML = '';
+
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const pageUsers = usersToRender.slice(startIndex, endIndex);
+
+            pageUsers.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid var(--border-color)';
+                
+                let memberStatusText = '';
+                let memberStatusColor = '';
+                if (user.memberStatus === 'svip') {
+                    memberStatusText = 'SVIP';
+                    memberStatusColor = 'background: rgba(118, 75, 162, 0.1); color: var(--secondary-color);';
+                } else if (user.memberStatus === 'vip') {
+                    memberStatusText = 'VIP';
+                    memberStatusColor = 'background: rgba(255, 215, 0, 0.15); color: #B8860B;';
+                } else {
+                    memberStatusText = '普通用户';
+                    memberStatusColor = 'background: var(--bg-tertiary); color: var(--text-secondary);';
+                }
+
+                let accountStatusText = '';
+                let accountStatusColor = '';
+                if (user.accountStatus === 'active') {
+                    accountStatusText = '已启用';
+                    accountStatusColor = 'background: rgba(72, 187, 120, 0.1); color: var(--success-color);';
+                } else if (user.accountStatus === 'inactive') {
+                    accountStatusText = '已禁用';
+                    accountStatusColor = 'background: rgba(237, 137, 54, 0.1); color: var(--warning-color);';
+                } else {
+                    accountStatusText = '已封禁';
+                    accountStatusColor = 'background: rgba(245, 101, 101, 0.1); color: var(--danger-color);';
+                }
+
+                tr.innerHTML = `
+                    <td style="padding: var(--spacing-md);">
+                        <div style="display: flex; align-items: center; gap: var(--spacing-md);">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px;">${user.name.charAt(0)}</div>
+                            <div>
+                                <div style="font-size: 14px; font-weight: 500; color: var(--text-primary);">${user.name}</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">ID: ${user.id}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">${user.phone}</td>
+                    <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">${user.registerTime}</td>
+                    <td style="padding: var(--spacing-md); font-size: 14px; color: var(--text-primary);">${user.lastLogin}</td>
+                    <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; ${memberStatusColor};">${memberStatusText}</span></td>
+                    <td style="padding: var(--spacing-md);"><span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; ${accountStatusColor};">${accountStatusText}</span></td>
+                    <td style="padding: var(--spacing-md);">
+                        <div style="display: flex; gap: var(--spacing-sm);">
+                            <button class="btn btn-secondary btn-sm" style="padding: 6px 10px;" title="查看详情" onclick="viewUserDetail('${user.id}')">👁️</button>
+                            <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--warning-color);" title="重置密码" onclick="resetPassword('${user.id}')">🔑</button>
+                            <button class="btn btn-secondary btn-sm" style="padding: 6px 10px; color: var(--success-color);" title="切换状态" onclick="toggleStatus('${user.id}')">⚡</button>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+
+            // 更新分页信息
+            updatePagination(usersToRender);
+        }
+
+        // 更新分页信息
+        function updatePagination(usersToRender = currentUsers) {
+            const totalUsers = usersToRender.length;
+            const totalPages = Math.ceil(totalUsers / pageSize);
+            
+            // 更新总记录数显示
+            const totalText = document.querySelector('.card > div:last-child > div:first-child');
+            if (totalText) {
+                totalText.textContent = `共 ${totalUsers.toLocaleString()} 条记录，每页 ${pageSize} 条`;
+            }
+            
+            // 更新分页按钮
+            const paginationContainer = document.querySelector('.card > div:last-child > div:last-child');
+            if (paginationContainer) {
+                paginationContainer.innerHTML = '';
+                
+                // 上一页按钮
+                const prevButton = document.createElement('button');
+                prevButton.className = 'btn btn-secondary btn-sm';
+                prevButton.textContent = '上一页';
+                prevButton.disabled = currentPage === 1;
+                prevButton.onclick = () => goToPage(currentPage - 1);
+                paginationContainer.appendChild(prevButton);
+                
+                // 页码按钮
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                
+                if (endPage - startPage + 1 < maxVisiblePages) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+                
+                if (startPage > 1) {
+                    const firstPageButton = document.createElement('button');
+                    firstPageButton.className = 'btn btn-secondary btn-sm';
+                    firstPageButton.textContent = '1';
+                    firstPageButton.onclick = () => goToPage(1);
+                    paginationContainer.appendChild(firstPageButton);
+                    
+                    if (startPage > 2) {
+                        const ellipsis1 = document.createElement('span');
+                        ellipsis1.textContent = '...';
+                        ellipsis1.style.padding = '6px 10px';
+                        ellipsis1.style.color = 'var(--text-secondary)';
+                        paginationContainer.appendChild(ellipsis1);
+                    }
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageButton = document.createElement('button');
+                    pageButton.className = `btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-secondary'}`;
+                    pageButton.textContent = i;
+                    pageButton.onclick = () => goToPage(i);
+                    paginationContainer.appendChild(pageButton);
+                }
+                
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        const ellipsis2 = document.createElement('span');
+                        ellipsis2.textContent = '...';
+                        ellipsis2.style.padding = '6px 10px';
+                        ellipsis2.style.color = 'var(--text-secondary)';
+                        paginationContainer.appendChild(ellipsis2);
+                    }
+                    
+                    const lastPageButton = document.createElement('button');
+                    lastPageButton.className = 'btn btn-secondary btn-sm';
+                    lastPageButton.textContent = totalPages;
+                    lastPageButton.onclick = () => goToPage(totalPages);
+                    paginationContainer.appendChild(lastPageButton);
+                }
+                
+                // 下一页按钮
+                const nextButton = document.createElement('button');
+                nextButton.className = 'btn btn-secondary btn-sm';
+                nextButton.textContent = '下一页';
+                nextButton.disabled = currentPage === totalPages;
+                nextButton.onclick = () => goToPage(currentPage + 1);
+                paginationContainer.appendChild(nextButton);
+            }
+        }
+
+        // 跳转到指定页码
+        function goToPage(page) {
+            const totalPages = Math.ceil(currentUsers.length / pageSize);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderUsers();
+            }
+        }
+
+        // 搜索用户功能
+        function searchUsers() {
+            const searchId = document.getElementById('searchId').value.trim();
+            const searchPhone = document.getElementById('searchPhone').value.trim();
+            const searchNickname = document.getElementById('searchNickname').value.trim();
+            const searchMemberStatus = document.getElementById('searchMemberStatus').value;
+            const searchAccountStatus = document.getElementById('searchAccountStatus').value;
+
+            currentUsers = users.filter(user => {
+                // 如果所有搜索条件都为空，则显示所有用户
+                if (!searchId && !searchPhone && !searchNickname && !searchMemberStatus && !searchAccountStatus) {
+                    return true;
+                }
+                
+                // OR逻辑：只需满足一个条件即可匹配
+                let match = false;
+
+                if (searchId && user.id.includes(searchId)) {
+                    match = true;
+                }
+
+                if (searchPhone && user.fullPhone.includes(searchPhone)) {
+                    match = true;
+                }
+
+                if (searchNickname && user.name.includes(searchNickname)) {
+                    match = true;
+                }
+
+                if (searchMemberStatus && user.memberStatus === searchMemberStatus) {
+                    match = true;
+                }
+
+                if (searchAccountStatus && user.accountStatus === searchAccountStatus) {
+                    match = true;
+                }
+
+                return match;
+            });
+
+            currentPage = 1;
+            renderUsers(currentUsers);
+        }
+
+        function resetSearch() {
+            document.getElementById('searchId').value = '';
+            document.getElementById('searchPhone').value = '';
+            document.getElementById('searchNickname').value = '';
+            document.getElementById('searchMemberStatus').value = '';
+            document.getElementById('searchAccountStatus').value = '';
+            
+            currentUsers = [...users];
+            currentPage = 1;
+            renderUsers();
+        }
+
+        function viewUserDetail(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            // 保存当前查看的用户ID
+            currentViewedUserId = userId;
+
+            const modal = document.getElementById('userDetailModal');
+            
+            // 更新用户头像和基本信息
+            const avatar = modal.querySelector('.modal > div:nth-child(2) > div:nth-child(1) > div:nth-child(1)');
+            if (avatar) {
+                avatar.textContent = user.name.charAt(0);
+            }
+            
+            const userName = modal.querySelector('.modal > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > h4');
+            if (userName) {
+                userName.textContent = user.name;
+            }
+            
+            const userInfo = modal.querySelectorAll('.modal > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > div > span');
+            if (userInfo.length >= 2) {
+                userInfo[0].textContent = `ID: ${user.id}`;
+                userInfo[1].textContent = user.phone;
+            }
+            
+            // 更新用户详情信息
+            const detailDivs = modal.querySelectorAll('.modal > div:nth-child(2) > div:nth-child(2) > div');
+            if (detailDivs.length >= 4) {
+                // 注册时间
+                const registerTimeDiv = detailDivs[0].querySelector('div:last-child');
+                if (registerTimeDiv) {
+                    registerTimeDiv.textContent = user.registerTime;
+                }
+                
+                // 最后登录
+                const lastLoginDiv = detailDivs[1].querySelector('div:last-child');
+                if (lastLoginDiv) {
+                    lastLoginDiv.textContent = user.lastLogin;
+                }
+                
+                // 会员状态
+                const memberStatusDiv = detailDivs[2].querySelector('div:last-child');
+                if (memberStatusDiv) {
+                    const memberStatusText = user.memberStatus === 'svip' ? 'SVIP会员' : user.memberStatus === 'vip' ? 'VIP会员' : '普通用户';
+                    memberStatusDiv.textContent = memberStatusText;
+                    memberStatusDiv.style.color = user.memberStatus === 'svip' ? 'var(--secondary-color)' : user.memberStatus === 'vip' ? '#B8860B' : 'var(--text-secondary)';
+                }
+                
+                // 账户状态
+                const accountStatusDiv = detailDivs[3].querySelector('div:last-child');
+                if (accountStatusDiv) {
+                    const accountStatusText = user.accountStatus === 'active' ? '已启用' : user.accountStatus === 'inactive' ? '已禁用' : '已封禁';
+                    accountStatusDiv.textContent = accountStatusText;
+                    accountStatusDiv.style.color = user.accountStatus === 'active' ? 'var(--success-color)' : user.accountStatus === 'inactive' ? 'var(--warning-color)' : 'var(--danger-color)';
+                }
+            }
+            
+            // 更新健康评分
+            const healthScoreDiv = modal.querySelector('.modal > div:nth-child(2) > div:nth-child(3) > div:nth-child(1) > div:nth-child(1)');
+            if (healthScoreDiv) {
+                healthScoreDiv.textContent = user.healthScore;
+            }
+            
+            // 更新体质类型标签
+            const constitutionContainer = modal.querySelector('.modal > div:nth-child(2) > div:nth-child(3) > div:nth-child(2)');
+            if (constitutionContainer) {
+                constitutionContainer.innerHTML = '';
+                user.constitution.forEach(constitution => {
+                    const span = document.createElement('span');
+                    span.style.padding = '6px 12px';
+                    span.style.background = constitution === '平和质' ? 'var(--primary-color)' : 'rgba(102, 126, 234, 0.1)';
+                    span.style.color = constitution === '平和质' ? 'white' : 'var(--primary-color)';
+                    span.style.borderRadius = '20px';
+                    span.style.fontSize = '13px';
+                    span.style.fontWeight = '500';
+                    span.textContent = constitution;
+                    constitutionContainer.appendChild(span);
+                });
+            }
+            
+            // 更新模态框中的按钮功能
+            const modalButtons = modal.querySelectorAll('.modal > div:nth-child(3) > button');
+            if (modalButtons.length >= 3) {
+                // 重置密码按钮
+                modalButtons[1].onclick = () => {
+                    resetPassword(userId);
+                    closeModal();
+                };
+                
+                // 封禁/解封账户按钮
+                modalButtons[2].onclick = () => {
+                    banUser(userId);
+                    closeModal();
+                };
+                
+                // 更新封禁/解封按钮文本
+                const accountStatusText = user.accountStatus === 'active' || user.accountStatus === 'inactive' ? '封禁账户' : '解封账户';
+                modalButtons[2].textContent = accountStatusText;
+            }
+            
+            // 显示模态框
+            modal.classList.add('show');
+        }
+
+        // 打开修改用户信息模态框
+        function openEditModal(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            // 填充表单数据
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUserName').value = user.name;
+            document.getElementById('editUserPhone').value = user.fullPhone;
+            document.getElementById('editUserMemberStatus').value = user.memberStatus;
+            document.getElementById('editUserAccountStatus').value = user.accountStatus;
+            document.getElementById('editUserHealthScore').value = user.healthScore;
+            
+            // 重置并勾选体质类型
+            const checkboxes = document.querySelectorAll('input[name="constitution"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = user.constitution.includes(checkbox.value);
+            });
+            
+            // 显示修改模态框
+            const editModal = document.getElementById('editUserModal');
+            editModal.classList.add('show');
+        }
+
+        // 关闭修改用户信息模态框
+        function closeEditModal() {
+            const editModal = document.getElementById('editUserModal');
+            editModal.classList.remove('show');
+        }
+
+        // 保存用户修改
+        function saveUserChanges() {
+            const userId = document.getElementById('editUserId').value;
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            // 获取表单数据
+            const name = document.getElementById('editUserName').value;
+            const fullPhone = document.getElementById('editUserPhone').value;
+            const memberStatus = document.getElementById('editUserMemberStatus').value;
+            const accountStatus = document.getElementById('editUserAccountStatus').value;
+            const healthScore = parseInt(document.getElementById('editUserHealthScore').value);
+            
+            // 获取选中的体质类型
+            const selectedConstitutions = [];
+            const checkboxes = document.querySelectorAll('input[name="constitution"]:checked');
+            checkboxes.forEach(checkbox => {
+                selectedConstitutions.push(checkbox.value);
+            });
+            
+            // 验证手机号格式
+            const phoneRegex = /^1[3-9]\d{9}$/;
+            if (!phoneRegex.test(fullPhone)) {
+                alert('请输入正确的手机号格式');
+                return;
+            }
+            
+            // 更新用户数据
+            user.name = name;
+            user.fullPhone = fullPhone;
+            user.phone = fullPhone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+            user.memberStatus = memberStatus;
+            user.accountStatus = accountStatus;
+            user.healthScore = healthScore;
+            user.constitution = selectedConstitutions;
+            
+            // 更新当前用户列表
+            const index = currentUsers.findIndex(u => u.id === userId);
+            if (index !== -1) {
+                currentUsers[index] = {...user};
+            }
+            
+            // 重新渲染用户列表
+            renderUsers();
+            
+            // 关闭修改模态框
+            closeEditModal();
+            
+            // 关闭详情模态框
+            closeModal();
+            
+            // 显示成功消息
+            alert('用户信息修改成功！');
+        }
+
+        function resetPassword(userId) {
+            if (confirm('确定要为该用户重置密码吗？')) {
+                // 模拟重置密码
+                setTimeout(() => {
+                    alert('密码重置成功！新密码为：123456');
+                }, 1000);
+            }
+        }
+
+        function toggleStatus(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            let newStatus = '';
+            if (user.accountStatus === 'active') {
+                newStatus = 'inactive';
+            } else if (user.accountStatus === 'inactive') {
+                newStatus = 'active';
+            } else {
+                newStatus = 'active';
+            }
+
+            if (confirm(`确定要将用户状态从${user.accountStatus === 'active' ? '已启用' : user.accountStatus === 'inactive' ? '已禁用' : '已封禁'}切换为${newStatus === 'active' ? '已启用' : newStatus === 'inactive' ? '已禁用' : '已封禁'}吗？`)) {
+                // 模拟状态切换
+                user.accountStatus = newStatus;
+                renderUsers();
+                alert('状态切换成功！');
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('userDetailModal');
+            modal.classList.remove('show');
+        }
+
+        // 封禁/解封用户功能
+        function banUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            let newStatus = '';
+            let actionText = '';
+            if (user.accountStatus === 'active' || user.accountStatus === 'inactive') {
+                newStatus = 'banned';
+                actionText = '封禁';
+            } else {
+                newStatus = 'active';
+                actionText = '解封';
+            }
+
+            if (confirm(`确定要${actionText}该用户吗？`)) {
+                // 模拟封禁/解封操作
+                user.accountStatus = newStatus;
+                renderUsers();
+                alert(`${actionText}成功！`);
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('userDetailModal');
+            if (e.target === modal) {
+                closeModal();
+            }
+            
+            const editModal = document.getElementById('editUserModal');
+            if (e.target === editModal) {
+                closeEditModal();
+            }
+        });
+
+        // 导出Excel功能
+        function exportExcel() {
+            // 准备导出的数据
+            const exportData = currentUsers.map(user => ({
+                '用户ID': user.id,
+                '姓名': user.name,
+                '手机号': user.fullPhone,
+                '会员状态': user.memberStatus === 'svip' ? 'SVIP' : user.memberStatus === 'vip' ? 'VIP' : '普通用户',
+                '账户状态': user.accountStatus === 'active' ? '已启用' : user.accountStatus === 'inactive' ? '已禁用' : '已封禁',
+                '注册时间': user.registerTime,
+                '最后登录': user.lastLogin,
+                '健康评分': user.healthScore,
+                '体质类型': user.constitution.join(', ')
+            }));
+
+            // 创建工作簿和工作表
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+            // 设置列宽
+            const colWidths = [
+                { wch: 10 }, // 用户ID
+                { wch: 10 }, // 姓名
+                { wch: 15 }, // 手机号
+                { wch: 12 }, // 会员状态
+                { wch: 12 }, // 账户状态
+                { wch: 20 }, // 注册时间
+                { wch: 20 }, // 最后登录
+                { wch: 10 }, // 健康评分
+                { wch: 25 }  // 体质类型
+            ];
+            worksheet['!cols'] = colWidths;
+
+            // 将工作表添加到工作簿
+            XLSX.utils.book_append_sheet(workbook, worksheet, '用户列表');
+
+            // 生成Excel文件并下载
+            const fileName = `用户列表_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            renderUsers();
+        });
+    </script>
+</body>
+</html>

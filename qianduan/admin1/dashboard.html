@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据看板 - 灵境管理后台</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon"></div>
+                    <div>
+                        <div class="sidebar-logo-text">灵境管理</div>
+                        <div class="sidebar-logo-sub">Admin Console</div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">主要功能</div>
+                    <a href="dashboard.html" class="nav-item active">
+                        <span class="nav-item-icon">📊</span>
+                        <span class="nav-item-text">数据看板</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <span class="nav-item-icon">👥</span>
+                        <span class="nav-item-text">用户管理</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                        <span class="nav-item-icon">📈</span>
+                        <span class="nav-item-text">数据分析</span>
+                    </a>
+                    <a href="membership.html" class="nav-item">
+                        <span class="nav-item-icon">💎</span>
+                        <span class="nav-item-text">会员分析</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统管理</div>
+                    <a href="security.html" class="nav-item">
+                        <span class="nav-item-icon">🔒</span>
+                        <span class="nav-item-text">安全管理</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="nav-item-icon">⚙️</span>
+                        <span class="nav-item-text">系统设置</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <span class="nav-item-icon">🚪</span>
+                        <span class="nav-item-text">退出登录</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 class="header-title">数据看板</h1>
+                    <p class="header-subtitle">实时监控平台运营数据与用户行为</p>
+                </div>
+                <div class="header-actions">
+                    <select class="form-select" style="width: auto;" id="dateRangeSelect">
+                        <option value="7">最近7天</option>
+                        <option value="30" selected>最近30天</option>
+                        <option value="90">最近90天</option>
+                    </select>
+                    <button class="header-btn primary" onclick="exportReport()">
+                        <span>📥</span>
+                        <span>导出报表</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon users">👥</div>
+                        <span class="stat-trend up">↑ 12.5%</span>
+                    </div>
+                    <div class="stat-value">128,456</div>
+                    <div class="stat-label">注册用户总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon revenue">💰</div>
+                        <span class="stat-trend up">↑ 8.3%</span>
+                    </div>
+                    <div class="stat-value">¥486,920</div>
+                    <div class="stat-label">本月收入</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon active">⚡</div>
+                        <span class="stat-trend up">↑ 15.2%</span>
+                    </div>
+                    <div class="stat-value">45,892</div>
+                    <div class="stat-label">日活跃用户</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon conversion">🎯</div>
+                        <span class="stat-trend down">↓ 2.1%</span>
+                    </div>
+                    <div class="stat-value">23.4%</div>
+                    <div class="stat-label">会员转化率</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg);" class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">核心功能使用分析</h3>
+                        <div style="display: flex; gap: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color);"></span>
+                                <span>日均使用次数</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="functionUsageChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">功能使用热力图</h3>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: var(--spacing-sm);">过去30天各模块使用频率</div>
+                    <div id="heatmap" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;"></div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--text-tertiary);">
+                        <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">AI对话使用情况</h3>
+                        <div style="display: flex; gap: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color);"></span>
+                                <span>对话次数</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--warning-color);"></span>
+                                <span>平均会话长度</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="aiChatChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">内容生态分析</h3>
+                        <div style="display: flex; gap: var(--spacing-md);">
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary-color);"></span>
+                                <span>发帖量</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary);">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success-color);"></span>
+                                <span>互动量</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="contentEcosystemChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--spacing-md);" class="dashboard-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">最新动态</h3>
+                        <a href="#" style="font-size: 13px; color: var(--primary-color); text-decoration: none;">查看全部 →</a>
+                    </div>
+                    <div style="max-height: 320px; overflow-y: auto;" id="latestActivities">
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">李</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">新用户 <strong>李晓明</strong> 注册成功</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">2分钟前</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--success-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">王</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">用户 <strong>王芳</strong> 开通年度会员</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">15分钟前</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--warning-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">张</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">用户 <strong>张伟</strong> 完成健康问卷</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">32分钟前</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-color);">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--secondary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">刘</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">用户 <strong>刘洋</strong> 发布健康心得帖子</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">1小时前</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0;">
+                            <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: var(--danger-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">陈</div>
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">用户 <strong>陈静</strong> 使用舌像检测功能</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">2小时前</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">快捷操作</h3>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                        <button class="btn btn-secondary" style="justify-content: flex-start; padding: var(--spacing-md);" onclick="location.href='users.html'">
+                            <span style="width: 40px; height: 40px; border-radius: var(--border-radius-md); background: rgba(102, 126, 234, 0.1); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 18px;">👤</span>
+                            <div style="text-align: left;">
+                                <div style="font-size: 14px; color: var(--text-primary); font-weight: 500;">用户管理</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">查看和管理所有用户</div>
+                            </div>
+                        </button>
+                        <button class="btn btn-secondary" style="justify-content: flex-start; padding: var(--spacing-md);" onclick="location.href='analytics.html'">
+                            <span style="width: 40px; height: 40px; border-radius: var(--border-radius-md); background: rgba(72, 187, 120, 0.1); color: var(--success-color); display: flex; align-items: center; justify-content: center; font-size: 18px;">📊</span>
+                            <div style="text-align: left;">
+                                <div style="font-size: 14px; color: var(--text-primary); font-weight: 500;">数据分析</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">查看详细统计报告</div>
+                            </div>
+                        </button>
+                        <button class="btn btn-secondary" style="justify-content: flex-start; padding: var(--spacing-md);" onclick="location.href='security.html'">
+                            <span style="width: 40px; height: 40px; border-radius: var(--border-radius-md); background: rgba(237, 137, 54, 0.1); color: var(--warning-color); display: flex; align-items: center; justify-content: center; font-size: 18px;">🔐</span>
+                            <div style="text-align: left;">
+                                <div style="font-size: 14px; color: var(--text-primary); font-weight: 500;">安全设置</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">管理账户安全策略</div>
+                            </div>
+                        </button>
+                        <button class="btn btn-secondary" style="justify-content: flex-start; padding: var(--spacing-md);" onclick="backupData()">
+                            <span style="width: 40px; height: 40px; border-radius: var(--border-radius-md); background: rgba(118, 75, 162, 0.1); color: var(--secondary-color); display: flex; align-items: center; justify-content: center; font-size: 18px;">💾</span>
+                            <div style="text-align: left;">
+                                <div style="font-size: 14px; color: var(--text-primary); font-weight: 500;">数据备份</div>
+                                <div style="font-size: 12px; color: var(--text-tertiary);">立即备份系统数据</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const chartColors = {
+            primary: '#667eea',
+            secondary: '#764ba2',
+            success: '#48bb78',
+            warning: '#ed8936',
+            danger: '#f56565',
+            purple: '#764ba2'
+        };
+
+        function initFunctionUsageChart() {
+            const ctx = document.getElementById('functionUsageChart').getContext('2d');
+            
+            // 根据日期范围生成不同的数据
+            let data;
+            if (currentDateRange === 7) {
+                data = [5200, 4800, 6500, 3200, 4100, 9800];
+            } else if (currentDateRange === 30) {
+                data = [12500, 9800, 15600, 7200, 8900, 23400];
+            } else {
+                data = [32500, 28900, 39800, 21500, 25600, 65400];
+            }
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['命理分析', '健康评估', '饮食推荐', '健康规划', '舌像检测', 'AI对话'],
+                    datasets: [{
+                        label: '日均使用次数',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(72, 187, 120, 0.8)',
+                            'rgba(237, 137, 54, 0.8)',
+                            'rgba(245, 101, 101, 0.8)',
+                            'rgba(118, 75, 162, 0.8)'
+                        ],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initHeatmap() {
+            const heatmapContainer = document.getElementById('heatmap');
+            const modules = ['命理', '健康', '饮食', '规划', 'AI'];
+            
+            // 清空现有内容
+            heatmapContainer.innerHTML = '';
+            
+            // 根据日期范围生成不同数量的单元格
+            const days = currentDateRange;
+            
+            for (let i = 0; i < days; i++) {
+                const cell = document.createElement('div');
+                cell.style.aspectRatio = '1';
+                cell.style.borderRadius = '4px';
+                const level = Math.floor(Math.random() * 5) + 1;
+                const opacity = level * 0.2;
+                cell.style.background = `rgba(102, 126, 234, ${opacity})`;
+                cell.title = `第${i + 1}天 - ${modules[i % 5]}模块使用`;
+                heatmapContainer.appendChild(cell);
+            }
+        }
+
+        function initAIChatChart() {
+            const ctx = document.getElementById('aiChatChart').getContext('2d');
+            
+            // 根据日期范围生成不同的标签和数据
+            let labels, chatData, durationData;
+            if (currentDateRange === 7) {
+                labels = ['1日', '2日', '3日', '4日', '5日', '6日', '7日'];
+                chatData = [1200, 1400, 1350, 1500, 1650, 1800, 1750];
+                durationData = [8.2, 9.1, 8.7, 10.2, 9.4, 11.5, 10.8];
+            } else if (currentDateRange === 30) {
+                labels = ['1日', '5日', '10日', '15日', '20日', '25日', '30日'];
+                chatData = [4200, 4800, 5100, 4900, 5600, 6200, 5800];
+                durationData = [8.5, 9.2, 8.8, 10.1, 9.5, 11.2, 10.5];
+            } else {
+                labels = ['1日', '15日', '30日', '45日', '60日', '75日', '90日'];
+                chatData = [12500, 14200, 15300, 14800, 16700, 18500, 17600];
+                durationData = [8.8, 9.5, 9.1, 10.3, 9.8, 11.6, 10.9];
+            }
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '对话次数',
+                        data: chatData,
+                        borderColor: chartColors.success,
+                        backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: '平均会话长度(分钟)',
+                        data: durationData,
+                        borderColor: chartColors.warning,
+                        backgroundColor: 'transparent',
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            beginAtZero: true,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initContentEcosystemChart() {
+            const ctx = document.getElementById('contentEcosystemChart').getContext('2d');
+            
+            // 根据日期范围生成不同的数据
+            let labels, postData, interactionData;
+            if (currentDateRange === 7) {
+                labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+                postData = [156, 189, 234, 198, 267, 312, 289];
+                interactionData = [892, 1056, 1234, 1189, 1456, 1876, 1623];
+            } else if (currentDateRange === 30) {
+                labels = ['第1周', '第2周', '第3周', '第4周', '第5周'];
+                postData = [654, 723, 812, 789, 856];
+                interactionData = [3456, 3892, 4234, 4056, 4489];
+            } else {
+                labels = ['第1月', '第2月', '第3月'];
+                postData = [2890, 3123, 3456];
+                interactionData = [14567, 15892, 16789];
+            }
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '发帖量',
+                        data: postData,
+                        borderColor: chartColors.primary,
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '互动量',
+                        data: interactionData,
+                        borderColor: chartColors.success,
+                        backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        let currentDateRange = 30;
+
+        function exportReport() {
+            // 显示导出进度
+            const exportBtn = event.target;
+            const originalText = exportBtn.innerHTML;
+            exportBtn.innerHTML = '<span>⏳</span><span>导出中...</span>';
+            exportBtn.disabled = true;
+            
+            // 准备导出数据
+            const reportData = {
+                '日期范围': `${currentDateRange}天`,
+                '导出时间': new Date().toLocaleString(),
+                '注册用户总数': '128,456',
+                '本月收入': '¥486,920',
+                '日活跃用户': '45,892',
+                '会员转化率': '23.4%'
+            };
+            
+            // 核心功能使用数据
+            const functionUsageData = {
+                '功能': ['命理分析', '健康评估', '饮食推荐', '健康规划', '舌像检测', 'AI对话'],
+                '日均使用次数': currentDateRange === 7 ? [5200, 4800, 6500, 3200, 4100, 9800] : 
+                                currentDateRange === 30 ? [12500, 9800, 15600, 7200, 8900, 23400] : 
+                                [32500, 28900, 39800, 21500, 25600, 65400]
+            };
+            
+            // AI对话使用数据
+            const aiChatData = {
+                '日期': currentDateRange === 7 ? ['1日', '2日', '3日', '4日', '5日', '6日', '7日'] : 
+                        currentDateRange === 30 ? ['1日', '5日', '10日', '15日', '20日', '25日', '30日'] : 
+                        ['1日', '15日', '30日', '45日', '60日', '75日', '90日'],
+                '对话次数': currentDateRange === 7 ? [1200, 1400, 1350, 1500, 1650, 1800, 1750] : 
+                            currentDateRange === 30 ? [4200, 4800, 5100, 4900, 5600, 6200, 5800] : 
+                            [12500, 14200, 15300, 14800, 16700, 18500, 17600],
+                '平均会话长度(分钟)': currentDateRange === 7 ? [8.2, 9.1, 8.7, 10.2, 9.4, 11.5, 10.8] : 
+                                    currentDateRange === 30 ? [8.5, 9.2, 8.8, 10.1, 9.5, 11.2, 10.5] : 
+                                    [8.8, 9.5, 9.1, 10.3, 9.8, 11.6, 10.9]
+            };
+            
+            // 内容生态数据
+            const contentData = {
+                '周期': currentDateRange === 7 ? ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] : 
+                        currentDateRange === 30 ? ['第1周', '第2周', '第3周', '第4周', '第5周'] : 
+                        ['第1月', '第2月', '第3月'],
+                '发帖量': currentDateRange === 7 ? [156, 189, 234, 198, 267, 312, 289] : 
+                        currentDateRange === 30 ? [654, 723, 812, 789, 856] : 
+                        [2890, 3123, 3456],
+                '互动量': currentDateRange === 7 ? [892, 1056, 1234, 1189, 1456, 1876, 1623] : 
+                        currentDateRange === 30 ? [3456, 3892, 4234, 4056, 4489] : 
+                        [14567, 15892, 16789]
+            };
+            
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            
+            // 添加概览工作表
+            const overviewSheet = XLSX.utils.json_to_sheet([reportData]);
+            XLSX.utils.book_append_sheet(wb, overviewSheet, '概览');
+            
+            // 添加核心功能使用工作表
+            const functionSheetData = [];
+            for (let i = 0; i < functionUsageData.功能.length; i++) {
+                functionSheetData.push({
+                    '功能': functionUsageData.功能[i],
+                    '日均使用次数': functionUsageData.日均使用次数[i]
+                });
+            }
+            const functionSheet = XLSX.utils.json_to_sheet(functionSheetData);
+            XLSX.utils.book_append_sheet(wb, functionSheet, '核心功能使用');
+            
+            // 添加AI对话使用工作表
+            const aiChatSheetData = [];
+            for (let i = 0; i < aiChatData.日期.length; i++) {
+                aiChatSheetData.push({
+                    '日期': aiChatData.日期[i],
+                    '对话次数': aiChatData.对话次数[i],
+                    '平均会话长度(分钟)': aiChatData.平均会话长度(分钟)[i]
+                });
+            }
+            const aiChatSheet = XLSX.utils.json_to_sheet(aiChatSheetData);
+            XLSX.utils.book_append_sheet(wb, aiChatSheet, 'AI对话使用');
+            
+            // 添加内容生态工作表
+            const contentSheetData = [];
+            for (let i = 0; i < contentData.周期.length; i++) {
+                contentSheetData.push({
+                    '周期': contentData.周期[i],
+                    '发帖量': contentData.发帖量[i],
+                    '互动量': contentData.互动量[i]
+                });
+            }
+            const contentSheet = XLSX.utils.json_to_sheet(contentSheetData);
+            XLSX.utils.book_append_sheet(wb, contentSheet, '内容生态');
+            
+            // 导出文件
+            setTimeout(() => {
+                XLSX.writeFile(wb, `数据看板报表_${currentDateRange}天_${new Date().toISOString().slice(0, 10)}.xlsx`);
+                exportBtn.innerHTML = originalText;
+                exportBtn.disabled = false;
+                alert('报表导出成功！');
+            }, 1000);
+        }
+
+        function backupData() {
+            // 显示备份进度对话框
+            const backupBtn = event.target;
+            const originalText = backupBtn.innerHTML;
+            backupBtn.innerHTML = '<span>⏳</span><span>备份中...</span>';
+            backupBtn.disabled = true;
+            
+            // 模拟备份过程
+            setTimeout(() => {
+                backupBtn.innerHTML = '<span>✅</span><span>备份完成</span>';
+                setTimeout(() => {
+                    backupBtn.innerHTML = originalText;
+                    backupBtn.disabled = false;
+                    alert('数据备份成功！');
+                }, 1000);
+            }, 2000);
+        }
+
+        function updateAllCharts(range) {
+            currentDateRange = range;
+            
+            // 重新初始化所有图表
+            initFunctionUsageChart();
+            initHeatmap();
+            initAIChatChart();
+            initContentEcosystemChart();
+        }
+
+        // 生成随机活动数据的函数
+        function generateActivityItem() {
+            const users = ['张三', '李四', '王五', '赵六', '钱七', '孙八', '周九', '吴十'];
+            const actions = [
+                '注册成功',
+                '开通年度会员',
+                '完成健康问卷',
+                '发布健康心得帖子',
+                '使用舌像检测功能',
+                '查看健康报告',
+                '分享健康文章',
+                '邀请好友注册'
+            ];
+            const user = users[Math.floor(Math.random() * users.length)];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const colors = ['linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%)', 'var(--success-color)', 'var(--warning-color)', 'var(--secondary-color)', 'var(--danger-color)'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const timeAgo = Math.floor(Math.random() * 120) + '分钟前';
+            
+            return `
+                <div style="display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-color);">
+                    <div style="width: 40px; height: 40px; border-radius: var(--border-radius-full); background: ${color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0;">${user.charAt(0)}</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; color: var(--text-primary); margin-bottom: 4px;">用户 <strong>${user}</strong> ${action}</div>
+                        <div style="font-size: 12px; color: var(--text-tertiary);">${timeAgo}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 初始化滚动加载功能
+        function initScrollLoad() {
+            const activitiesContainer = document.getElementById('latestActivities');
+            let isLoading = false;
+            
+            activitiesContainer.addEventListener('scroll', function() {
+                if (isLoading) return;
+                
+                // 当滚动到距离底部100px时加载更多
+                if (activitiesContainer.scrollTop + activitiesContainer.clientHeight >= activitiesContainer.scrollHeight - 100) {
+                    loadMoreActivities();
+                }
+            });
+            
+            function loadMoreActivities() {
+                isLoading = true;
+                
+                // 模拟异步加载
+                setTimeout(() => {
+                    for (let i = 0; i < 3; i++) {
+                        const activityItem = generateActivityItem();
+                        activitiesContainer.innerHTML += activityItem;
+                    }
+                    isLoading = false;
+                }, 800);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化图表
+            initFunctionUsageChart();
+            initHeatmap();
+            initAIChatChart();
+            initContentEcosystemChart();
+            
+            // 添加日期范围选择器事件监听
+            const dateRangeSelect = document.getElementById('dateRangeSelect');
+            dateRangeSelect.addEventListener('change', function() {
+                const range = parseInt(this.value);
+                updateAllCharts(range);
+            });
+            
+            // 初始化滚动加载功能
+            initScrollLoad();
+        });
+    </script>
+</body>
+</html>

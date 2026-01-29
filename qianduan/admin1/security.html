@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全管理 - 灵境管理后台</title>
+    <link rel="stylesheet" href="common.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon"></div>
+                    <div>
+                        <div class="sidebar-logo-text">灵境管理</div>
+                        <div class="sidebar-logo-sub">Admin Console</div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">主要功能</div>
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="nav-item-icon">📊</span>
+                        <span class="nav-item-text">数据看板</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <span class="nav-item-icon">👥</span>
+                        <span class="nav-item-text">用户管理</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item">
+                        <span class="nav-item-icon">📈</span>
+                        <span class="nav-item-text">数据分析</span>
+                    </a>
+                    <a href="membership.html" class="nav-item">
+                        <span class="nav-item-icon">💎</span>
+                        <span class="nav-item-text">会员分析</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统管理</div>
+                    <a href="security.html" class="nav-item active">
+                        <span class="nav-item-icon">🔒</span>
+                        <span class="nav-item-text">安全管理</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="nav-item-icon">⚙️</span>
+                        <span class="nav-item-text">系统设置</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <span class="nav-item-icon">🚪</span>
+                        <span class="nav-item-text">退出登录</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 class="header-title">安全管理</h1>
+                    <p class="header-subtitle">平台安全状态监控与合规管理</p>
+                </div>
+                <div class="header-actions">
+                    <div class="date-range">
+                        <select class="form-select">
+                            <option>实时</option>
+                            <option selected>今日</option>
+                            <option>本周</option>
+                            <option>本月</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary">
+                        <span>🔍</span>
+                        <span>安全扫描</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="security-score-banner">
+                <div class="score-info">
+                    <div class="score-circle">92</div>
+                    <div class="score-details">
+                        <h3>安全评分</h3>
+                        <p>系统运行良好，暂无高危风险</p>
+                    </div>
+                </div>
+                <div class="score-actions">
+                    <button class="btn btn-white">
+                        <span>📊</span>
+                        <span>生成报告</span>
+                    </button>
+                    <button class="btn btn-outline-white">
+                        <span>⚙️</span>
+                        <span>安全设置</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon users">📈</div>
+                        <span class="stat-trend up">↑ 15.2%</span>
+                    </div>
+                    <div class="stat-value">1,234,567</div>
+                    <div class="stat-label">今日请求数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon success">✅</div>
+                        <span class="stat-trend up">↑ 0.01%</span>
+                    </div>
+                    <div class="stat-value">99.99%</div>
+                    <div class="stat-label">系统可用性</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon warning">🛡️</div>
+                        <span class="stat-trend down">↓ 8.3%</span>
+                    </div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">今日拦截</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon danger">⚠️</div>
+                        <span class="stat-trend down">↓ 50.0%</span>
+                    </div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">待处理告警</div>
+                </div>
+            </div>
+
+            <div class="charts-grid" style="margin-bottom: var(--spacing-lg);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📊 安全事件趋势</h3>
+                        <div class="card-subtitle">最近7天安全事件统计</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="securityEventsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🔒 安全事件分布</h3>
+                        <div class="card-subtitle">不同类型安全事件占比</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="securityEventsPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-sections">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🔒 数据安全</h3>
+                        <div class="card-subtitle">敏感数据加密存储与传输保护</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔐 AES-256 加密
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    用户面部照片、出生信息、健康数据均采用AES-256加密存储，确保敏感信息安全性。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">已加密字段: 32个</span>
+                                    <span class="detail-tag">最近更新: 2小时前</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🌐 HTTPS/TLS 1.2+
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    全站启用HTTPS，采用TLS 1.2+协议，保障数据传输安全，防止中间人攻击。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">证书类型: EV SSL</span>
+                                    <span class="detail-tag">到期时间: 2026-03-15</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔑 密钥管理 (KMS)
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    使用专用密钥管理服务管理API密钥、数据库密码等敏感凭证，支持自动轮换。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">托管密钥: 48个</span>
+                                    <span class="detail-tag">轮换周期: 90天</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🛡️ 用户隐私与合规</h3>
+                        <div class="card-subtitle">遵守个人信息保护法相关法规</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="compliance-list">
+                            <div class="compliance-item">
+                                <div class="compliance-icon checked">✓</div>
+                                <div class="compliance-content">
+                                    <div class="compliance-title">隐私政策明确</div>
+                                    <div class="compliance-desc">明确告知用户数据收集和使用方式，已通过法律审核</div>
+                                </div>
+                                <span class="status-badge success">已合规</span>
+                            </div>
+                            <div class="compliance-item">
+                                <div class="compliance-icon checked">✓</div>
+                                <div class="compliance-content">
+                                    <div class="compliance-title">权限最小化</div>
+                                    <div class="compliance-desc">仅申请必要权限（相机、位置），并提供用户开关选项</div>
+                                </div>
+                                <span class="status-badge success">已合规</span>
+                            </div>
+                            <div class="compliance-item">
+                                <div class="compliance-icon checked">✓</div>
+                                <div class="compliance-content">
+                                    <div class="compliance-title">数据匿名化处理</div>
+                                    <div class="compliance-desc">行为数据去标识化后用于推荐模型训练</div>
+                                </div>
+                                <span class="status-badge success">已合规</span>
+                            </div>
+                            <div class="compliance-item">
+                                <div class="compliance-icon unchecked">!</div>
+                                <div class="compliance-content">
+                                    <div class="compliance-title">第三方审计</div>
+                                    <div class="compliance-desc">计划每年度进行一次第三方安全审计</div>
+                                </div>
+                                <span class="status-badge warning">待完成</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🔐 身份认证与授权</h3>
+                        <div class="card-subtitle">OAuth 2.0 / JWT 多因素认证</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔑 OAuth 2.0 / JWT
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    JSON Web Token用于用户登录与会话管理，支持自动续期机制。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">Token有效期: 7天</span>
+                                    <span class="detail-tag">活跃用户: 12,589</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        📱 多因素认证 (MFA)
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    支持手机号/邮箱+验证码，提高账户安全性，有效防止账号盗用。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">已绑定: 8,234</span>
+                                    <span class="detail-tag">覆盖率: 65.4%</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        👥 RBAC 权限控制
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    基于角色的访问控制，限制不同用户的数据访问范围，保障数据隔离。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">角色数: 12个</span>
+                                    <span class="detail-tag">权限规则: 156条</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🌐 API安全</h3>
+                        <div class="card-subtitle">接口安全防护与访问控制</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🚦 接口限流
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    使用Redis实现接口限流，防止恶意刷接口，保障服务稳定性。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">限制: 60次/分钟</span>
+                                    <span class="detail-tag">今日拦截: 12次</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔐 API网关鉴权
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    所有API请求必须携带有效Token，由网关统一验证，防止未授权访问。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">网关节点: 3个</span>
+                                    <span class="detail-tag">日均请求: 1,234,567</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🛡️ 输入验证
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    防止SQL注入、XSS攻击，对所有输入进行校验和过滤，保障应用安全。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">规则数: 128条</span>
+                                    <span class="detail-tag">今日检测: 45,678次</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🛠️ 代码与运维安全</h3>
+                        <div class="card-subtitle">代码质量与运维安全防护</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔍 依赖扫描
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    使用Snyk/Dependabot定期扫描第三方库漏洞，及时修复安全隐患。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">依赖项: 2,456个</span>
+                                    <span class="detail-tag">扫描周期: 每日</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        📊 SonarQube扫描
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    代码质量与安全漏洞扫描，持续集成流程中发现并修复问题。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">代码规范: A级</span>
+                                    <span class="detail-tag">技术债务: 2.3天</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🔄 漏洞管理
+                                        <span class="status-badge warning">进行中</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    建立漏洞响应机制，定期进行安全审计和渗透测试，保障系统安全。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">最近审计: 2025-01-10</span>
+                                    <span class="detail-tag">待修复: 0个</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">💾 备份与灾难恢复</h3>
+                        <div class="card-subtitle">数据备份与容灾方案</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="items-grid">
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        📦 定期备份
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    用户数据、日志、配置定期备份至异地存储（如AWS S3），保障数据安全。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">备份周期: 每日</span>
+                                    <span class="detail-tag">保留时间: 30天</span>
+                                </div>
+                            </div>
+                            <div class="security-item">
+                                <div class="item-header">
+                                    <div class="item-title">
+                                        🏃 灾备方案
+                                        <span class="status-badge success">已启用</span>
+                                    </div>
+                                </div>
+                                <div class="item-desc">
+                                    多可用区部署，自动故障转移，保障业务连续性，避免单点故障。
+                                </div>
+                                <div class="item-details">
+                                    <span class="detail-tag">可用区: 3个</span>
+                                    <span class="detail-tag">RTO: < 5分钟</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 安全日志</h3>
+                        <div class="card-subtitle">系统安全事件记录与监控</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="log-controls">
+                            <div class="search-box">
+                                <input type="text" placeholder="搜索日志..." class="form-input" id="logSearch">
+                            </div>
+                            <div class="filters">
+                                <select class="form-select" id="logTypeFilter">
+                                    <option value="">所有类型</option>
+                                    <option value="security">🔒 安全</option>
+                                    <option value="info">ℹ️ 系统</option>
+                                    <option value="warning">⚠️ 警告</option>
+                                </select>
+                                <select class="form-select" id="logStatusFilter">
+                                    <option value="">所有状态</option>
+                                    <option value="success">成功</option>
+                                    <option value="warning">已处理</option>
+                                    <option value="info">监控中</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>类型</th>
+                                        <th>事件描述</th>
+                                        <th>状态</th>
+                                        <th>来源IP</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>2025-01-15 14:32:15</td>
+                                        <td><span class="log-type security">🔒 安全</span></td>
+                                        <td>检测到异常登录尝试</td>
+                                        <td><span class="status-badge warning">已处理</span></td>
+                                        <td>192.168.1.105</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-01-15 14:30:22</td>
+                                        <td><span class="log-type info">ℹ️ 系统</span></td>
+                                        <td>系统自动备份完成</td>
+                                        <td><span class="status-badge success">成功</span></td>
+                                        <td>系统</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-01-15 14:28:45</td>
+                                        <td><span class="log-type warning">⚠️ 警告</span></td>
+                                        <td>API请求频率接近限制</td>
+                                        <td><span class="status-badge info">监控中</span></td>
+                                        <td>192.168.1.88</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-01-15 14:25:10</td>
+                                        <td><span class="log-type info">ℹ️ 系统</span></td>
+                                        <td>用户密码强度提升</td>
+                                        <td><span class="status-badge success">成功</span></td>
+                                        <td>用户 139****2233</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-01-15 14:20:33</td>
+                                        <td><span class="log-type security">🔒 安全</span></td>
+                                        <td>检测到可疑SQL注入</td>
+                                        <td><span class="status-badge success">已拦截</span></td>
+                                        <td>10.0.0.55</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pagination">
+                            <span>显示最近 5 条记录</span>
+                            <div class="pagination-buttons">
+                                <button class="btn btn-secondary">上一页</button>
+                                <button class="btn btn-secondary">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">⚠️ 安全漏洞列表</h3>
+                        <div class="card-subtitle">系统存在的安全漏洞及修复建议</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="vulnerabilities-list">
+                            <div class="vulnerability-item">
+                                <div class="vulnerability-severity high">高危</div>
+                                <div class="vulnerability-content">
+                                    <div class="vulnerability-title">旧版本依赖漏洞</div>
+                                    <div class="vulnerability-desc">检测到部分第三方库存在已知安全漏洞，建议尽快更新</div>
+                                    <div class="vulnerability-meta">
+                                        <span class="meta-tag">CVSS评分: 8.5</span>
+                                        <span class="meta-tag">影响范围: 全部服务</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-primary">立即修复</button>
+                            </div>
+                            <div class="vulnerability-item">
+                                <div class="vulnerability-severity medium">中危</div>
+                                <div class="vulnerability-content">
+                                    <div class="vulnerability-title">弱密码策略</div>
+                                    <div class="vulnerability-desc">当前密码策略不够严格，建议加强密码复杂度要求</div>
+                                    <div class="vulnerability-meta">
+                                        <span class="meta-tag">CVSS评分: 6.2</span>
+                                        <span class="meta-tag">影响范围: 用户认证</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-primary">立即修复</button>
+                            </div>
+                            <div class="vulnerability-item">
+                                <div class="vulnerability-severity low">低危</div>
+                                <div class="vulnerability-content">
+                                    <div class="vulnerability-title">日志记录不完整</div>
+                                    <div class="vulnerability-desc">部分敏感操作未记录详细日志，建议完善日志记录</div>
+                                    <div class="vulnerability-meta">
+                                        <span class="meta-tag">CVSS评分: 3.1</span>
+                                        <span class="meta-tag">影响范围: 审计日志</span>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-primary">立即修复</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">💡 安全建议</h3>
+                        <div class="card-subtitle">提升系统安全性的建议</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="security-tips-grid">
+                            <div class="security-tip">
+                                <div class="tip-icon">🔒</div>
+                                <div class="tip-content">
+                                    <div class="tip-title">定期更新系统和依赖</div>
+                                    <div class="tip-desc">确保系统和第三方库始终保持最新版本，修复已知安全漏洞</div>
+                                </div>
+                            </div>
+                            <div class="security-tip">
+                                <div class="tip-icon">📱</div>
+                                <div class="tip-content">
+                                    <div class="tip-title">启用多因素认证</div>
+                                    <div class="tip-desc">为所有管理员账号启用多因素认证，提高账号安全性</div>
+                                </div>
+                            </div>
+                            <div class="security-tip">
+                                <div class="tip-icon">📊</div>
+                                <div class="tip-content">
+                                    <div class="tip-title">定期进行安全审计</div>
+                                    <div class="tip-desc">每季度进行一次全面的安全审计，发现并修复潜在安全问题</div>
+                                </div>
+                            </div>
+                            <div class="security-tip">
+                                <div class="tip-icon">🚨</div>
+                                <div class="tip-content">
+                                    <div class="tip-title">设置安全告警</div>
+                                    <div class="tip-desc">配置实时安全告警，及时发现并响应安全事件</div>
+                                </div>
+                            </div>
+                            <div class="security-tip">
+                                <div class="tip-icon">👥</div>
+                                <div class="tip-content">
+                                    <div class="tip-title">员工安全培训</div>
+                                    <div class="tip-desc">定期组织员工进行安全培训，提高安全意识</div>
+                                </div>
+                            </div>
+                            <div class="security-tip">
+                                <div class="tip-icon">📝</div>
+                                <div class="tip-content">
+                                    <div class="tip-title">完善安全策略</div>
+                                    <div class="tip-desc">制定并完善安全策略，明确安全责任和流程</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .log-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            gap: var(--spacing-md);
+        }
+        
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        .log-controls .form-select {
+            min-width: 150px;
+        }
+        
+        @media (max-width: 768px) {
+            .log-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+        }
+        
+        /* 安全评分圆环样式 */
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+        }
+        
+        /* 悬停动画效果 */
+        .stat-card,
+        .security-item,
+        .compliance-item {
+            transition: all var(--transition-normal);
+        }
+        
+        /* 图表网格样式 */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+        }
+        
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 图表容器样式 */
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* 安全漏洞列表样式 */
+        .vulnerabilities-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .vulnerability-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius-md);
+            transition: all var(--transition-normal);
+        }
+        
+        .vulnerability-item:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .vulnerability-severity {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            min-width: 60px;
+            text-align: center;
+            margin-top: 4px;
+        }
+        
+        .vulnerability-severity.high {
+            background: var(--danger-color);
+        }
+        
+        .vulnerability-severity.medium {
+            background: var(--warning-color);
+        }
+        
+        .vulnerability-severity.low {
+            background: var(--info-color);
+        }
+        
+        .vulnerability-content {
+            flex: 1;
+        }
+        
+        .vulnerability-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .vulnerability-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .vulnerability-meta {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .meta-tag {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            padding: 2px 8px;
+            background: var(--bg-light);
+            border-radius: 12px;
+        }
+        
+        /* 安全建议样式 */
+        .security-tips-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+        }
+        
+        .security-tip {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius-md);
+            transition: all var(--transition-normal);
+        }
+        
+        .security-tip:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .tip-icon {
+            font-size: 24px;
+            margin-top: 2px;
+        }
+        
+        .tip-content {
+            flex: 1;
+        }
+        
+        .tip-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .tip-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .security-tips-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .security-tips-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .vulnerability-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .vulnerability-item .btn {
+                align-self: flex-start;
+            }
+        }
+    </style>
+    <script>
+        // 用于存储安全日志数据
+        let securityLogs = [
+            { time: '2025-01-15 14:32:15', type: 'security', desc: '检测到异常登录尝试', status: 'warning', ip: '192.168.1.105' },
+            { time: '2025-01-15 14:30:22', type: 'info', desc: '系统自动备份完成', status: 'success', ip: '系统' },
+            { time: '2025-01-15 14:28:45', type: 'warning', desc: 'API请求频率接近限制', status: 'info', ip: '192.168.1.88' },
+            { time: '2025-01-15 14:25:10', type: 'info', desc: '用户密码强度提升', status: 'success', ip: '用户 139****2233' },
+            { time: '2025-01-15 14:20:33', type: 'security', desc: '检测到可疑SQL注入', status: 'success', ip: '10.0.0.55' }
+        ];
+
+        // 用于存储图表实例
+        let charts = {};
+
+        // 根据日期范围生成不同的数据
+        function generateSecurityData(range) {
+            let data = {
+                score: 92,
+                stats: {
+                    requests: 1234567,
+                    availability: 99.99,
+                    blocked: 12,
+                    alerts: 2
+                },
+                logs: securityLogs,
+                charts: {
+                    eventsTrend: {
+                        labels: ['1月10日', '1月11日', '1月12日', '1月13日', '1月14日', '1月15日', '1月16日'],
+                        datasets: [
+                            {
+                                label: '安全事件',
+                                data: [8, 12, 9, 15, 11, 12, 10],
+                                backgroundColor: '#667eea',
+                                borderRadius: 8
+                            },
+                            {
+                                label: '系统事件',
+                                data: [25, 32, 28, 35, 31, 29, 33],
+                                backgroundColor: '#48bb78',
+                                borderRadius: 8
+                            },
+                            {
+                                label: '警告事件',
+                                data: [5, 8, 6, 10, 7, 8, 6],
+                                backgroundColor: '#ed8936',
+                                borderRadius: 8
+                            }
+                        ]
+                    },
+                    eventsDistribution: {
+                        labels: ['异常登录', 'SQL注入', 'XSS攻击', 'API滥用', '系统异常', '其他'],
+                        datasets: [
+                            {
+                                data: [45, 25, 15, 10, 3, 2],
+                                backgroundColor: [
+                                    '#667eea',
+                                    '#48bb78',
+                                    '#ed8936',
+                                    '#f56565',
+                                    '#9f7aea',
+                                    '#4299e1'
+                                ]
+                            }
+                        ]
+                    }
+                }
+            };
+
+            // 根据不同的日期范围调整数据
+            switch(range) {
+                case '实时':
+                    data.score = 93;
+                    data.stats = {
+                        requests: 123456,
+                        availability: 99.99,
+                        blocked: 2,
+                        alerts: 0
+                    };
+                    data.charts.eventsTrend.datasets.forEach(dataset => {
+                        dataset.data = dataset.data.map(() => Math.floor(Math.random() * 5));
+                    });
+                    break;
+                case '今日':
+                    // 使用默认数据
+                    break;
+                case '本周':
+                    data.score = 91;
+                    data.stats = {
+                        requests: 8641969,
+                        availability: 99.98,
+                        blocked: 85,
+                        alerts: 12
+                    };
+                    data.charts.eventsTrend = {
+                        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                        datasets: [
+                            {
+                                label: '安全事件',
+                                data: [45, 52, 48, 65, 58, 32, 28],
+                                backgroundColor: '#667eea',
+                                borderRadius: 8
+                            },
+                            {
+                                label: '系统事件',
+                                data: [125, 132, 128, 145, 138, 95, 88],
+                                backgroundColor: '#48bb78',
+                                borderRadius: 8
+                            },
+                            {
+                                label: '警告事件',
+                                data: [25, 32, 28, 45, 38, 18, 15],
+                                backgroundColor: '#ed8936',
+                                borderRadius: 8
+                            }
+                        ]
+                    };
+                    break;
+                case '本月':
+                    data.score = 90;
+                    data.stats = {
+                        requests: 37215678,
+                        availability: 99.97,
+                        blocked: 378,
+                        alerts: 45
+                    };
+                    data.charts.eventsTrend = {
+                        labels: ['第1周', '第2周', '第3周', '第4周'],
+                        datasets: [
+                            {
+                                label: '安全事件',
+                                data: [185, 202, 195, 210],
+                                backgroundColor: '#667eea',
+                                borderRadius: 8
+                            },
+                            {
+                                label: '系统事件',
+                                data: [525, 552, 538, 565],
+                                backgroundColor: '#48bb78',
+                                borderRadius: 8
+                            },
+                            {
+                                label: '警告事件',
+                                data: [95, 112, 105, 120],
+                                backgroundColor: '#ed8936',
+                                borderRadius: 8
+                            }
+                        ]
+                    };
+                    break;
+            }
+
+            return data;
+        }
+
+        // 更新安全评分
+        function updateSecurityScore(score) {
+            const scoreCircle = document.querySelector('.score-circle');
+            if (scoreCircle) {
+                scoreCircle.textContent = score;
+            }
+        }
+
+        // 更新统计卡片
+        function updateStatsCards(data) {
+            const stats = data.stats;
+            const statCards = document.querySelectorAll('.stat-card .stat-value');
+            
+            if (statCards[0]) {
+                statCards[0].textContent = stats.requests.toLocaleString();
+            }
+            if (statCards[1]) {
+                statCards[1].textContent = `${stats.availability}%`;
+            }
+            if (statCards[2]) {
+                statCards[2].textContent = stats.blocked;
+            }
+            if (statCards[3]) {
+                statCards[3].textContent = stats.alerts;
+            }
+        }
+
+        // 更新图表
+        function updateCharts(data) {
+            // 更新安全事件趋势图
+            const eventsTrendCtx = document.getElementById('securityEventsChart');
+            if (eventsTrendCtx) {
+                // 销毁现有图表实例
+                if (charts.eventsTrend) {
+                    charts.eventsTrend.destroy();
+                }
+                
+                charts.eventsTrend = new Chart(eventsTrendCtx, {
+                    type: 'bar',
+                    data: data.charts.eventsTrend,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 更新安全事件分布饼图
+            const eventsPieCtx = document.getElementById('securityEventsPieChart');
+            if (eventsPieCtx) {
+                // 销毁现有图表实例
+                if (charts.eventsDistribution) {
+                    charts.eventsDistribution.destroy();
+                }
+                
+                charts.eventsDistribution = new Chart(eventsPieCtx, {
+                    type: 'pie',
+                    data: data.charts.eventsDistribution,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 过滤安全日志
+        function filterSecurityLogs() {
+            const logs = window.currentLogs || [];
+            const searchTerm = document.getElementById('logSearch').value.toLowerCase();
+            const typeFilter = document.getElementById('logTypeFilter').value;
+            const statusFilter = document.getElementById('logStatusFilter').value;
+            
+            return logs.filter(log => {
+                // 搜索关键词过滤
+                const matchesSearch = !searchTerm || 
+                    log.time.toLowerCase().includes(searchTerm) || 
+                    log.desc.toLowerCase().includes(searchTerm) || 
+                    log.ip.toLowerCase().includes(searchTerm);
+                
+                // 类型过滤
+                const matchesType = !typeFilter || log.type === typeFilter;
+                
+                // 状态过滤
+                const matchesStatus = !statusFilter || log.status === statusFilter;
+                
+                return matchesSearch && matchesType && matchesStatus;
+            });
+        }
+
+        // 更新安全日志
+        function updateSecurityLogs() {
+            // 应用筛选条件
+            const filteredLogs = filterSecurityLogs();
+            
+            const tbody = document.querySelector('.table-container tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                filteredLogs.forEach(log => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${log.time}</td>
+                        <td><span class="log-type ${log.type}">${log.type === 'security' ? '🔒 安全' : log.type === 'info' ? 'ℹ️ 系统' : '⚠️ 警告'}</span></td>
+                        <td>${log.desc}</td>
+                        <td><span class="status-badge ${log.status}">${log.status === 'success' ? '成功' : log.status === 'warning' ? '已处理' : '监控中'}</span></td>
+                        <td>${log.ip}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        // 根据日期范围更新所有数据
+        function updateDataByRange(range) {
+            // 显示加载状态
+            document.body.style.cursor = 'wait';
+            
+            // 生成新数据
+            const data = generateSecurityData(range);
+            
+            // 更新安全评分
+            updateSecurityScore(data.score);
+            
+            // 更新统计卡片
+            updateStatsCards(data);
+            
+            // 更新图表
+            updateCharts(data);
+            
+            // 保存当前日志数据，用于搜索和筛选
+            window.currentLogs = data.logs;
+            
+            // 更新安全日志
+            updateSecurityLogs();
+            
+            // 恢复正常状态
+            document.body.style.cursor = 'default';
+        }
+
+        // 实现安全扫描功能
+        function runSecurityScan() {
+            const scanBtn = document.querySelector('.btn-primary');
+            if (scanBtn) {
+                const originalText = scanBtn.innerHTML;
+                scanBtn.innerHTML = '<span>⏳</span><span>扫描中...</span>';
+                scanBtn.disabled = true;
+                
+                // 模拟扫描过程
+                setTimeout(() => {
+                    scanBtn.innerHTML = '<span>✅</span><span>扫描完成</span>';
+                    setTimeout(() => {
+                        scanBtn.innerHTML = originalText;
+                        scanBtn.disabled = false;
+                        
+                        // 显示扫描结果
+                        alert('安全扫描完成，未发现高危风险！');
+                    }, 1500);
+                }, 3000);
+            }
+        }
+
+        // 生成安全报告
+        function generateSecurityReport() {
+            // 获取当前日期范围
+            const range = document.querySelector('.date-range select').value;
+            const data = generateSecurityData(range);
+            
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            
+            // 创建统计数据工作表
+            const statsData = [
+                ['指标', '值'],
+                ['安全评分', data.score],
+                ['请求数', data.stats.requests],
+                ['系统可用性', `${data.stats.availability}%`],
+                ['拦截次数', data.stats.blocked],
+                ['待处理告警', data.stats.alerts]
+            ];
+            const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
+            XLSX.utils.book_append_sheet(wb, statsSheet, '安全统计');
+            
+            // 创建安全日志工作表
+            const logsData = [
+                ['时间', '类型', '事件描述', '状态', '来源IP']
+            ];
+            data.logs.forEach(log => {
+                logsData.push([log.time, log.type, log.desc, log.status, log.ip]);
+            });
+            const logsSheet = XLSX.utils.aoa_to_sheet(logsData);
+            XLSX.utils.book_append_sheet(wb, logsSheet, '安全日志');
+            
+            // 导出为Excel文件
+            const fileName = `安全报告_${new Date().toISOString().slice(0, 10)}_${range}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+
+        // 安全设置功能
+        function openSecuritySettings() {
+            alert('安全设置功能将在后续版本中实现！');
+        }
+
+        // 初始化事件监听器
+        function initEventListeners() {
+            // 日期范围选择事件
+            const dateRangeSelect = document.querySelector('.date-range select');
+            dateRangeSelect.addEventListener('change', function() {
+                const range = this.value;
+                updateDataByRange(range);
+            });
+            
+            // 安全扫描事件
+            const scanBtn = document.querySelector('.btn-primary');
+            scanBtn.addEventListener('click', runSecurityScan);
+            
+            // 生成报告事件
+            const generateReportBtn = document.querySelector('.btn-white');
+            generateReportBtn.addEventListener('click', generateSecurityReport);
+            
+            // 安全设置事件
+            const securitySettingsBtn = document.querySelector('.btn-outline-white');
+            securitySettingsBtn.addEventListener('click', openSecuritySettings);
+            
+            // 悬停效果
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                    this.style.boxShadow = 'var(--shadow-lg)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'var(--shadow)';
+                });
+            });
+            
+            // 安全项目悬停效果
+            const securityItems = document.querySelectorAll('.security-item');
+            securityItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = 'var(--shadow-md)';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'var(--shadow)';
+                });
+            });
+            
+            // 合规项目悬停效果
+            const complianceItems = document.querySelectorAll('.compliance-item');
+            complianceItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'var(--bg-tertiary)';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = 'transparent';
+                });
+            });
+            
+            // 日志搜索和筛选事件
+            const logSearch = document.getElementById('logSearch');
+            const logTypeFilter = document.getElementById('logTypeFilter');
+            const logStatusFilter = document.getElementById('logStatusFilter');
+            
+            function handleLogFilterChange() {
+                updateSecurityLogs();
+            }
+            
+            logSearch.addEventListener('input', handleLogFilterChange);
+            logTypeFilter.addEventListener('change', handleLogFilterChange);
+            logStatusFilter.addEventListener('change', handleLogFilterChange);
+            
+            // 分页按钮事件
+            const paginationButtons = document.querySelectorAll('.pagination-buttons button');
+            paginationButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    console.log('分页按钮点击:', this.textContent);
+                    // 这里可以添加分页逻辑
+                });
+            });
+            
+            // 保存当前日志数据，用于搜索和筛选
+            window.currentLogs = securityLogs;
+        }
+
+        // 初始化页面
+        function initPage() {
+            // 获取初始日期范围
+            const initialRange = document.querySelector('.date-range select').value;
+            
+            // 初始数据更新
+            updateDataByRange(initialRange);
+            
+            // 初始化事件监听器
+            initEventListeners();
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

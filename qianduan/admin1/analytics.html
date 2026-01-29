@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据分析 - 灵境管理后台</title>  
+    <link rel="stylesheet" href="common.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon"></div>
+                    <div>
+                        <div class="sidebar-logo-text">灵境管理</div>
+                        <div class="sidebar-logo-sub">Admin Console</div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <div class="nav-section">
+                    <div class="nav-section-title">主要功能</div>
+                    <a href="dashboard.html" class="nav-item">
+                        <span class="nav-item-icon">📊</span>
+                        <span class="nav-item-text">数据看板</span>
+                    </a>
+                    <a href="users.html" class="nav-item">
+                        <span class="nav-item-icon">👥</span>
+                        <span class="nav-item-text">用户管理</span>
+                    </a>
+                    <a href="analytics.html" class="nav-item active">
+                        <span class="nav-item-icon">📈</span>
+                        <span class="nav-item-text">数据分析</span>
+                    </a>
+                    <a href="membership.html" class="nav-item">
+                        <span class="nav-item-icon">💎</span>
+                        <span class="nav-item-text">会员分析</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">系统管理</div>
+                    <a href="security.html" class="nav-item">
+                        <span class="nav-item-icon">🔒</span>
+                        <span class="nav-item-text">安全管理</span>
+                    </a>
+                    <a href="settings.html" class="nav-item">
+                        <span class="nav-item-icon">⚙️</span>
+                        <span class="nav-item-text">系统设置</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <span class="nav-item-icon">🚪</span>
+                        <span class="nav-item-text">退出登录</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div>
+                    <h1 class="header-title">数据分析</h1>
+                    <p class="header-subtitle">平台功能使用数据与用户行为分析</p>
+                </div>
+                <div class="header-actions">
+                    <div class="date-range">
+                        <select class="form-select">
+                            <option value="7">最近7天</option>
+                            <option value="30" selected>最近30天</option>
+                            <option value="90">最近90天</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        <span>📥</span>
+                        <span>导出报表</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="stats-grid" style="margin-bottom: var(--spacing-lg);">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon users">👁️</div>
+                        <span class="stat-trend up">↑ 15.3%</span>
+                    </div>
+                    <div class="stat-value">1,234,567</div>
+                    <div class="stat-label">总访问量</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon revenue">🔥</div>
+                        <span class="stat-trend up">↑ 8.7%</span>
+                    </div>
+                    <div class="stat-value">45,892</div>
+                    <div class="stat-label">日活跃用户</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon active">⏱️</div>
+                        <span class="stat-trend up">↑ 12.2%</span>
+                    </div>
+                    <div class="stat-value">8.5分钟</div>
+                    <div class="stat-label">平均使用时长</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon conversion">📊</div>
+                        <span class="stat-trend down">↓ 1.2%</span>
+                    </div>
+                    <div class="stat-value">23.4%</div>
+                    <div class="stat-label">次日留存率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon users">✅</div>
+                        <span class="stat-trend up">↑ 3.5%</span>
+                    </div>
+                    <div class="stat-value">89.2%</div>
+                    <div class="stat-label">功能完成率</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: var(--spacing-lg);">
+                <div class="card-header">
+                    <h3 class="card-title">功能使用热力图</h3>
+                    <div class="card-subtitle">各核心模块每日使用频率分布</div>
+                </div>
+                <div class="card-body">
+                    <div class="heatmap-container">
+                        <div class="heatmap-grid" id="heatmapGrid"></div>
+                        <div class="heatmap-legend">
+                            <span>低</span>
+                            <div class="heatmap-legend-cell" style="background: var(--bg-tertiary);"></div>
+                            <div class="heatmap-legend-cell" style="background: rgba(102, 126, 234, 0.25);"></div>
+                            <div class="heatmap-legend-cell" style="background: rgba(102, 126, 234, 0.5);"></div>
+                            <div class="heatmap-legend-cell" style="background: rgba(102, 126, 234, 0.75);"></div>
+                            <div class="heatmap-legend-cell" style="background: var(--primary-color);"></div>
+                            <span>高</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-lg); margin-bottom: var(--spacing-lg);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">功能使用趋势</h3>
+                        <div class="card-subtitle">各核心模块使用次数</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="usageTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">用户活跃度分布</h3>
+                        <div class="card-subtitle">不同活跃程度用户占比</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="activityDistChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: var(--spacing-lg);">
+                <div class="card-header">
+                    <h3 class="card-title">内容生态分析</h3>
+                    <div class="card-subtitle">社区帖子与互动趋势</div>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                        <div style="text-align: center; padding: var(--spacing-md); background: var(--bg-tertiary); border-radius: var(--border-radius-md);">
+                            <div style="font-size: 24px; font-weight: 600; color: var(--text-primary);">2,847</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">今日发帖量</div>
+                        </div>
+                        <div style="text-align: center; padding: var(--spacing-md); background: var(--bg-tertiary); border-radius: var(--border-radius-md);">
+                            <div style="font-size: 24px; font-weight: 600; color: var(--text-primary);">12,456</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">今日互动量</div>
+                        </div>
+                        <div style="text-align: center; padding: var(--spacing-md); background: var(--bg-tertiary); border-radius: var(--border-radius-md);">
+                            <div style="font-size: 24px; font-weight: 600; color: var(--text-primary);">89.3%</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">互动率</div>
+                        </div>
+                        <div style="text-align: center; padding: var(--spacing-md); background: var(--bg-tertiary); border-radius: var(--border-radius-md);">
+                            <div style="font-size: 24px; font-weight: 600; color: var(--text-primary);">4.8</div>
+                            <div style="font-size: 13px; color: var(--text-secondary);">平均评分</div>
+                        </div>
+                    </div>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="contentTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-lg);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">热门话题标签</h3>
+                        <div class="card-subtitle">用户关注度排行</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="rank-list">
+                            <div class="rank-item">
+                                <div class="rank-number top1">1</div>
+                                <div class="rank-content">
+                                    <div class="rank-name">#健康饮食</div>
+                                    <div class="rank-meta">12,456 次讨论 · 89.2万 阅读</div>
+                                </div>
+                                <div class="rank-value">+15.3%</div>
+                            </div>
+                            <div class="rank-item">
+                                <div class="rank-number top2">2</div>
+                                <div class="rank-content">
+                                    <div class="rank-name">#睡眠改善</div>
+                                    <div class="rank-meta">10,234 次讨论 · 76.5万 阅读</div>
+                                </div>
+                                <div class="rank-value">+12.8%</div>
+                            </div>
+                            <div class="rank-item">
+                                <div class="rank-number top3">3</div>
+                                <div class="rank-content">
+                                    <div class="rank-name">#运动健身</div>
+                                    <div class="rank-meta">9,876 次讨论 · 65.3万 阅读</div>
+                                </div>
+                                <div class="rank-value">+9.4%</div>
+                            </div>
+                            <div class="rank-item">
+                                <div class="rank-number">4</div>
+                                <div class="rank-content">
+                                    <div class="rank-name">#心理健康</div>
+                                    <div class="rank-meta">8,765 次讨论 · 54.2万 阅读</div>
+                                </div>
+                                <div class="rank-value">+8.1%</div>
+                            </div>
+                            <div class="rank-item">
+                                <div class="rank-number">5</div>
+                                <div class="rank-content">
+                                    <div class="rank-name">#体质调理</div>
+                                    <div class="rank-meta">7,654 次讨论 · 43.1万 阅读</div>
+                                </div>
+                                <div class="rank-value">+6.7%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">AI对话分析</h3>
+                        <div class="card-subtitle">智能助手使用情况</div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-lg);">
+                            <div style="padding: var(--spacing-md); background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border-radius: var(--border-radius-md); text-align: center;">
+                                <div style="font-size: 28px; font-weight: 600; color: var(--primary-color);">156,789</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">总对话次数</div>
+                            </div>
+                            <div style="padding: var(--spacing-md); background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)); border-radius: var(--border-radius-md); text-align: center;">
+                                <div style="font-size: 28px; font-weight: 600; color: var(--primary-color);">8.5分钟</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">平均会话时长</div>
+                            </div>
+                        </div>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="aiChatChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .heatmap-container {
+            overflow-x: auto;
+        }
+        
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: 100px repeat(7, 1fr);
+            gap: 4px;
+            min-width: 600px;
+        }
+        
+        .heatmap-header {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: var(--spacing-sm);
+        }
+        
+        .heatmap-row-label {
+            font-size: 13px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            padding-right: var(--spacing-sm);
+            font-weight: 500;
+        }
+        
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            min-height: 40px;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+        }
+        
+        .heatmap-cell.level-0 { background: var(--bg-tertiary); }
+        .heatmap-cell.level-1 { background: rgba(102, 126, 234, 0.2); }
+        .heatmap-cell.level-2 { background: rgba(102, 126, 234, 0.4); }
+        .heatmap-cell.level-3 { background: rgba(102, 126, 234, 0.6); }
+        .heatmap-cell.level-4 { background: rgba(102, 126, 234, 0.8); }
+        .heatmap-cell.level-5 { background: var(--primary-color); }
+        
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: var(--spacing-md);
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .heatmap-legend-cell {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+        
+        .rank-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .rank-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius-md);
+            transition: all var(--transition-normal);
+        }
+        
+        .rank-item:hover {
+            background: var(--border-color);
+            transform: translateX(4px);
+        }
+        
+        .rank-number {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius-full);
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        .rank-number.top1 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+        }
+        
+        .rank-number.top2 {
+            background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+            color: white;
+        }
+        
+        .rank-number.top3 {
+            background: linear-gradient(135deg, #CD7F32, #8B4513);
+            color: white;
+        }
+        
+        .rank-content {
+            flex: 1;
+        }
+        
+        .rank-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        
+        .rank-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+        
+        .rank-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--success-color);
+        }
+    </style>
+
+    <script>
+        const modules = ['命理分析', '健康评估', '饮食推荐', '健康规划'];
+        const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+        
+        function generateHeatmapData() {
+            const data = [];
+            for (let i = 0; i < modules.length; i++) {
+                const row = [];
+                for (let j = 0; j < 7; j++) {
+                    row.push(Math.floor(Math.random() * 6));
+                }
+                data.push(row);
+            }
+            return data;
+        }
+        
+        function renderHeatmap() {
+            const grid = document.getElementById('heatmapGrid');
+            const data = generateHeatmapData();
+            
+            let html = '<div class="heatmap-header"></div>';
+            days.forEach(day => {
+                html += `<div class="heatmap-header">${day}</div>`;
+            });
+            
+            for (let i = 0; i < modules.length; i++) {
+                html += `<div class="heatmap-row-label">${modules[i]}</div>`;
+                for (let j = 0; j < 7; j++) {
+                    html += `<div class="heatmap-cell level-${data[i][j]}" title="${modules[i]} - ${days[j]}: ${data[i][j] * 20}%"></div>`;
+                }
+            }
+            
+            grid.innerHTML = html;
+        }
+        
+        function initCharts() {
+            const usageTrendCtx = document.getElementById('usageTrendChart');
+            if (usageTrendCtx) {
+                new Chart(usageTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                        datasets: [
+                            {
+                                label: '命理分析',
+                                data: [1200, 1350, 1280, 1420, 1380, 1560, 1490],
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: '健康评估',
+                                data: [980, 1120, 1050, 1180, 1220, 1340, 1280],
+                                borderColor: '#764ba2',
+                                backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: '饮食推荐',
+                                data: [850, 920, 890, 980, 1050, 1120, 1080],
+                                borderColor: '#f093fb',
+                                backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: '健康规划',
+                                data: [650, 720, 780, 820, 890, 950, 920],
+                                borderColor: '#48bb78',
+                                backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const activityDistCtx = document.getElementById('activityDistChart');
+            if (activityDistCtx) {
+                new Chart(activityDistCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['高活跃', '中活跃', '低活跃', '流失用户'],
+                        datasets: [{
+                            data: [25, 35, 28, 12],
+                            backgroundColor: [
+                                '#667eea',
+                                '#48bb78',
+                                '#ed8936',
+                                '#e2e8f0'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            }
+                        },
+                        cutout: '65%'
+                    }
+                });
+            }
+            
+            const contentTrendCtx = document.getElementById('contentTrendChart');
+            if (contentTrendCtx) {
+                new Chart(contentTrendCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['第一周', '第二周', '第三周', '第四周'],
+                        datasets: [
+                            {
+                                label: '发帖量',
+                                data: [18234, 19876, 21543, 22345],
+                                backgroundColor: '#667eea',
+                                borderRadius: 8
+                            },
+                            {
+                                label: '互动量',
+                                data: [45678, 52341, 58976, 62345],
+                                backgroundColor: '#48bb78',
+                                borderRadius: 8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const aiChatCtx = document.getElementById('aiChatChart');
+            if (aiChatCtx) {
+                new Chart(aiChatCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['命理', '健康', '饮食', '规划', '其他'],
+                        datasets: [{
+                            label: '对话次数',
+                            data: [45678, 38901, 32134, 25678, 12398],
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(118, 75, 162, 0.8)',
+                                'rgba(240, 147, 251, 0.8)',
+                                'rgba(72, 187, 120, 0.8)',
+                                'rgba(237, 137, 54, 0.8)'
+                            ],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function refreshData() {
+            renderHeatmap();
+            initCharts();
+        }
+        
+        // 当前选择的日期范围
+        let currentDateRange = 30;
+        
+        // 根据日期范围生成不同的数据
+        function generateDataByDateRange(range) {
+            // 基础数据
+            const baseData = {
+                usageTrend: {
+                    '7': {
+                        labels: ['1日', '2日', '3日', '4日', '5日', '6日', '7日'],
+                        datasets: [
+                            { label: '命理分析', data: [1200, 1350, 1280, 1420, 1380, 1560, 1490] },
+                            { label: '健康评估', data: [980, 1120, 1050, 1180, 1220, 1340, 1280] },
+                            { label: '饮食推荐', data: [850, 920, 890, 980, 1050, 1120, 1080] },
+                            { label: '健康规划', data: [650, 720, 780, 820, 890, 950, 920] }
+                        ]
+                    },
+                    '30': {
+                        labels: ['第一周', '第二周', '第三周', '第四周'],
+                        datasets: [
+                            { label: '命理分析', data: [8500, 9200, 9800, 10500] },
+                            { label: '健康评估', data: [6800, 7500, 8200, 8900] },
+                            { label: '饮食推荐', data: [5200, 5800, 6400, 7100] },
+                            { label: '健康规划', data: [3800, 4200, 4700, 5300] }
+                        ]
+                    },
+                    '90': {
+                        labels: ['第1月', '第2月', '第3月'],
+                        datasets: [
+                            { label: '命理分析', data: [32000, 35000, 38000] },
+                            { label: '健康评估', data: [25000, 28000, 31000] },
+                            { label: '饮食推荐', data: [18000, 21000, 24000] },
+                            { label: '健康规划', data: [12000, 15000, 18000] }
+                        ]
+                    }
+                },
+                contentTrend: {
+                    '7': {
+                        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                        datasets: [
+                            { label: '发帖量', data: [1234, 1356, 1456, 1398, 1567, 1789, 1654] },
+                            { label: '互动量', data: [5678, 6789, 7890, 7234, 8765, 9876, 9234] }
+                        ]
+                    },
+                    '30': {
+                        labels: ['第一周', '第二周', '第三周', '第四周'],
+                        datasets: [
+                            { label: '发帖量', data: [8234, 8976, 9543, 10345] },
+                            { label: '互动量', data: [45678, 52341, 58976, 62345] }
+                        ]
+                    },
+                    '90': {
+                        labels: ['第1月', '第2月', '第3月'],
+                        datasets: [
+                            { label: '发帖量', data: [32876, 35987, 38765] },
+                            { label: '互动量', data: [185678, 202341, 218976] }
+                        ]
+                    }
+                },
+                aiChat: {
+                    '7': {
+                        labels: ['命理', '健康', '饮食', '规划', '其他'],
+                        datasets: [{ data: [12345, 10987, 9876, 8765, 7654] }]
+                    },
+                    '30': {
+                        labels: ['命理', '健康', '饮食', '规划', '其他'],
+                        datasets: [{ data: [45678, 38901, 32134, 25678, 19876] }]
+                    },
+                    '90': {
+                        labels: ['命理', '健康', '饮食', '规划', '其他'],
+                        datasets: [{ data: [135678, 118901, 98765, 78901, 59876] }]
+                    }
+                }
+            };
+            
+            return baseData;
+        }
+
+        // 更新图表
+        function updateCharts() {
+            // 销毁所有现有图表
+            Chart.helpers.each(Chart.instances, function(instance) {
+                instance.destroy();
+            });
+            
+            // 重新初始化图表
+            initCharts();
+        }
+
+        // 重新初始化图表函数
+        function initCharts() {
+            const data = generateDataByDateRange(currentDateRange);
+            
+            const usageTrendCtx = document.getElementById('usageTrendChart');
+            if (usageTrendCtx) {
+                new Chart(usageTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.usageTrend[currentDateRange].labels,
+                        datasets: data.usageTrend[currentDateRange].datasets.map(dataset => ({
+                            label: dataset.label,
+                            data: dataset.data,
+                            borderColor: `hsl(${Math.random() * 360}, 70%, 60%)`,
+                            backgroundColor: `hsla(${Math.random() * 360}, 70%, 60%, 0.1)`,
+                            tension: 0.4,
+                            fill: true
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                        }
+                    }
+                });
+            }
+            
+            const activityDistCtx = document.getElementById('activityDistChart');
+            if (activityDistCtx) {
+                new Chart(activityDistCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['高活跃', '中活跃', '低活跃', '流失用户'],
+                        datasets: [{
+                            data: [25, 35, 28, 12],
+                            backgroundColor: [
+                                '#667eea',
+                                '#48bb78',
+                                '#ed8936',
+                                '#e2e8f0'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        return `${label}: ${value}%`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '65%'
+                    }
+                });
+            }
+            
+            const contentTrendCtx = document.getElementById('contentTrendChart');
+            if (contentTrendCtx) {
+                new Chart(contentTrendCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.contentTrend[currentDateRange].labels,
+                        datasets: data.contentTrend[currentDateRange].datasets.map((dataset, index) => ({
+                            label: dataset.label,
+                            data: dataset.data,
+                            backgroundColor: index === 0 ? '#667eea' : '#48bb78',
+                            borderRadius: 8
+                        }))
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            const aiChatCtx = document.getElementById('aiChatChart');
+            if (aiChatCtx) {
+                new Chart(aiChatCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.aiChat[currentDateRange].labels,
+                        datasets: [{
+                            label: '对话次数',
+                            data: data.aiChat[currentDateRange].datasets[0].data,
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(118, 75, 162, 0.8)',
+                                'rgba(240, 147, 251, 0.8)',
+                                'rgba(72, 187, 120, 0.8)',
+                                'rgba(237, 137, 54, 0.8)'
+                            ],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 导出数据功能
+        function exportData() {
+            // 显示导出进度
+            const exportBtn = event.target;
+            const originalText = exportBtn.innerHTML;
+            exportBtn.innerHTML = '<span>⏳</span><span>导出中...</span>';
+            exportBtn.disabled = true;
+            
+            // 准备导出数据
+            const data = generateDataByDateRange(currentDateRange);
+            
+            // 创建工作簿
+            const workbook = XLSX.utils.book_new();
+            
+            // 功能使用趋势数据
+            const usageTrendData = data.usageTrend[currentDateRange];
+            const usageTrendSheetData = [
+                ['日期范围', `${currentDateRange}天`],
+                [''],
+                ['功能使用趋势'],
+                ['日期', ...usageTrendData.datasets.map(d => d.label)]
+            ];
+            
+            usageTrendData.labels.forEach((label, index) => {
+                const row = [label];
+                usageTrendData.datasets.forEach(dataset => {
+                    row.push(dataset.data[index]);
+                });
+                usageTrendSheetData.push(row);
+            });
+            
+            const usageTrendSheet = XLSX.utils.aoa_to_sheet(usageTrendSheetData);
+            XLSX.utils.book_append_sheet(workbook, usageTrendSheet, '功能使用趋势');
+            
+            // 内容生态数据
+            const contentTrendData = data.contentTrend[currentDateRange];
+            const contentTrendSheetData = [
+                ['内容生态分析'],
+                ['日期', ...contentTrendData.datasets.map(d => d.label)]
+            ];
+            
+            contentTrendData.labels.forEach((label, index) => {
+                const row = [label];
+                contentTrendData.datasets.forEach(dataset => {
+                    row.push(dataset.data[index]);
+                });
+                contentTrendSheetData.push(row);
+            });
+            
+            const contentTrendSheet = XLSX.utils.aoa_to_sheet(contentTrendSheetData);
+            XLSX.utils.book_append_sheet(workbook, contentTrendSheet, '内容生态分析');
+            
+            // AI对话数据
+            const aiChatData = data.aiChat[currentDateRange];
+            const aiChatSheetData = [
+                ['AI对话分析'],
+                ['类型', '对话次数']
+            ];
+            
+            aiChatData.labels.forEach((label, index) => {
+                aiChatSheetData.push([label, aiChatData.datasets[0].data[index]]);
+            });
+            
+            const aiChatSheet = XLSX.utils.aoa_to_sheet(aiChatSheetData);
+            XLSX.utils.book_append_sheet(workbook, aiChatSheet, 'AI对话分析');
+            
+            // 导出文件
+            setTimeout(() => {
+                XLSX.writeFile(workbook, `数据分析报表_${currentDateRange}天_${new Date().toISOString().slice(0, 10)}.xlsx`);
+                exportBtn.innerHTML = originalText;
+                exportBtn.disabled = false;
+                alert('报表导出成功！');
+            }, 1000);
+        }
+        
+        // 为热力图单元格添加点击事件
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('heatmap-cell')) {
+                const title = e.target.getAttribute('title');
+                if (title) {
+                    alert(title);
+                }
+            }
+        });
+
+        // 为排行榜项添加点击事件
+        document.addEventListener('click', function(e) {
+            const rankItem = e.target.closest('.rank-item');
+            if (rankItem) {
+                const rankName = rankItem.querySelector('.rank-name').textContent;
+                alert(`查看话题 ${rankName} 的详细数据`);
+            }
+        });
+
+        // 添加页面加载动画
+        window.addEventListener('load', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            setTimeout(function() {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // 为统计卡片添加悬停效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.style.transition = 'all var(--transition-normal)';
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = 'var(--shadow-md)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'var(--shadow-sm)';
+                });
+            });
+
+            renderHeatmap();
+            initCharts();
+        });
+
+        // 日期范围选择事件监听
+        document.getElementById('dateRangeSelect').addEventListener('change', function() {
+            currentDateRange = this.value;
+            refreshData();
+        });
+    </script>
+</body>
+</html>
